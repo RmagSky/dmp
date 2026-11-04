@@ -1,0 +1,16 @@
+# 項目本地數據（WorkBuddy 工作區記錄，不入庫）
+.workbuddy/
+
+# 系統與編輯器
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# 臨時文件
+_*.html
+_*.js
+_*.json
+*.log
+*.tmp

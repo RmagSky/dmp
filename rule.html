@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<!--
+  數據中台管理系統 · 產品基線規範
+  原型版本：V1.0.0 ｜ 入口：index.html
+  框架參考：中台商户 SaaS 投注交易平台 · 交互原型 V1.5.5
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="only light">
+<title>產品基線 · 數據中台管理系統 V1.0.0</title>
+<link rel="stylesheet" href="_fonts/outfit.css">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/rule.css">
+<script>
+/* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
+if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
+</script>
+</head>
+<body>
+<div class="proto-shell">
+  <header class="proto-bar">
+    <div class="proto-brand">
+      <span class="dot"></span>
+      <span class="name">數據中台管理系統</span>
+      <small>· 產品基線</small>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.0.0</span>
+    </div>
+    <nav class="proto-nav" style="flex:1"></nav>
+    <div class="proto-actions">
+      <span class="proto-hint">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#86909c" stroke-width="1.7"/><path d="M12 11v5.5M12 7.6v.2" stroke="#86909c" stroke-width="2" stroke-linecap="round"/></svg>
+        規範文檔 · 團隊協作基準
+      </span>
+      <button class="proto-btn" onclick="showVersion()">版本記錄</button>
+    </div>
+  </header>
+  <main class="proto-main" id="proto-main"></main>
+</div>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script src="assets/core.js"></script>
+<script>
+
+/* ==================================================================
+   產品基線 · 規範文檔
+   ================================================================== */
+const state={ specSection:'version' };
+
+const SPEC_NAV=[
+  {group:'基線總覽',items:[
+    {id:'version',n:'1.1',label:'原型版本信息'},
+    {id:'structure',n:'1.2',label:'產品信息結構'},
+    {id:'req',n:'1.3',label:'需求清單表',cnt:'40'}
+  ]},
+  {group:'全局規範',items:[
+    {id:'net',n:'2.1',label:'網絡異常'},
+    {id:'account',n:'2.2',label:'賬戶異常'},
+    {id:'loading',n:'2.3',label:'數據加載'},
+    {id:'empty',n:'2.4',label:'空數據'}
+  ]},
+  {group:'公共說明',items:[
+    {id:'dict',n:'3.1',label:'系統詞典'},
+    {id:'algo',n:'3.2',label:'系統算法'}
+  ]},
+  {group:'組件與規範',items:[
+    {id:'color',n:'4.1',label:'配色'},
+    {id:'type',n:'4.2',label:'字體 / 字號'},
+    {id:'icon',n:'4.3',label:'圖標'},
+    {id:'comp',n:'4.4',label:'常用組件'}
+  ]}
+];
+const REQ_LIST=[
+  ['R-01','事件總覽','6 項核心指標卡（總量/新入庫/待處理/即將結束/已結束/商戶數）','P0'],
+  ['R-02','事件總覽','新增趨勢柱狀圖，近 7 天與近 30 天切換','P0'],
+  ['R-03','事件總覽','類型分布面積圖，可按事件範圍篩選','P1'],
+  ['R-04','事件總覽','來源分布條形圖（polymarket / predict.fun）','P1'],
+  ['R-05','事件總覽','上游交易量 TOP10，支援 24h 交易量口徑','P1'],
+  ['R-06','事件列表','二級分類頁籤條切換，支援左右滾動','P0'],
+  ['R-07','事件列表','七項篩選：關鍵字/範圍/二級分類/標籤/狀態/推送狀態/數據來源','P0'],
+  ['R-08','事件列表','截止時間區間篩選','P1'],
+  ['R-09','事件列表','推送狀態開關，即時切換上架狀態','P0'],
+  ['R-10','事件列表','事件編輯彈窗（名稱/分類/標籤/狀態）','P0'],
+  ['R-11','事件列表','事件詳情彈窗（基本資訊 + 規則）','P0'],
+  ['R-12','事件列表','列表/欄位兩種檢視切換','P2'],
+  ['R-13','事件分類','分類表格，樹形展開子分類','P1'],
+  ['R-14','事件分類','新增分類彈窗（名稱 25 字 / 描述 100 字）','P0'],
+  ['R-15','事件分類','國家過濾彈窗，多選國家並即時計數','P1'],
+  ['R-16','事件分類','分類啟停開關','P0'],
+  ['R-17','事件分類','更多操作：編輯 / 關聯標籤 / 刪除','P1'],
+  ['R-18','事件複核','待複核與已複核雙列表','P0'],
+  ['R-19','事件複核','審核彈窗：通過 / 棄用雙動作 + 審核備註','P0'],
+  ['R-20','事件複核','審核詳情頁四頁籤（基本資訊/市場/倉位/欄位映射）','P0'],
+  ['R-21','事件複核','市場明細表（成交量/流動性/雙方概率/買賣價格）','P1'],
+  ['R-22','係數調控','全域係數設定，步進器調整 + 取消/儲存','P0'],
+  ['R-23','係數調控','計算範例隨係數即時聯動（YES/NO 雙欄）','P0'],
+  ['R-24','係數調控','三層調控層級說明與優先級可視化','P1'],
+  ['R-25','係數調控','按商戶調控列表，開啟/關閉/編輯','P0'],
+  ['R-26','係數調控','按事件調控列表，新增事件調控','P0'],
+  ['R-27','係數調控','全域係數儲存二次確認，提示影響範圍','P0'],
+  ['R-28','商戶列表','商戶表格（聯絡人/電話/電郵/過濾數/API Key/密鑰/IP）','P0'],
+  ['R-29','商戶列表','新增商戶彈窗，含國際區號選擇','P0'],
+  ['R-30','商戶列表','權限設定跳轉至商戶詳情頁','P0'],
+  ['R-31','商戶列表','IP 白名單彈窗，新增/啟停/移除','P1'],
+  ['R-32','商戶權限','四頁籤：類型/分類/數據源/過濾事件','P1'],
+  ['R-33','用戶管理','用戶表格（編號/帳號/名稱/角色/狀態/MFA/時間）','P0'],
+  ['R-34','用戶管理','新增用戶彈窗，帳號 6–20 位、密碼 8–20 位含字母數字','P0'],
+  ['R-35','用戶管理','重置密碼，新密碼二次確認','P0'],
+  ['R-36','用戶管理','解綁 Google 驗證，二次確認','P1'],
+  ['R-37','角色管理','角色表格，超級管理員為預置角色不可刪','P0'],
+  ['R-38','角色管理','權限樹：功能表 × 按鈕兩級勾選聯動','P0'],
+  ['R-39','操作日誌','日誌表格（操作人/類型/模組/描述）','P0'],
+  ['R-40','操作日誌','日誌詳情彈窗，含請求參數','P1']
+];
+const DICT=[
+  ['事件','Event','上游平台同步而來的可投注標的，一個事件下含多個市場','事件 ID 為 10 位數字'],
+  ['市場','Market','事件下的具體投注項，含 Yes/No 雙方概率與賠率','市場 ID 為 10 位數字'],
+  ['商戶','Merchant','接入中台數據的下游投注平台','以 API Key + 密鑰鑑權'],
+  ['複核','Review','對新入庫事件的分類與標籤進行人工確認','未複核事件不對外發佈'],
+  ['推送狀態','Push Status','事件是否已下發至商戶','上架 / 下架 兩態'],
+  ['調控係數','Coefficient','用於調整報價的乘數，係數越大賠率越低','建議範圍 0.01–10.00'],
+  ['全域調控','Global Control','作用於全部商戶與事件的係數','優先級最低'],
+  ['按商戶調控','Merchant Control','作用於指定商戶的係數','優先級居中'],
+  ['按事件調控','Event Control','作用於指定事件的係數','優先級最高'],
+  ['fair_p','Fair Probability','上游市場的原始概率','取值 0–1'],
+  ['quote_p','Quoted Probability','調整後概率，等於 fair_p × 係數','取值 0–1'],
+  ['DATA.BET','—','下游投注平台，最終賠率等於 1 / quote_p','展示保留 2 位小數'],
+  ['IP 白名單','IP Whitelist','允許透過 API 存取商戶數據的 IP 集合','支援單條啟停'],
+  ['MFA','Multi-Factor Auth','多因素認證，本系統對接 Google 驗證器','用戶維度開關']
+];
+const ALGO=[
+  ['賠率計算','quote_p = fair_p × 係數；最終賠率 = 1 / quote_p','以 Yes 概率 47%、係數 1.04 為例：quote_p = 0.47 × 1.04 = 0.4888，最終賠率 = 1 / 0.4888 ≈ 2.05x','係數越大，賠率越低'],
+  ['三層調控覆蓋','按事件 > 按商戶 > 全域，高優先級覆蓋低優先級','同一事件若同時存在三層設定，僅取最高優先級生效值；低層設定保留但不參與計算','關閉上層設定後自動回退下層'],
+  ['事件狀態流轉','已創建 → 進行中 → 已結束','到達開始時間由已創建轉為進行中；到達截止時間轉為已結束；已結束事件不可再編輯投注項','狀態由系統按時間自動流轉'],
+  ['複核發佈','審核通過 → 對外發佈；棄用 → 不發佈','審核通過後事件進入推送隊列，按商戶過濾規則下發；棄用事件保留在庫但不進入推送','棄用不刪除數據'],
+  ['國家過濾','分類級國家黑名單，命中即攔截','事件所屬國家若在分類的過濾名單內，該事件不推送至該分類下的所有商戶','過濾在推送前執行']
+];
+
+function renderSpec(){
+  const navHtml=SPEC_NAV.map(function(g){
+    return '<div class="spec-side-title">'+g.group+'</div>'+
+      g.items.map(function(it){
+        return '<div class="spec-link'+(state.specSection===it.id?' active':'')+'" onclick="setSpec(\''+it.id+'\')">'+
+          '<span class="n num">'+it.n+'</span>'+it.label+
+          (it.cnt?'<span class="cnt num">'+it.cnt+'</span>':'')+'</div>';
+      }).join('');
+  }).join('');
+  return '<div class="spec"><aside class="spec-side">'+navHtml+'</aside>'+
+    '<div class="spec-body">'+specContent()+'</div></div>';
+}
+function setSpec(id){state.specSection=id;renderShell();}
+function specContent(){
+  const s=state.specSection;
+  if(s==='structure')return specStructure();
+  if(s==='req')return specReq();
+  if(s==='net')return specNet();
+  if(s==='account')return specAccount();
+  if(s==='loading')return specLoading();
+  if(s==='empty')return specEmpty();
+  if(s==='dict')return specDict();
+  if(s==='algo')return specAlgo();
+  if(s==='color')return specColor();
+  if(s==='type')return specType();
+  if(s==='icon')return specIcon();
+  if(s==='comp')return specComp();
+  return specVersion();
+}
+
+function specVersion(){
+  const changes=[
+    ['V1.0.0','2026-11-04','首次發布','依原站（192.168.10.51:7080）前端還原管理面 9 個業務頁面：事件總覽、事件列表、事件分類、事件複核、投注類係數調控、商戶列表、用戶管理、角色管理、操作日誌。覆蓋 7 類彈窗與 3 個跳轉頁。外框改為產品基線結構，新增本規範文檔頁，含基線總覽、全局規範、公共說明、組件與規範四部分。字體按基線統一為 Outfit + 系統中文字體，配色沿用原站藍色體系。']
+  ];
+  return '<div class="spec-crumb">產品基線 / 基線總覽 / 原型版本信息</div>'+
+    '<h1 class="spec-h1">原型版本信息</h1>'+
+    '<p class="spec-lead">本節記錄原型當前的版本標識與實際變更內容。入口頂部版本徽標與本節記錄表同步，作為團隊協作的版本基準。</p>'+
+    '<div class="spec-block"><h3>當前原型標準版本</h3><p class="sub">入口頂部徽標與本表保持一致。</p>'+
+      '<div class="ver-cards">'+
+      '<div class="ver-card"><div class="k">當前版本</div><div class="v">'+VERSION+'</div></div>'+
+      '<div class="ver-card"><div class="k">發布日期</div><div class="v">'+BUILD_DATE+'</div></div>'+
+      '<div class="ver-card"><div class="k">框架參考</div><div class="v">'+BASE_REF+'</div></div>'+
+      '<div class="ver-card"><div class="k">覆蓋功能單元</div><div class="v">12</div></div>'+
+      '<div class="ver-card"><div class="k">覆蓋頁面</div><div class="v">10 頁</div></div></div></div>'+
+    '<div class="spec-block"><h3>原型版本變更記錄</h3><p class="sub">按版本倒序，首行為當前生效版本。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:86px">版本</th><th style="width:104px">日期</th><th style="width:96px">變更類型</th><th>變更摘要</th></tr></thead><tbody>'+
+      changes.map(function(c){
+        return '<tr><td class="num">'+c[0]+'</td><td class="num">'+c[1]+'</td><td>'+c[2]+'</td><td style="color:#4e5969">'+c[3]+'</td></tr>';
+      }).join('')+'</tbody></table></div>'+
+    '<div class="spec-block"><h3>版本升版規則</h3><p class="sub">團隊協作時按此規則判斷是否升版。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:150px">變更類型</th><th style="width:110px">是否升版</th><th>判定標準</th></tr></thead><tbody>'+
+      '<tr><td>功能變更</td><td><span class="pri pri-p0">升版</span></td><td>增刪合併功能單元、頁面、章節</td></tr>'+
+      '<tr><td>內容變更</td><td><span class="pri pri-p0">升版</span></td><td>規則口徑、計算邏輯、術語定義、字段集合、校驗條件</td></tr>'+
+      '<tr><td>文案措辭</td><td><span class="pri pri-p2">不升版</span></td><td>措辭調整、錯別字、品牌標識</td></tr>'+
+      '<tr><td>視覺微調</td><td><span class="pri pri-p2">不升版</span></td><td>字號、配色、元素位置</td></tr>'+
+      '</tbody></table>'+
+      '<div class="spec-note"><span class="i">'+icon('warn',15)+'</span><span>升版只替換當前版本展示位與變更記錄首行，歷史行不動。禁止全局替換版本號串。</span></div></div>';
+}
+
+function specStructure(){
+  const pages=[
+    ['事件總覽','/index','指標卡 6 項、新增趨勢柱狀圖、類型分布面積圖、來源分布條形圖、上游交易量 TOP10'],
+    ['事件列表','/event/list','分類頁籤條、7 項篩選、事件表格（10 列）、狀態與推送開關、編輯/詳情彈窗'],
+    ['事件分類','/event/category','分類表格（14 條）、樹形展開、狀態開關、新增分類/國家過濾/更多'],
+    ['事件複核','/event/review','待複核與已複核雙頁籤、7 項篩選、審核彈窗（通過/棄用）'],
+    ['投注類係數調控','/event/betting-coefficient','三層頁籤：全域調控（公式/層級/係數/計算範例）、按商戶調控、按事件調控'],
+    ['商戶列表','/merchant/merchant/index','商戶表格（11 列）、權限設定跳轉、IP 白名單、更多操作'],
+    ['商戶權限設定','/merchant/merchant/detail','商戶資訊頭 + 四頁籤：類型/分類/數據源/過濾事件'],
+    ['用戶管理','/system/user','用戶表格（11 列）、狀態與 MFA 開關、解綁驗證、重置密碼、新增用戶'],
+    ['角色管理','/system/role','角色表格、編輯跳轉至權限樹、刪除確認'],
+    ['新增角色','/system/role/create','角色名稱/描述 + 功能表權限樹（4 組 9 子項）'],
+    ['操作日誌','/system/operation','日誌表格（6 列）、詳情彈窗（含請求參數）'],
+    ['事件審核詳情','/event/review/detail','四頁籤 + 基本資訊 + 賽事比分 + 規則 + 市場明細']
+  ];
+  return '<div class="spec-crumb">產品基線 / 基線總覽 / 產品信息結構</div>'+
+    '<h1 class="spec-h1">產品信息結構</h1>'+
+    '<p class="spec-lead">原型覆蓋管理面單端，共 9 個一級業務頁面與 3 個跳轉頁，按左側菜單四組組織。</p>'+
+    '<div class="spec-block"><h3>頁面清單</h3><p class="sub">路由與頁面承載內容對照。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:140px">頁面</th><th style="width:220px">路由</th><th>承載內容</th></tr></thead><tbody>'+
+      pages.map(function(p){
+        return '<tr><td>'+p[0]+'</td><td><span class="mono-code">'+p[1]+'</span></td><td style="color:#4e5969">'+p[2]+'</td></tr>';
+      }).join('')+'</tbody></table></div>'+
+    '<div class="spec-block"><h3>菜單分組</h3><p class="sub">與原站左側導航一致，四組共 9 個二級入口。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:150px">一級菜單</th><th>二級菜單</th></tr></thead><tbody>'+
+      '<tr><td>事件總覽</td><td>—（直接進入頁面）</td></tr>'+
+      '<tr><td>事件管理</td><td>事件列表 / 事件分類 / 事件複核 / 投注類係數調控</td></tr>'+
+      '<tr><td>商戶管理</td><td>商戶列表</td></tr>'+
+      '<tr><td>系統設置</td><td>用戶管理 / 角色管理 / 操作日誌</td></tr>'+
+      '</tbody></table></div>'+
+    '<div class="spec-block"><h3>權限顆粒度</h3><p class="sub">角色權限按「功能表 × 按鈕」兩級配置，與角色管理頁的權限樹一致。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:150px">功能表</th><th>按鈕權限</th></tr></thead><tbody>'+
+      '<tr><td>事件列表</td><td>查看事件 / 編輯事件 / 過濾事件國家 / 更新事件狀態</td></tr>'+
+      '<tr><td>事件分類</td><td>查詢 / 新增 / 編輯 / 刪除事件分類、過濾分類國家、關聯分類標籤</td></tr>'+
+      '<tr><td>事件複核</td><td>批量審核 / 事件詳情 / 審核</td></tr>'+
+      '<tr><td>投注類係數調控</td><td>編輯商戶信息 / 更改商戶調控狀態 / 更改事件調控狀態 / 事件編輯 / 事件詳情 / 更改投注係數</td></tr>'+
+      '<tr><td>商戶列表</td><td>權限設定（類型/分類/事件/渠道）/ IP 白名單 / 更新密鑰 / 新增 / 編輯 / 刪除商戶</td></tr>'+
+      '<tr><td>用戶管理</td><td>新增 / 編輯 / 刪除用戶、重設密碼、啟用 / 禁用 / 重置 MFA</td></tr>'+
+      '<tr><td>角色管理</td><td>新增 / 編輯 / 刪除角色</td></tr>'+
+      '</tbody></table></div>';
+}
+
+function specReq(){
+  const cnt={P0:0,P1:0,P2:0};
+  REQ_LIST.forEach(function(r){cnt[r[3]]++;});
+  return '<div class="spec-crumb">產品基線 / 基線總覽 / 需求清單表</div>'+
+    '<h1 class="spec-h1">需求清單表</h1>'+
+    '<p class="spec-lead">原型已覆蓋的需求項，按模塊分組。P0 為首版必須交付，P1 為首版應交付，P2 為可延後。</p>'+
+    '<div class="spec-block"><h3>優先級統計</h3>'+
+      '<div class="ver-cards" style="grid-template-columns:repeat(4,1fr)">'+
+      '<div class="ver-card"><div class="k">需求總數</div><div class="v">'+REQ_LIST.length+'</div></div>'+
+      '<div class="ver-card"><div class="k">P0 必須</div><div class="v" style="color:#c62828">'+cnt.P0+'</div></div>'+
+      '<div class="ver-card"><div class="k">P1 應交付</div><div class="v" style="color:#b26a00">'+cnt.P1+'</div></div>'+
+      '<div class="ver-card"><div class="k">P2 可延後</div><div class="v" style="color:#5b6b7f">'+cnt.P2+'</div></div></div></div>'+
+    '<div class="spec-block"><h3>需求明細</h3><p class="sub">編號可作為協作時的引用標識。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:66px">編號</th><th style="width:120px">模塊</th><th>需求描述</th><th style="width:70px">優先級</th></tr></thead><tbody>'+
+      REQ_LIST.map(function(r){
+        const cls=r[3]==='P0'?'pri-p0':(r[3]==='P1'?'pri-p1':'pri-p2');
+        return '<tr><td class="num">'+r[0]+'</td><td>'+r[1]+'</td><td style="color:#4e5969">'+r[2]+'</td>'+
+          '<td><span class="pri '+cls+'">'+r[3]+'</span></td></tr>';
+      }).join('')+'</tbody></table></div>';
+}
+
+function specNet(){
+  return '<div class="spec-crumb">產品基線 / 全局規範 / 網絡異常</div>'+
+    '<h1 class="spec-h1">網絡異常</h1>'+
+    '<p class="spec-lead">請求失敗或超時的統一反饋規則。四端共用同一套文案與重試入口。</p>'+
+    '<div class="spec-block"><h3>頁面級異常</h3><p class="sub">整頁數據加載失敗時，內容區替換為異常態，保留導航與頁籤。</p>'+
+      '<div class="state-box"><div class="ico-wrap">'+icon('wifi',30)+'</div>'+
+      '<div class="t">網絡連線異常</div>'+
+      '<div class="d">請檢查網絡設定後重試。若持續失敗，請聯絡系統管理員。</div>'+
+      '<button class="btn btn-primary" onclick="toast(\'原型示意：重新加載\',\'info\')">'+icon('refresh',14)+' 重新加載</button></div></div>'+
+    '<div class="spec-block"><h3>反饋規則</h3>'+
+      '<table class="spec-table"><thead><tr><th style="width:150px">場景</th><th style="width:150px">反饋形式</th><th>文案與行為</th></tr></thead><tbody>'+
+      '<tr><td>整頁加載失敗</td><td>頁面級異常態</td><td>內容區替換為異常插圖 + 說明 + 重試按鈕，導航與頁籤保留</td></tr>'+
+      '<tr><td>局部模塊失敗</td><td>模塊內異常態</td><td>僅該卡片顯示「加載失敗，點擊重試」，其餘卡片正常</td></tr>'+
+      '<tr><td>寫入操作失敗</td><td>Toast 錯誤提示</td><td>頂部紅色 Toast，保留用戶已填內容，不清空表單</td></tr>'+
+      '<tr><td>請求超時</td><td>Toast 錯誤提示</td><td>「請求逾時，請稍後重試」，超過 30s 未響應觸發</td></tr>'+
+      '<tr><td>輪詢中斷</td><td>狀態條提示</td><td>頁面頂部細條提示「數據更新已暫停」，恢復後自動消失</td></tr>'+
+      '</tbody></table>'+
+      '<div class="spec-note blue"><span class="i">'+icon('info',15)+'</span><span>異常態文案不暴露技術細節（錯誤碼、堆棧），技術資訊寫入操作日誌。</span></div></div>';
+}
+
+function specAccount(){
+  return '<div class="spec-crumb">產品基線 / 全局規範 / 賬戶異常</div>'+
+    '<h1 class="spec-h1">賬戶異常</h1>'+
+    '<p class="spec-lead">登入態失效、權限不足、帳號狀態異常的統一處理。</p>'+
+    '<div class="spec-block"><h3>異常類型與處理</h3>'+
+      '<table class="spec-table"><thead><tr><th style="width:130px">異常類型</th><th style="width:110px">HTTP</th><th style="width:150px">處理方式</th><th>說明</th></tr></thead><tbody>'+
+      '<tr><td>未登入 / Token 過期</td><td class="num">401</td><td>跳轉登入頁</td><td>清空本地 Token，記錄原路徑，登入後回跳</td></tr>'+
+      '<tr><td>無操作權限</td><td class="num">403</td><td>隱藏入口</td><td>無權限的菜單與按鈕直接隱藏，不展示灰化態</td></tr>'+
+      '<tr><td>帳號已禁用</td><td class="num">40404</td><td>攔截登入</td><td>登入頁提示「帳號已被禁用，請聯絡管理員」</td></tr>'+
+      '<tr><td>帳號或密碼錯誤</td><td class="num">40402</td><td>表單行內提示</td><td>輸入框下方紅字提示，不清空帳號</td></tr>'+
+      '<tr><td>MFA 驗證失敗</td><td class="num">40601</td><td>二次驗證彈窗</td><td>保留驗證碼輸入框，提示剩餘嘗試次數</td></tr>'+
+      '<tr><td>會話被擠下線</td><td class="num">401</td><td>彈窗提示</td><td>「帳號在其他裝置登入」，提供「重新登入」按鈕</td></tr>'+
+      '</tbody></table></div>'+
+    '<div class="spec-block"><h3>權限可見性原則</h3>'+
+      '<div class="state-grid">'+
+      '<div style="border:1px solid #eef1f6;border-radius:8px;padding:14px 16px"><div style="font-weight:600;margin-bottom:6px;color:#c62828">無權限 → 隱藏</div>'+
+      '<div style="color:#4e5969;font-size:12.5px;line-height:1.75">菜單項、操作按鈕在無權限時不渲染，避免用戶誤以為功能可用。</div></div>'+
+      '<div style="border:1px solid #eef1f6;border-radius:8px;padding:14px 16px"><div style="font-weight:600;margin-bottom:6px;color:#b26a00">條件不滿足 → 置灰</div>'+
+      '<div style="color:#4e5969;font-size:12.5px;line-height:1.75">有權限但業務條件不滿足時置灰，並用 tooltip 給出原因。</div></div>'+
+      '</div></div>';
+}
+
+function specLoading(){
+  return '<div class="spec-crumb">產品基線 / 全局規範 / 數據加載</div>'+
+    '<h1 class="spec-h1">數據加載</h1>'+
+    '<p class="spec-lead">首屏與局部加載的佔位規則，避免佈局跳動。</p>'+
+    '<div class="spec-block"><h3>骨架屏示例</h3><p class="sub">骨架塊使用 #F0F2F5，1.6s 呼吸動畫，尺寸與最終內容一致。</p>'+
+      '<div style="border:1px solid #eef1f6;border-radius:8px;padding:18px 20px">'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">'+
+      [1,2,3].map(function(){
+        return '<div style="border:1px solid #f0f2f5;border-radius:8px;padding:14px 16px">'+
+          '<div class="skel" style="height:12px;width:52%;margin-bottom:12px"></div>'+
+          '<div class="skel" style="height:22px;width:70%"></div></div>';
+      }).join('')+'</div>'+
+      [1,2,3,4,5].map(function(){
+        return '<div style="display:flex;gap:14px;align-items:center;padding:9px 0">'+
+          '<div class="skel" style="height:12px;width:9%"></div>'+
+          '<div class="skel" style="height:12px;width:34%"></div>'+
+          '<div class="skel" style="height:12px;width:18%"></div>'+
+          '<div class="skel" style="height:12px;width:14%"></div></div>';
+      }).join('')+'</div></div>'+
+    '<div class="spec-block"><h3>加載規則</h3>'+
+      '<table class="spec-table"><thead><tr><th style="width:150px">場景</th><th style="width:150px">形式</th><th>規則</th></tr></thead><tbody>'+
+      '<tr><td>首屏進入</td><td>骨架屏</td><td>骨架結構與真實內容一致，加載完成直接替換，不產生佈局跳動</td></tr>'+
+      '<tr><td>表格翻頁</td><td>表格區遮罩</td><td>表頭保持可見，僅內容區顯示 loading 遮罩</td></tr>'+
+      '<tr><td>按鈕提交</td><td>按鈕內 loading</td><td>按鈕進入 loading 態並禁用，防重複提交，文案保持不變</td></tr>'+
+      '<tr><td>局部刷新</td><td>模塊內 loading</td><td>僅該卡片顯示加載態，不影響其他模塊</td></tr>'+
+      '<tr><td>圖表加載</td><td>圖表區骨架</td><td>保持圖表容器高度，避免下方內容上移</td></tr>'+
+      '</tbody></table>'+
+      '<div class="spec-note blue"><span class="i">'+icon('info',15)+'</span><span>超過 300ms 才顯示 loading，避免快速響應時閃爍。</span></div></div>';
+}
+
+function specEmpty(){
+  return '<div class="spec-crumb">產品基線 / 全局規範 / 空數據</div>'+
+    '<h1 class="spec-h1">空數據</h1>'+
+    '<p class="spec-lead">區分「無數據」與「無搜尋結果」，兩者文案與操作不同。</p>'+
+    '<div class="spec-block"><h3>空態示例</h3>'+
+      '<div class="state-grid">'+
+      '<div class="state-box"><div class="ico-wrap">'+icon('inbox',28)+'</div>'+
+      '<div class="t">暫無數據</div>'+
+      '<div class="d">目前還沒有任何記錄</div>'+
+      '<button class="btn btn-primary" onclick="toast(\'原型示意：新增記錄\',\'info\')">'+icon('plus',14)+' 新增</button></div>'+
+      '<div class="state-box"><div class="ico-wrap">'+icon('wifi',28)+'</div>'+
+      '<div class="t">未找到相關搜尋結果</div>'+
+      '<div class="d">請調整篩選條件後重試</div>'+
+      '<button class="btn btn-ghost" onclick="toast(\'原型示意：重置篩選\',\'info\')">重置篩選</button></div>'+
+      '</div></div>'+
+    '<div class="spec-block"><h3>空態規則</h3>'+
+      '<table class="spec-table"><thead><tr><th style="width:150px">場景</th><th style="width:180px">文案</th><th>操作入口</th></tr></thead><tbody>'+
+      '<tr><td>列表無任何數據</td><td>暫無數據 / 目前還沒有任何記錄</td><td>主按鈕「新增」，引導建立第一條</td></tr>'+
+      '<tr><td>篩選無結果</td><td>未找到相關搜尋結果 / 請調整篩選條件後重試</td><td>次按鈕「重置篩選」</td></tr>'+
+      '<tr><td>搜尋框無結果</td><td>未找到相關搜尋結果</td><td>無按鈕，僅文案</td></tr>'+
+      '<tr><td>子表無數據</td><td>暫無數據</td><td>無按鈕，縮小空態高度</td></tr>'+
+      '<tr><td>圖表無數據</td><td>暫無數據</td><td>保留圖表容器，居中顯示文案</td></tr>'+
+      '</tbody></table>'+
+      '<div class="spec-note"><span class="i">'+icon('warn',15)+'</span><span>空態文案不寫「沒有找到您想要的」類主觀表述，統一使用陳述句式。</span></div></div>';
+}
+
+function specDict(){
+  return '<div class="spec-crumb">產品基線 / 公共說明 / 系統詞典</div>'+
+    '<h1 class="spec-h1">系統詞典</h1>'+
+    '<p class="spec-lead">團隊協作時統一術語口徑。界面文案、需求文檔、接口命名均以此表為準。</p>'+
+    '<div class="spec-block"><h3>業務術語</h3>'+
+      '<table class="spec-table"><thead><tr><th style="width:120px">術語</th><th style="width:150px">英文 / 標識</th><th>定義</th><th style="width:200px">約定</th></tr></thead><tbody>'+
+      DICT.map(function(d){
+        return '<tr><td>'+d[0]+'</td><td style="color:#86909c">'+d[1]+'</td><td style="color:#4e5969">'+d[2]+'</td><td style="color:#86909c">'+d[3]+'</td></tr>';
+      }).join('')+'</tbody></table></div>'+
+    '<div class="spec-block"><h3>狀態用語對照</h3><p class="sub">狀態文案取業務原文，不創造、不簡寫。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:120px">對象</th><th style="width:110px">狀態</th><th style="width:90px">標識色</th><th>含義</th></tr></thead><tbody>'+
+      '<tr><td>事件</td><td>進行中</td><td><span class="swatch" style="background:#00B42A;width:22px;height:12px;border-radius:6px"></span></td><td>已開始且未到截止時間</td></tr>'+
+      '<tr><td>事件</td><td>已創建</td><td><span class="swatch" style="background:#2F6BF6;width:22px;height:12px;border-radius:6px"></span></td><td>已入庫但未到開始時間</td></tr>'+
+      '<tr><td>事件</td><td>已結束</td><td><span class="swatch" style="background:#C9CDD4;width:22px;height:12px;border-radius:6px"></span></td><td>已過截止時間</td></tr>'+
+      '<tr><td>調控</td><td>已控</td><td><span class="swatch" style="background:#00B42A;width:22px;height:12px;border-radius:6px"></span></td><td>該層調控已啟用</td></tr>'+
+      '<tr><td>調控</td><td>未控</td><td><span class="swatch" style="background:#C9CDD4;width:22px;height:12px;border-radius:6px"></span></td><td>回退至上層係數</td></tr>'+
+      '<tr><td>推送</td><td>上架</td><td><span class="swatch" style="background:#00B42A;width:22px;height:12px;border-radius:6px"></span></td><td>已下發至商戶</td></tr>'+
+      '<tr><td>推送</td><td>下架</td><td><span class="swatch" style="background:#C9CDD4;width:22px;height:12px;border-radius:6px"></span></td><td>已停止下發</td></tr>'+
+      '<tr><td>複核</td><td>無法分類</td><td><span class="swatch" style="background:#2F6BF6;width:22px;height:12px;border-radius:6px"></span></td><td>系統未能自動匹配分類，需人工判定</td></tr>'+
+      '</tbody></table></div>';
+}
+
+function specAlgo(){
+  return '<div class="spec-crumb">產品基線 / 公共說明 / 系統算法</div>'+
+    '<h1 class="spec-h1">系統算法</h1>'+
+    '<p class="spec-lead">核心計算與流轉規則。前端展示與後端計算必須同源，避免口徑不一致。</p>'+
+    '<div class="spec-block"><h3>算法明細</h3>'+
+      '<table class="spec-table"><thead><tr><th style="width:130px">算法</th><th style="width:260px">規則</th><th>示例 / 說明</th></tr></thead><tbody>'+
+      ALGO.map(function(a){
+        return '<tr><td>'+a[0]+'</td><td style="color:#4e5969">'+a[1]+'</td><td style="color:#86909c">'+a[2]+'</td></tr>';
+      }).join('')+'</tbody></table></div>'+
+    '<div class="spec-block"><h3>賠率計算推導</h3><p class="sub">以全域係數 1.04 為例，Yes 概率 47%、No 概率 53%。</p>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
+      '<div style="background:linear-gradient(90deg,#f2fbf4,#fbfefc);border:1px solid #e2f5e7;border-radius:8px;padding:14px 16px">'+
+      '<div style="font-size:11px;font-weight:700;color:#12923c;margin-bottom:10px">YES</div>'+
+      '<div style="font-size:12.5px;color:#4e5969;line-height:2">fair_p = 0.47<br/>quote_p = 0.47 × 1.04 = <b class="num">0.4888</b><br/>賠率 = 1 / 0.4888 = <b class="num">2.05x</b></div></div>'+
+      '<div style="background:linear-gradient(90deg,#fef4f4,#fffbfb);border:1px solid #fbe4e4;border-radius:8px;padding:14px 16px">'+
+      '<div style="font-size:11px;font-weight:700;color:#d33;margin-bottom:10px">NO</div>'+
+      '<div style="font-size:12.5px;color:#4e5969;line-height:2">fair_p = 0.53<br/>quote_p = 0.53 × 1.04 = <b class="num">0.5512</b><br/>賠率 = 1 / 0.5512 = <b class="num">1.81x</b></div></div></div>'+
+      '<div class="spec-note blue"><span class="i">'+icon('info',15)+'</span><span>quote_p 與最終賠率展示保留 4 位與 2 位小數；計算過程使用全精度，僅展示層做四捨五入。</span></div></div>'+
+    '<div class="spec-block"><h3>三層調控優先級</h3><p class="sub">同一事件同時存在多層設定時，僅最高優先級生效。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:150px">層級</th><th style="width:110px">優先級</th><th>作用範圍</th></tr></thead><tbody>'+
+      '<tr><td>按事件調控</td><td><span class="pri pri-p0">高</span></td><td>僅該事件的報價，覆蓋商戶與全域設定</td></tr>'+
+      '<tr><td>按商戶調控</td><td><span class="pri pri-p1">中</span></td><td>該商戶下全部事件的報價，覆蓋全域設定</td></tr>'+
+      '<tr><td>全域調控</td><td><span class="pri pri-p2">低</span></td><td>全部商戶與事件，作為兜底值</td></tr>'+
+      '</tbody></table></div>';
+}
+
+function specColor(){
+  const rows=[
+    ['主色','--primary','#2F6BF6','主按鈕、選中態、強調'],
+    ['主色 hover','--primary-hover','#1F5AE8','按鈕按下態'],
+    ['主色淺底','--primary-light','#EAF1FF','選中背景、徽標底'],
+    ['頁面背景','--bg','#EAF1F9','內容區底色'],
+    ['卡片背景','--card','#FFFFFF','卡片、彈窗、表格'],
+    ['邊框','--border','#E5E8EF','分隔線、表格線、輸入框'],
+    ['主文字','--text','#1D2129','標題與正文'],
+    ['次要文字','--text-sub','#4E5969','輔助說明、字段名'],
+    ['禁用文字','--text-disabled','#C9CDD4','佔位符、不可用態'],
+    ['成功','--success','#00B42A','已結束、正常、已控'],
+    ['警告','--warning','#FF7D00','預警、待處理'],
+    ['危險','--danger','#F53F3F','異常、負數、刪除'],
+    ['資訊','--info','#2F6BF6','提示、說明類']
+  ];
+  return '<div class="spec-crumb">產品基線 / 組件與規範 / 配色</div>'+
+    '<h1 class="spec-h1">組件與規範 · 配色</h1>'+
+    '<p class="spec-lead">配色沿用原站 192.168.10.51:7080 的藍色體系，不引入外部主色。所有色值以 CSS 變數定義於 <span class="mono-code">:root</span>，禁止硬編碼色值。</p>'+
+    '<div class="spec-block"><h3>一、淺色主題色板</h3><p class="sub">管理面單一主題，不設深色模式。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:120px">用途</th><th style="width:170px">CSS 變數</th><th style="width:110px">色值</th><th style="width:80px">實際效果</th><th>使用場景</th></tr></thead><tbody>'+
+      rows.map(function(r){
+        return '<tr><td>'+r[0]+'</td><td><span class="mono-code">'+r[1]+'</span></td><td class="num">'+r[2]+'</td>'+
+          '<td><span class="swatch" style="background:'+r[2]+'"></span></td><td style="color:#4e5969">'+r[3]+'</td></tr>';
+      }).join('')+'</tbody></table>'+
+      '<div class="spec-note"><span class="i">'+icon('warn',15)+'</span><span><b>漲跌配色（中國金融慣例）：</b>增加 / 上漲用紅色，減少 / 下跌用綠色。僅用於展示金額盈虧與餘額增減，不濫用到普通按鈕或標籤。</span></div></div>'+
+    '<div class="spec-block"><h3>二、狀態色對照</h3><p class="sub">事件狀態與調控狀態的點狀標識取值。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:150px">狀態</th><th style="width:110px">色值</th><th style="width:80px">實際效果</th><th>說明</th></tr></thead><tbody>'+
+      [['進行中','#00B42A','綠點，事件處於有效期內'],['已創建','#2F6BF6','藍點，尚未開始'],['已結束','#C9CDD4','灰點，已過截止時間'],['已控','#00B42A','綠點，調控已啟用'],['未控','#C9CDD4','灰點，回退上層係數'],['待處理','#FF7D00','橙點，需人工介入']]
+        .map(function(r){
+          return '<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td>'+
+            '<td><span class="swatch" style="background:'+r[1]+';width:22px;height:12px;border-radius:6px"></span></td>'+
+            '<td style="color:#4e5969">'+r[2]+'</td></tr>';
+        }).join('')+'</tbody></table></div>';
+}
+
+function specType(){
+  const sizes=[
+    ['統計大數值','24px','600','統計卡片的主數值'],
+    ['頁面標題','18px','600','內容區頂部頁面標題'],
+    ['區塊標題','16px','600','卡片標題、區塊標題'],
+    ['正文','14px','400','正文、表單標籤、左側菜單'],
+    ['表格','13px','400','表格內容、按鈕、麵包屑'],
+    ['輔助說明','12px','400','字段說明、卡片描述、空態文案'],
+    ['標籤文字','11px','500','狀態標籤、角標']
+  ];
+  return '<div class="spec-crumb">產品基線 / 組件與規範 / 字體字號</div>'+
+    '<h1 class="spec-h1">組件與規範 · 字體 / 字號</h1>'+
+    '<p class="spec-lead">本原型按產品基線字體規範執行：西文與數字統一使用 Outfit，中文由系統字體按棧序回退。配色維持原站不變。</p>'+
+    '<div class="spec-block"><h3>一、字體棧</h3>'+
+      '<table class="spec-table"><thead><tr><th style="width:110px">層級</th><th style="width:80px">字體</th><th>字體棧與用途</th></tr></thead><tbody>'+
+      '<tr><td>西文與數字</td><td>Outfit</td><td>Outfit, "Noto Sans SC", "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif</td></tr>'+
+      '<tr><td>中文</td><td>系統字體</td><td>"PingFang SC"（macOS / iOS）→ "Microsoft YaHei" / 微軟雅黑（Windows）→ Arial → sans-serif</td></tr>'+
+      '<tr><td>代碼與字段名</td><td>等寬</td><td>ui-monospace, "SFMono-Regular", Consolas, Menlo, monospace<br/><span style="color:#86909c">僅用於接口字段名、請求 / 響應代碼塊、參數鍵名</span></td></tr>'+
+      '</tbody></table>'+
+      '<div class="spec-note red"><span class="i">'+icon('warn',15)+'</span><span><b>等寬字體的使用邊界（強制）：</b>等寬字體僅用於真正的代碼場景。事件 ID、時間戳、金額、百分比、錯誤碼一律走正文棧，不使用等寬字體。</span></div></div>'+
+    '<div class="spec-block"><h3>二、字號層級</h3><p class="sub">只有這七檔，不允許出現中間字號。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:120px">層級</th><th style="width:76px">字號</th><th style="width:76px">字重</th><th>用途與示例</th></tr></thead><tbody>'+
+      sizes.map(function(s){
+        return '<tr><td>'+s[0]+'</td><td class="num">'+s[1]+'</td><td class="num">'+s[2]+'</td><td>'+s[3]+'</td></tr>';
+      }).join('')+'</tbody></table></div>'+
+    '<div class="spec-block"><h3>三、字號示例預覽</h3><p class="sub">實際渲染效果，可直接對照檢查。</p>'+
+      '<div class="type-demo"><div class="meta"><span class="lv">統計大數值 · 24px / 600</span></div><div class="num" style="font-size:24px;font-weight:600">138,988</div></div>'+
+      '<div class="type-demo"><div class="meta"><span class="lv">頁面標題 · 18px / 600</span></div><div style="font-size:18px;font-weight:600">事件總覽</div></div>'+
+      '<div class="type-demo"><div class="meta"><span class="lv">區塊標題 · 16px / 600</span></div><div style="font-size:16px;font-weight:600">全域係數設定</div></div>'+
+      '<div class="type-demo"><div class="meta"><span class="lv">正文 · 14px / 400</span></div><div style="font-size:14px">調控係數越大，展示賠率越低。</div></div>'+
+      '<div class="type-demo"><div class="meta"><span class="lv">表格 · 13px / 400</span></div><div class="num" style="font-size:13px">Gold Up or Down – November 4, 10AM ET</div></div>'+
+      '<div class="type-demo"><div class="meta"><span class="lv">輔助說明 · 12px / 400</span></div><div style="font-size:12px;color:#86909c">當前預設 1.04，建議範圍 0.01–10.00</div></div>'+
+      '<div class="type-demo" style="margin-bottom:0"><div class="meta"><span class="lv">標籤文字 · 11px / 500</span></div>'+
+      '<div><span class="chip chip-blue">進行中</span> <span class="chip chip-gray">無法分類</span></div></div></div>'+
+    '<div class="spec-block"><h3>四、數字對齊</h3><p class="sub">表格數值、金額、百分比、ID、時間戳統一啟用 tabular-nums，保證多行數值縱向對齊。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:190px">場景</th><th>處理方式</th></tr></thead><tbody>'+
+      '<tr><td>表格數值 / 金額</td><td><span class="mono-code">font-variant-numeric: tabular-nums</span> + <span class="mono-code">font-feature-settings: "tnum" 1</span></td></tr>'+
+      '<tr><td>統計卡片大數值</td><td>24px / 600，啟用 tabular-nums，千分位分隔</td></tr>'+
+      '<tr><td>ID / 時間戳</td><td>正文棧，13px，tabular-nums，不使用等寬字體</td></tr>'+
+      '<tr><td>輸入框內數值</td><td>編輯態不加千分位，避免干擾錄入</td></tr>'+
+      '</tbody></table></div>';
+}
+
+function specIcon(){
+  const icons=[
+    ['dashboard','事件總覽'],['tree','事件管理'],['shop','商戶管理'],['gear','系統設置'],
+    ['user','用戶'],['doc','文檔'],['file','文件'],['layers','分層'],
+    ['clock','時間'],['pause','待處理'],['check','完成'],['warn','警告'],
+    ['info','提示'],['globe','全域'],['trophy','賽事'],['box','組件'],
+    ['shield','權限'],['history','日誌'],['refresh','刷新'],['inbox','空態']
+  ];
+  return '<div class="spec-crumb">產品基線 / 組件與規範 / 圖標</div>'+
+    '<h1 class="spec-h1">組件與規範 · 圖標</h1>'+
+    '<p class="spec-lead">全站使用線性圖標，統一 24×24 視圖框，線寬 1.6–1.9，圓角端點。不使用面性圖標與多色圖標。</p>'+
+    '<div class="spec-block"><h3>一、圖標清單</h3><p class="sub">原型內已使用的圖標，命名對應 ICONS 對象的鍵名。</p>'+
+      '<div class="icon-grid">'+
+      icons.map(function(i){
+        return '<div class="icon-cell"><span style="color:#4e5969">'+icon(i[0],22)+'</span>'+
+          '<span class="nm">'+i[1]+'</span><span style="font-size:10px;color:#c9cdd4;font-family:ui-monospace,monospace">'+i[0]+'</span></div>';
+      }).join('')+'</div></div>'+
+    '<div class="spec-block"><h3>二、尺寸規範</h3>'+
+      '<table class="spec-table"><thead><tr><th style="width:150px">使用場景</th><th style="width:100px">尺寸</th><th>說明</th></tr></thead><tbody>'+
+      '<tr><td>左側菜單</td><td class="num">16px</td><td>與菜單文字 14px 搭配，垂直居中</td></tr>'+
+      '<tr><td>按鈕內圖標</td><td class="num">14px</td><td>與按鈕文字 13px 搭配，間距 6px</td></tr>'+
+      '<tr><td>表格操作</td><td class="num">13px</td><td>僅在圖標按鈕場景使用</td></tr>'+
+      '<tr><td>頁面標題</td><td class="num">17–18px</td><td>與標題字號同級</td></tr>'+
+      '<tr><td>空態 / 異常態</td><td class="num">28–30px</td><td>置於 64px 圓形容器內</td></tr>'+
+      '</tbody></table>'+
+      '<div class="spec-note"><span class="i">'+icon('warn',15)+'</span><span>圖標顏色跟隨文字色（currentColor），不單獨指定色值。狀態色僅用於點狀標識，不用於圖標本體。</span></div></div>';
+}
+
+function specComp(){
+  return '<div class="spec-crumb">產品基線 / 組件與規範 / 常用組件</div>'+
+    '<h1 class="spec-h1">組件與規範 · 常用組件</h1>'+
+    '<p class="spec-lead">四類必備組件，風格一致。以下為可直接運行的原型示例。</p>'+
+    '<div class="spec-block"><h3>一、數據表格</h3>'+
+      '<p class="sub">表頭淺灰底 #F7F9FC、13px，行 hover 高亮，分隔線 1px，操作列用文字按鈕。</p>'+
+      '<div class="table-wrap" style="margin-top:0"><table style="min-width:0"><thead><tr>'+
+      '<th>事件 ID</th><th>名稱</th><th style="width:120px">事件狀態</th><th style="width:140px">交易量 ($)</th><th style="width:120px">操作</th></tr></thead><tbody>'+
+      '<tr><td class="num">8016024137</td><td class="name">Gold Up or Down – November 4, 10AM ET</td>'+
+      '<td>'+statusBadge('live')+'</td><td class="num">20,528,763</td>'+
+      '<td class="actions"><span class="btn-text">編輯</span><span class="btn-text">詳情</span></td></tr>'+
+      '<tr><td class="num">8015839204</td><td class="name">KOSPI Composite Index (Korea) Up or Down</td>'+
+      '<td>'+statusBadge('created')+'</td><td class="num">12,406,510</td>'+
+      '<td class="actions"><span class="btn-text">編輯</span><span class="btn-text">詳情</span></td></tr>'+
+      '<tr><td class="num">8015726417</td><td class="name">Gold Up or Down – November 4, 6AM ET</td>'+
+      '<td>'+statusBadge('ended')+'</td><td class="num">0</td>'+
+      '<td class="actions"><span class="btn-text">編輯</span><span class="btn-text">詳情</span></td></tr>'+
+      '</tbody></table></div></div>'+
+    '<div class="spec-block"><h3>二、統計卡片</h3><p class="sub">大號數值 24px / 600 + 指標名 + 環比（漲跌換色）。</p>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">'+
+      '<div style="border:1px solid #eef1f6;border-radius:8px;padding:16px 18px">'+
+      '<div style="color:#86909c;font-size:12px;margin-bottom:8px">事件總量</div>'+
+      '<div class="num" style="font-size:24px;font-weight:600">138,988</div>'+
+      '<div style="font-size:11px;color:#86909c;margin-top:6px"><span class="up">▲ 14.98%</span> 較上月</div></div>'+
+      '<div style="border:1px solid #eef1f6;border-radius:8px;padding:16px 18px">'+
+      '<div style="color:#86909c;font-size:12px;margin-bottom:8px">已結束</div>'+
+      '<div class="num" style="font-size:24px;font-weight:600">111,543</div>'+
+      '<div style="font-size:11px;color:#86909c;margin-top:6px">佔全部事件 80.3%</div></div>'+
+      '<div style="border:1px solid #eef1f6;border-radius:8px;padding:16px 18px">'+
+      '<div style="color:#86909c;font-size:12px;margin-bottom:8px">待處理</div>'+
+      '<div class="num" style="font-size:24px;font-weight:600">60</div>'+
+      '<div style="font-size:11px;color:#86909c;margin-top:6px"><span class="down">▼ 2.10%</span> 較昨日</div></div></div></div>'+
+    '<div class="spec-block"><h3>三、狀態標籤</h3><p class="sub">帶背景色的圓角標籤，4px 圓角、11px 文字，顏色與狀態語義對應。</p>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">'+
+      '<span class="chip" style="background:#E8F8EC;color:#12923C">進行中</span>'+
+      '<span class="chip" style="background:#EAF1FF;color:#2F6BF6">已創建</span>'+
+      '<span class="chip" style="background:#F2F5FA;color:#86909C">已結束</span>'+
+      '<span class="chip" style="background:#E8F8EC;color:#12923C">已控</span>'+
+      '<span class="chip" style="background:#F2F5FA;color:#86909C">未控</span>'+
+      '<span class="chip" style="background:#FFF3E8;color:#C25E00">待處理</span>'+
+      '<span class="chip" style="background:#FDECEC;color:#D33">異常</span></div>'+
+      '<div class="spec-note"><span class="i">'+icon('warn',15)+'</span><span>標籤文字取業務原文，不創造、不簡寫。事件狀態固定為「進行中 / 已創建 / 已結束」三態。</span></div></div>'+
+    '<div class="spec-block"><h3>四、按鈕</h3>'+
+      '<p class="sub">主按鈕（主色實心）、次按鈕（描邊）、危險按鈕（紅實心）、文字按鈕（無邊框），均有 hover / active / disabled 三態。</p>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">'+
+      '<button class="btn btn-primary">主按鈕</button>'+
+      '<button class="btn btn-ghost">次按鈕</button>'+
+      '<button class="btn btn-danger">危險按鈕</button>'+
+      '<button class="btn btn-text" style="height:34px;padding:0 12px">文字按鈕</button></div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:10px">'+
+      '<button class="btn btn-primary" disabled>主按鈕禁用</button>'+
+      '<button class="btn btn-ghost" style="opacity:.55;cursor:not-allowed">次按鈕禁用</button>'+
+      '<button class="btn btn-danger" style="opacity:.55;cursor:not-allowed">危險按鈕禁用</button></div>'+
+      '<div class="spec-note blue"><span class="i">'+icon('info',15)+'</span><span><b>禁用態區分兩種情況：</b>① 業務條件不滿足（如係數超出範圍）→ 置灰禁用並給出原因文案；② 無操作權限 → 直接隱藏入口，不展示灰化按鈕，避免誤導。</span></div></div>';
+}
+
+
+/* 規範頁外框 */
+function renderShell(){
+  document.getElementById('proto-main').innerHTML=renderSpec();
+}
+
+/* 版本記錄彈窗（與 dmp.html 共用同一版本號） */
+function showVersion(){
+  openModal(modalShell({
+    title:'原型版本記錄',
+    body:'<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>本原型為界面與交互演示，數據為業務化 mock，不含真實後端邏輯。</span></div>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:4px 0 16px">'+
+      '<div class="ver-card"><div class="k">當前版本</div><div class="v">'+VERSION+'</div></div>'+
+      '<div class="ver-card"><div class="k">發布日期</div><div class="v">'+BUILD_DATE+'</div></div>'+
+      '<div class="ver-card"><div class="k">框架參考</div><div class="v">'+BASE_REF+'</div></div></div>'+
+      '<div style="border-top:1px solid #eef1f6;padding-top:14px">'+
+      '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
+      '<div style="display:flex;gap:12px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 首次發布</div>'+
+      '依原站前端還原管理面業務頁面與彈窗；外框改為產品基線結構，本頁為規範文檔；'+
+      '字體按基線規範統一為 Outfit + 系統中文字體，配色沿用原站藍色體系。</div></div></div>',
+    foot:'<button class="btn btn-primary" onclick="closeModal()">關閉</button>'
+  }));
+}
+
+/* 啟動 */
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&modalStack.length)closeModal();
+});
+renderShell();
+
+</script>
+</body>
+</html>

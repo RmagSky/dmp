@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!--
+  數據中台管理系統 · 交互原型統一入口（框架頁）
+  用途：在管理面與產品基線之間切換瀏覽。各頁面為獨立 HTML，也可單獨打開。
+  文件對應：dmp.html（管理面）/ rule.html（產品基線）
+  原型版本：V1.0.0
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="only light">
+<title>數據中台管理系統 · 交互原型 V1.0.0</title>
+<link rel="stylesheet" href="_fonts/outfit.css">
+<style>
+  :root{
+    --primary:#2f6bf6; --primary-hover:#1f5ae8; --primary-light:#eaf1ff;
+    --bg:#eaf1f9; --card:#ffffff;
+    --border:#e5e8ef; --text:#1d2129; --text-sub:#4e5969; --text-disabled:#c9cdd4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+    text-rendering:optimizeLegibility;
+    font-family:Outfit,"Noto Sans SC","Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    background:var(--bg);color:var(--text);
+    display:flex;flex-direction:column;height:100vh;overflow:hidden;
+  }
+  /* 頂部工具條 */
+  header{
+    height:56px;flex:0 0 56px;background:var(--card);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:20px;padding:0 20px;z-index:10;
+  }
+  .brand{display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .brand .dot{width:11px;height:11px;border-radius:3px;background:var(--primary);flex:0 0 auto}
+  .brand .name{font-size:15px;font-weight:600;letter-spacing:-.1px}
+  .brand small{font-weight:400;color:var(--text-sub);font-size:12px}
+  /* 原型版本徽標：與 rule.html 內的版本記錄同步 */
+  .vnum{
+    font-weight:700;font-size:11px;background:var(--primary);color:#fff;
+    padding:2px 7px;border-radius:4px;letter-spacing:.5px;flex:0 0 auto;
+    cursor:pointer;font-variant-numeric:tabular-nums;
+  }
+  nav{display:flex;gap:4px;flex:1;min-width:0;overflow-x:auto}
+  nav::-webkit-scrollbar{height:0}
+  .tab{
+    padding:8px 16px;border-radius:6px;font-size:14px;color:var(--text-sub);
+    cursor:pointer;border:1px solid transparent;background:transparent;transition:all .15s;
+    display:flex;align-items:center;gap:6px;white-space:nowrap;flex:0 0 auto;
+  }
+  .tab:hover{background:var(--bg);color:var(--text)}
+  .tab.active{background:var(--primary-light);color:var(--primary);font-weight:600;border-color:#cdddff}
+  .tab .badge{
+    font-size:11px;padding:1px 6px;border-radius:4px;background:var(--bg);
+    color:var(--text-sub);font-weight:500;
+  }
+  .tab.active .badge{background:#fff;color:var(--primary)}
+  .actions{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+  .btn{
+    padding:7px 14px;border-radius:6px;font-size:13px;cursor:pointer;
+    border:1px solid var(--border);background:var(--card);color:var(--text-sub);transition:all .15s;
+    font-family:inherit;white-space:nowrap;
+  }
+  .btn:hover{border-color:var(--primary);color:var(--primary)}
+  .hint{font-size:12px;color:var(--text-disabled);display:flex;align-items:center;gap:6px;white-space:nowrap}
+  main{flex:1;position:relative;background:var(--bg);min-height:0}
+  iframe{width:100%;height:100%;border:0;display:block;background:var(--card)}
+  @media (max-width:900px){
+    header{gap:12px;padding:0 12px}
+    .hint{display:none}
+    .brand small{display:none}
+  }
+  @media (max-width:640px){
+    .brand .name{font-size:13px}
+    .tab{padding:7px 11px;font-size:13px}
+    .actions .btn{display:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span class="dot"></span>
+    <span class="name">數據中台管理系統</span>
+    <small>· 交互原型</small>
+    <span class="vnum" id="proto-ver" onclick="jump('rule')" title="點擊查看版本記錄">V1.0.0</span>
+  </div>
+  <nav id="nav"></nav>
+  <div class="actions">
+    <span class="hint">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#86909c" stroke-width="1.7"/><path d="M12 11v5.5M12 7.6v.2" stroke="#86909c" stroke-width="2" stroke-linecap="round"/></svg>
+      演示數據為 mock，不含真實後端
+    </span>
+    <button class="btn" onclick="jump('rule')">版本記錄</button>
+  </div>
+</header>
+<main>
+  <iframe id="stage" title="原型內容" src="dmp.html"></iframe>
+</main>
+
+<script>
+/* ==================================================================
+   框架頁：在管理面與產品基線之間切換
+   ================================================================== */
+const VIEWS = [
+  { key:'dmp',  label:'管理面',   badge:'10 頁', file:'dmp.html'  },
+  { key:'rule', label:'產品基線', badge:'規範',  file:'rule.html' }
+];
+const VERSION = 'V1.0.0';
+
+let current = 'dmp';
+
+function render(){
+  document.getElementById('nav').innerHTML = VIEWS.map(function(v){
+    return '<button class="tab'+(v.key===current?' active':'')+'" onclick="jump(\''+v.key+'\')">'+
+      v.label+' <span class="badge">'+v.badge+'</span></button>';
+  }).join('');
+}
+function jump(key){
+  const v = VIEWS.find(function(x){ return x.key===key; });
+  if(!v) return;
+  current = key;
+  document.getElementById('stage').src = v.file;
+  render();
+  try{ history.replaceState(null,'','#'+key); }catch(e){}
+}
+
+/* 支持 URL 帶 hash 直接進入指定頁 */
+(function init(){
+  const h = (location.hash||'').replace('#','');
+  if(VIEWS.some(function(v){ return v.key===h; })) current = h;
+  render();
+  document.getElementById('stage').src = VIEWS.find(function(v){ return v.key===current; }).file;
+})();
+</script>
+</body>
+</html>

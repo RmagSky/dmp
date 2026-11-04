@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<!--
+  數據中台管理系統 · 管理面
+  原型版本：V1.0.0 ｜ 入口：index.html
+  配色沿用原站 192.168.10.51:7080；字體按產品基線規範
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="only light">
+<title>管理面 · 數據中台管理系統 V1.0.0</title>
+<link rel="stylesheet" href="_fonts/outfit.css">
+<link rel="stylesheet" href="assets/app.css">
+<script>
+/* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
+if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
+</script>
+</head>
+<body>
+<div class="proto-shell">
+  <header class="proto-bar">
+    <div class="proto-brand">
+      <span class="dot"></span>
+      <span class="name">數據中台管理系統</span>
+      <small>· 管理面</small>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.0.0</span>
+    </div>
+    <nav class="proto-nav" style="flex:1"></nav>
+    <div class="proto-actions">
+      <span class="proto-hint">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#86909c" stroke-width="1.7"/><path d="M12 11v5.5M12 7.6v.2" stroke="#86909c" stroke-width="2" stroke-linecap="round"/></svg>
+        演示數據為 mock，不含真實後端
+      </span>
+      <button class="proto-btn" onclick="showVersion()">版本記錄</button>
+    </div>
+  </header>
+  <main class="proto-main" id="proto-main"></main>
+</div>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script src="assets/core.js"></script>
+<script>
+/* ==================================================================
+   數據中台管理系統 · 交互原型
+   框架參考產品基線；配色沿用原站；字體按基線規範
+   ================================================================== */
+/* ---------- 選單 ---------- */
+const MENU=[
+  {key:'dashboard',label:'事件總覽',icon:'dashboard',path:'/index'},
+  {key:'event',label:'事件管理',icon:'tree',children:[
+    {label:'事件列表',path:'/event/list'},
+    {label:'事件分類',path:'/event/category'},
+    {label:'事件複核',path:'/event/review'},
+    {label:'投注類係數調控',path:'/event/betting-coefficient'}
+  ]},
+  {key:'merchant',label:'商戶管理',icon:'shop',children:[
+    {label:'商戶列表',path:'/merchant/merchant/index'}
+  ]},
+  {key:'system',label:'系統設置',icon:'gear',children:[
+    {label:'用戶管理',path:'/system/user'},
+    {label:'角色管理',path:'/system/role'},
+    {label:'操作日誌',path:'/system/operation'}
+  ]},
+  {key:'auth',label:'登錄與認證',icon:'shield',children:[
+    {label:'登錄頁',path:'/login'}
+  ]}
+];
+const ROUTE_TITLE={
+  '/index':'事件總覽','/event/list':'事件列表','/event/category':'事件分類',
+  '/event/review':'事件複核','/event/betting-coefficient':'投注類係數調控',
+  '/merchant/merchant/index':'商戶列表','/system/user':'用戶管理','/system/role':'角色管理',
+  '/system/operation':'操作日誌','/system/role/create':'新增角色',
+  '/merchant/merchant/detail':'商戶權限設定','/event/review/detail':'事件審核詳情',
+  '/login':'登錄頁'
+};
+
+/* ---------- 資料 ---------- */
+const DASH={
+  stats:[
+    {label:'事件總量',value:'138,988',unit:'件',icon:'layers',color:'#2f6bf6',bg:'#eaf1ff',foot:'較上月 <span class="up">14.98% ↑</span>'},
+    {label:'今日新入庫',value:'4,142',unit:'件',icon:'file',color:'#00b42a',bg:'#e8f8ec'},
+    {label:'待處理',value:'60',unit:'件',icon:'pause',color:'#86909c',bg:'#f2f4f7'},
+    {label:'即將結束',value:'6,338',unit:'件',icon:'clock',color:'#ff7d00',bg:'#fff3e8'},
+    {label:'已結束',value:'111,543',unit:'件',icon:'check',color:'#2f6bf6',bg:'#eaf1ff'},
+    {label:'商戶總數',value:'19',unit:'家',icon:'shop',color:'#8b5cf6',bg:'#f3edff',foot:'啟用 19 家 · 停用 0 家'}
+  ],
+  trend:{labels:['10-29','10-30','10-31','11-1','11-2','11-3','11-4'],values:[2400,1700,3800,2300,1950,9240,4100]},
+  cats:{labels:['Crypto','Sports','Finance','Politics','Weather','Culture','Science'],values:[70086,57294,4794,3390,2755,658,657]},
+  sources:[{name:'polymarket',v:142800},{name:'predict.fun',v:4800}],
+  top:[
+    {n:'Fed Decision in October?',v:'20,528,763,904'},
+    {n:'Which party will win the House in 2026?',v:'20,012,201,995'},
+    {n:'LoL: Top Esports vs Invictus Gaming (BO5) - Worlds Playoffs',v:'15,658,544,631'},
+    {n:'Which Senate Swing States will Republicans win? (Build Your Map)',v:'15,331,478,484'},
+    {n:'Balance of Power: 2026 Midterms',v:'13,539,799,048'},
+    {n:'Which party will win the Senate in 2026?',v:'12,960,980,232'},
+    {n:'Trail Blazers vs. Lakers',v:'10,034,586,651'},
+    {n:'LoL: Invictus Gaming vs LYON (BO3) - Worlds Group Stage',v:'8,965,115,146'}
+  ],
+  /* 同一批事件的全週期累計交易量，與 24h 口徑排行不同，切換後排序隨之變化 */
+  topTotal:[
+    {n:'Fed Decision in October?',v:'482,916,307,551'},
+    {n:'Which party will win the House in 2026?',v:'391,204,668,120'},
+    {n:'Balance of Power: 2026 Midterms',v:'288,745,102,933'},
+    {n:'Which party will win the Senate in 2026?',v:'264,880,417,006'},
+    {n:'Which Senate Swing States will Republicans win? (Build Your Map)',v:'203,559,844,712'},
+    {n:'LoL: Top Esports vs Invictus Gaming (BO5) - Worlds Playoffs',v:'97,412,830,265'},
+    {n:'Trail Blazers vs. Lakers',v:'74,608,295,118'},
+    {n:'LoL: Invictus Gaming vs LYON (BO3) - Worlds Group Stage',v:'58,236,910,447'}
+  ]
+};
+const CAT_TABS=['CF測試83447','CF測試83350','zhenzhengr3','youtest002','MJHTEST','tech','Business','Weather','Culture','Science','Finance','Crypto'];
+const EVENTS=[
+  ['8016024137','Gold Up or Down – November 4, 10AM ET','General Finance','','live','on','polymarket',['15M','+5']],
+  ['8016024136','Silver Up or Down – November 4, 10AM ET','General Finance','','live','on','polymarket',['15M','+5']],
+  ['8015839204','KOSPI Composite Index (Korea) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2']],
+  ['8015839203','UNITREE (宇樹科技) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2']],
+  ['8015839202','Gold Up or Down – November 4, 8AM ET','General Finance','+1','live','on','predict.fun',['XAU','+4']],
+  ['8015839201','HANG SENG INDEX (恆生指數) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+3']],
+  ['8015726418','SK Hynix Inc. Up or Down – Nov 4','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2']],
+  ['8015726417','Gold Up or Down – November 4, 6AM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
+  ['8015726416','Zhipu AI Up or Down – Nov 4','General Finance','+1','ended','on','predict.fun',['ZHIPU','+4']],
+  ['8015726415','Gold Up or Down – November 3, 10PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
+  ['8015726414','Gold Up or Down – November 3, 8PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
+  ['8015726413','SK Hynix Inc. Up or Down – Nov 3','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4']],
+  ['8015726412','SK Hynix Inc. Up or Down – Nov 3 (Late)','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4']],
+  ['8015726411','Gold Up or Down – November 3, 6PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
+  ['8015726410','Gold Up or Down – November 3, 4PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
+  ['8015621048','Unitree Robotics Up or Down – Nov 3','General Finance','+1','ended','on','predict.fun',['UNITREE','+4']],
+  ['8015621047','Unitree Robotics Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['UNITREE','+4']],
+  ['8015621046','Gold Up or Down – November 2, 10PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
+  ['8015621045','Zhipu AI Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['ZHIPU','+4']],
+  ['8015621044','SK Hynix Inc. Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4']]
+];
+const CATEGORIES=[
+  ['CF測試83447',2,'1212','阿富汗、亞美尼亞、亞塞拜然…',[],true,true],
+  ['CF測試83350',0,'–','–',[],true,false],
+  ['zhenzhengr3',1,'–','–',[],false,true],
+  ['youtest002',0,'–','–',[],true,false],
+  ['MJHTEST',0,'MJHTEST_EDITED','–',[],true,false],
+  ['tech',3,'科技','–',[],true,true],
+  ['Business',5,'商業、企業、併購、商業事件','–',['Meta','Apple','+9'],true,true],
+  ['Weather',4,'氣候、天氣、自然災害','–',['earthquake','+3'],true,true],
+  ['Culture',13,'文化、娛樂、獎項、流行文…','–',['education','+16'],true,true],
+  ['Science',14,'科技、AI、航天、生物、醫學','–',['astronomy','+24'],true,true],
+  ['Finance',12,'經濟、宏觀經濟、股市、財…','–',['Pyth Finance','+18'],true,true],
+  ['Crypto',14,'加密貨幣、區塊鏈、NFT、D…','–',['coinbase','+12'],true,true],
+  ['Sports',15,'體育/賽事，各類體育賽事、…','–',['Rugby','Cricket','+27'],true,true],
+  ['Politics',11,'政治、政治選舉、地緣政治…','–',['Trump','China','+26'],true,true]
+];
+/* 已複核列表：[事件ID, 名稱, 標籤, 複核類型, 審核狀態, 審核備註, 操作人, 審核時間, 截止時間, 數據來源, 事件狀態] */
+const REVIEWED=[
+  ['20','Will Stephen Curry or Matt Ryan hit their CryptoPunks #55…','All','無法分類','通過','12','mjhbud002','2025-11-04 09:05:02','2025-06-13 00:00:00','polymarket','ended'],
+  ['108422','KOSPI Index Up or Down – Nov 4','All','已分類','棄用','–','zhaozhengxi','2026-10-21 06:00:00','2026-11-04 10:00:00','polymarket','live'],
+  ['43','Will Bitcoin (BTC) hit $20,000 or less by July 30?','All','已分類','通過','–','qwer1234','2026-10-21 05:16:44','2026-11-03 00:00:00','polymarket','ended'],
+  ['51','Will the price of WTI Crude Oil (WTI) be above 15 cents on…','All','已分類','通過','測試','master','2026-10-19 07:37:55','2026-12-31 00:00:00','polymarket','ended'],
+  ['55','Will the floor price of Chill Robbers be above 1.25 ETH on D…','All','已分類','通過','–','master','2026-10-19 07:36:47','2026-12-02 00:00:00','polymarket','ended'],
+  ['56','Will avian influenza in the European Union be 0.0% or more…','All','已分類','通過','–','master','2026-10-19 07:36:46','2025-05-18 00:00:00','polymarket','ended'],
+  ['57','NBA: Will the Suns beat the Clippers by more than 6.5 points…','All','已分類','通過','–','master','2026-10-19 07:36:45','2025-11-10 00:00:00','polymarket','ended'],
+  ['58','Will Lewis Hamilton finish ahead of Max Verstappen in the Sau…','All','已分類','通過','–','master','2026-10-19 07:36:44','2026-12-05 00:00:00','polymarket','ended'],
+  ['59','Will $ETH hit $1,000 or $2,000 first?','All','已分類','通過','–','master','2026-10-19 07:36:43','2025-03-01 00:00:00','polymarket','ended'],
+  ['60','Will Edward Hopper\u2019s “Two Puritans” (Lot 38) sell for more t…','All','已分類','通過','–','master','2026-10-19 07:36:42','2026-11-11 00:00:00','polymarket','ended'],
+  ['61','NBA: Will the Hornets beat the Cavaliers by more than 4.5 point…','All','已分類','通過','sss','sss','2026-10-19 07:36:41','2025-11-01 00:00:00','polymarket','ended'],
+  ['62','Will the Moscow Stock Exchange (MOEX) open for trading by M…','All','已分類','棄用','–','qwer1234','2026-10-19 03:13:10','2025-05-07 00:00:00','polymarket','ended'],
+  ['63','Will the sum of golds in Jamaica vs. USA soccer match be an ev…','All','已分類','通過','理論','mjhbud001','2026-10-14 09:06:57','2026-11-16 00:00:00','polymarket','ended'],
+  ['64','Will 120 million people have received a dose of an approved CO…','All','已分類','通過','看看','mjhbud001','2026-10-14 09:06:57','2025-07-15 00:00:00','polymarket','ended'],
+  ['8652','Bayern Tapachki back in France by…?','Dayton Tapachki','無法分類','通過','555555','mjhtest0005','2026-10-13 03:43:59','2029-01-01 04:59:00','polymarket','live'],
+  ['11358','Leopold Aschenbrenner charged by…?','–','無法分類','通過','–','mjhbud004','2025-10-13 05:21:19','2029-01-01 04:59:00','polymarket','live'],
+  ['108051','Dagenham and Redbridge FC vs. Hemel Hempstead – Exact Score','All','已分類','通過','–','mjhbud002','2026-10-12 16:20:31','2026-10-11 14:00:00','polymarket','ended'],
+  ['108042','AFC Totten vs. Walton and Hersham FC – Exact Score','All','已分類','通過','–','zhaozhengxi','2026-10-12 15:08:44','2026-10-11 14:00:00','polymarket','ended'],
+  ['108024','Radcliffe FC vs. Scarborough Athletic – Exact Score','All','已分類','通過','–','master','2026-10-12 11:42:09','2026-10-11 14:00:00','polymarket','ended'],
+  ['7958','SCOTUS invalidates AR–15 bans?','Judicial','已分類','通過','–','mjhbud002','2026-10-10 09:31:22','2026-10-10 14:00:00','polymarket','live']
+];
+const REVIEWS=[
+  ['108068','Maidenhead United FC vs. Tonbridge Angels – …','ended','無法分類','–'],
+  ['108051','Dagenham and Redbridge FC vs. Hemel Hempst…','ended','無法分類','–'],
+  ['108042','AFC Totten vs. Walton and Hersham FC – Exact…','ended','無法分類','–'],
+  ['108024','Radcliffe FC vs. Scarborough Athletic – Exact S…','ended','無法分類','–'],
+  ['8659','Who Will Max Holloway Fight Next?','live','無法分類','–'],
+  ['7958','SCOTUS invalidates AR–15 bans?','live','無法分類','Judicial'],
+  ['7574','UFC: Who Will Manel Kape Fight Next?','ended','無法分類','–'],
+  ['7536','Social Security Insolvent by…?','live','無法分類','–'],
+  ['54','Will there be more than 120 million confirmed C…','ended','無法分類','All'],
+  ['53','Will Croatia or England win their Euro 2020 mat…','ended','無法分類','All'],
+  ['52','Will $ETH be above $1,200 on July 15?','ended','無法分類','All'],
+  ['50','Will natural gas close above $8 on May 20, 2022?','ended','無法分類','All'],
+  ['49','NBA: Will the 76ers beat the Hornets by more t…','ended','無法分類','All'],
+  ['48','NBA: Will the Heat beat the Magic by more than…','ended','無法分類','All'],
+  ['47','Will Hikaru Nakamura or Fabiano Caruana win i…','ended','無法分類','All'],
+  ['46','Will the 7-day COVID-19 case average on Janu…','ended','無法分類','All'],
+  ['45','Will Hikaru Nakamura win the 2021 St. Louis Ra…','ended','無法分類','All'],
+  ['44','Will F9 gross more than $62M domestically on …','ended','無法分類','All'],
+  ['42','Will Hungary or France win their Euro 2020 mat…','ended','無法分類','All'],
+  ['41','Will the Raiders beat the Dolphins by more than…','ended','無法分類','All']
+];
+const MERCHANTS=[
+  ['55','www','+11352895263','5225@163.com',0,0,'06f94••••••70e2','6a7c2••••••6cd68','+1'],
+  ['煩煩煩方法','fff','+11332456785','342556@qq.com',0,1,'8663f••••••2f917','6b7de••••••ee9aa','19'],
+  ['hhu','eee','+1123546','2584621@qq.com',0,3,'307fc••••••59951','cddb2••••••0fb12','+2'],
+  ['呃啊色','–','–','21212121@998.com',0,0,'bd139••••••9608b','fbf99••••••3cec2','–'],
+  ['david–test','david','–','david@outlook.com',1,0,'52cdf••••••8062f','34f44••••••22938','–'],
+  ['kan02','dsds','+1112121212','kan102@qq.com',1,48,'15c56••••••cff79','9e13b••••••0137f','+1'],
+  ['kan01','dsds','+1112121212','youyouu@qq.com',0,1,'d29b5••••••23a24','60920••••••03a08','+1'],
+  ['bubu','–','–','bubu1@qq.com',0,8,'2b5f8••••••6a481','b5f63••••••e3be9','+2'],
+  ['bubu002','–','+6015222','bubu002@qq.com',0,0,'10cc8••••••9d3bf','fdae••••••18860','–'],
+  ['bubu','–','+8618888888','bubu@qq.com',0,0,'7bf49••••••57006','337b5••••••0402b','–'],
+  ['kan01','dsds','+1112121212','kan02@qq.com',0,40,'72135••••••4dee6','4a67e••••••0042e','+1'],
+  ['kan','–','+112312121','kan01@qq.com',0,0,'ba7c6••••••4422d','05c05••••••467e9','–'],
+  ['mi002','1111111','–','dasdas@qq.com',0,0,'2ec88••••••8d46d','32151••••••e86fc','–'],
+  ['mini002','–','–','da@qq.com',0,0,'b5b1e••••••2ca9b','e3487••••••4861c','–'],
+  ['mini','–','–','mini@qq.com',0,0,'03dc2••••••ada1d','435b5••••••1908f','–'],
+  ['jiqian','–','–','jiqian@qq.com',0,0,'57f46••••••59659','46536••••••675a2','–'],
+  ['test','–','–','merchant-80007@mi…',2,3,'a26ae••••••8a610','2a8cb••••••d776c','–'],
+  ['小王商行','小王','+112121212','merchant-80005@mi…',0,1,'f5b76••••••d5d87','8df3f••••••b2b7a','–'],
+  ['測試商戶','王','+1123456789','merchant-80001@mi…',0,2,'620fa••••••1de7d','41d93••••••7da0c','–']
+];
+const USERS=[
+  ['100030','mjhbud000002','mjhbu…','超級管理員',true,false,'–','2026-11-02 16:59:02','2026-11-02 16:59:55'],
+  ['100027','mjhbud003','mjhbu…','mjh001',true,true,'–','2026-10-19 14:38:27','2026-10-20 14:53:26'],
+  ['100026','mjhbud002','mjhbu…','super admin',true,false,'–','2026-10-19 14:38:13','2026-11-02 14:16:02'],
+  ['100025','zxcv1234','zxcv1…','超級管理員',true,false,'–','2026-10-19 10:40:54','2026-10-19 10:51:32'],
+  ['100024','csy12345','timi1','測試',true,true,'–','2026-09-28 11:38:59','2026-11-02 14:16:14'],
+  ['100023','dahai123456','dahai','超級管理員',true,false,'–','2026-09-07 17:29:59','2026-09-07 17:29:59'],
+  ['100022','mjhtest0006','mjhte…','測試',true,false,'–','2026-08-26 10:09:36','2026-11-02 16:58:18'],
+  ['100021','zhanghao','zhang…','平臺角色',true,false,'–','2026-08-24 15:20:41','2026-09-03 15:49:17'],
+  ['100020','lupeng','luxixi…','測試',true,false,'–','2026-08-24 15:11:44','2026-09-03 15:50:11'],
+  ['100019','asdf1234','asdf1…','測試',true,false,'–','2026-08-19 19:13:52','2026-08-19 19:14:28'],
+  ['100016','zhaozhengxi','前端…','平臺角色',true,true,'–','2026-08-19 10:36:18','2026-10-21 10:14:08'],
+  ['100015','Ulzy10086','Ulzy1…','測試',true,false,'–','2026-08-19 10:30:57','2026-08-21 17:55:39'],
+  ['100014','sdy00001','sdy','sdy',true,true,'–','2026-08-19 09:44:32','2026-10-20 11:58:00'],
+  ['100013','qwer1234','qwer1…','測試',true,false,'–','2026-08-18 18:58:24','2026-10-20 11:57:40'],
+  ['100012','skytest','Sky.r','測試',true,false,'–','2026-08-18 11:50:22','2026-09-22 15:12:31'],
+  ['100011','mjhtest0005','mjhtes…','super admin',true,false,'–','2026-08-17 18:08:04','2026-08-31 16:08:25'],
+  ['100010','mjhbud001','mjhbu…','super admin',true,false,'–','2026-08-17 10:09:36','2026-10-10 09:50:12'],
+  ['100009','1008611','ulzy','超級管理員',true,false,'–','2026-08-17 10:05:43','2026-08-17 10:21:45'],
+  ['100008','mjhtest0004','mjhtes…','超級管理員',true,false,'–','2026-08-14 18:16:57','2026-10-13 11:28:04']
+];
+const ROLES=[
+  ['xs1','–','2026-08-31 02:0…'],['cs','–','2026-08-31 02:0…'],
+  ['額我反而让发','額我分外其他个人特为前提','2026-08-24 01:4…'],
+  ['dsad11','dasd','2026-08-23 09:4…'],['Test','測試功能使用','2026-08-23 09:4…'],
+  ['的撒大阿达是','–','2026-08-19 08:2…'],['yu','蚕食正正蚕实订单','2026-08-19 08:0…'],
+  ['平臺角色','這是平臺角色111','2026-08-19 08:0…'],['super admin','–','2026-08-19 07:4…'],
+  ['sdy','sdy','2026-08-19 01:4…'],['mjh003','–','2026-08-14 10:0…'],
+  ['mjh002','–','2026-08-14 09:5…'],['mjh001','只有事件總覽','2026-08-14 09:4…'],
+  ['普通成員mjh','test','2026-08-14 09:4…'],['test','111','2026-08-14 06:5…'],
+  ['測試','測試用的','2026-08-14 02:4…'],['超級管理員','系統預置超級管理員角色','2026-06-29 08:2…']
+];
+const LOGS=[
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)']
+];
+const PERM_TREE=[
+  {name:'事件總覽',perms:[]},
+  {name:'事件管理',perms:[],children:[
+    {name:'事件列表',perms:['查看事件','編輯事件','過濾事件國家','更新事件狀態']},
+    {name:'事件分類',perms:['查詢事件分類','新增事件分類','編輯事件分類','刪除事件分類','過濾分類國家','關聯分類標籤']},
+    {name:'事件複核',perms:['批量審核','事件詳情','審核']},
+    {name:'投注類係數調控',perms:['編輯商戶信息','更改商戶調控狀態','更改事件調控狀態','事件編輯','事件詳情','更改投注係數']}
+  ]},
+  {name:'商戶管理',perms:[],children:[
+    {name:'商戶列表',perms:['權限設定-類型','權限設定-分類','權限設定-事件','權限設定-渠道','IP白名單','更新密鑰','新增商戶','編輯商戶','刪除商戶']}
+  ]},
+  {name:'系統設置',perms:[],children:[
+    {name:'用戶管理',perms:['新增用戶','編輯用戶','刪除用戶','重設用戶密碼','啟用用戶 MFA','禁用用戶 MFA','重置用戶 MFA']},
+    {name:'角色管理',perms:['新增角色','編輯角色','刪除角色']},
+    {name:'操作日誌',perms:[]}
+  ]}
+];
+
+/* ---------- 狀態 ---------- */
+const state={
+  view:'admin', loggedIn:true, route:'/index',
+  tabs:[{path:'/index',title:'事件總覽'}],
+  navOpen:{event:true,merchant:false,system:false,auth:false},
+  drawer:false, coefTab:'global', reviewTab:'basic', merchantTab:'type', specSection:'version',
+  topRange:'24h', mfaBound:false, eventCat:CAT_TABS[0]
+};
+
+function renderShell(){
+  document.getElementById('proto-main').innerHTML=renderAdmin();
+  tickClock();
+}
+
+/* ==================================================================
+   登入頁（作為菜單內頁面，在內容區渲染）
+   ================================================================== */
+function pageLogin(){
+  return '<div class="card" style="padding:0;overflow:hidden">'+
+    '<div class="login" style="min-height:560px">'+
+      '<div class="login-art">'+
+        '<div class="login-brand">'+
+          '<svg width="30" height="22" viewBox="0 0 40 28" fill="none"><path d="M3 20C3 11 10 5 19 5c7 0 12 4 12 9 0 4-3 7-7 7" stroke="#16325c" stroke-width="3.4" stroke-linecap="round"/><circle cx="30" cy="20" r="3.6" fill="#16325c"/></svg>'+
+          '<span>數據中台</span></div>'+
+      '</div>'+
+      '<div class="login-form-wrap">'+
+        '<div class="login-top">'+
+          '<button class="hbtn">未登錄 '+icon('chevron',13)+'</button>'+
+          '<button class="hbtn" onclick="toast(\'原型示意：語言切換\',\'info\')"><span class="flag"><svg width="16" height="16" viewBox="0 0 16 16"><rect width="16" height="16" fill="#de2910"/><circle cx="5" cy="5" r="2" fill="#ffde00"/></svg></span>繁體中文 '+icon('chevron',13)+'</button></div>'+
+        '<div class="login-body" style="padding-bottom:20px"><div class="login-box">'+
+          '<h1 class="login-title">歡迎登錄數據中台</h1>'+
+          '<p class="login-sub">請輸入您的帳號密碼以登入</p>'+
+          '<form onsubmit="doLogin(event)">'+
+            '<div class="field"><label class="field-label">帳號</label>'+
+            '<div class="input-wrap"><span class="ico">'+icon('user',15)+'</span>'+
+            '<input class="input" id="login-account" placeholder="請輸入" autocomplete="username" /></div></div>'+
+            '<div class="field"><label class="field-label">密碼</label>'+
+            '<div class="input-wrap"><span class="ico">'+icon('lock',15)+'</span>'+
+            '<input class="input" id="login-pwd" type="password" placeholder="請輸入" autocomplete="current-password" style="padding-right:36px" />'+
+            '<span class="suffix" id="pwd-eye" onclick="togglePwd()">'+icon('eyeOff',16)+'</span></div></div>'+
+            '<div class="login-row"><label class="check"><input type="checkbox" />記住帳號</label>'+
+            '<span class="link" style="font-size:13px" onclick="toast(\'原型示意：忘記密碼\',\'info\')">忘記密碼？</span></div>'+
+            '<button class="btn btn-primary btn-block" type="submit">登入</button></form>'+
+          '<p style="text-align:center;color:#c9cdd4;font-size:11px;margin-top:22px">原型設計稿 · 不含真實後端 · 任意帳密可進入</p>'+
+        '</div></div>'+
+      '</div>'+
+    '</div></div>';
+}
+function togglePwd(){
+  const i=document.getElementById('login-pwd'),e=document.getElementById('pwd-eye');
+  if(!i)return;
+  const show=i.type==='password';
+  i.type=show?'text':'password';
+  e.innerHTML=icon(show?'eye':'eyeOff',16);
+}
+function doLogin(e){
+  e.preventDefault();
+  const acc=(document.getElementById('login-account').value||'').trim();
+  const pwd=document.getElementById('login-pwd').value||'';
+  if(!acc){toast('請輸入帳號','err');return;}
+  if(!pwd){toast('請輸入密碼','err');return;}
+  state.loggedIn=true;
+  // 登入成功後關閉登錄頁頁籤，回到事件總覽
+  state.tabs=state.tabs.filter(function(t){return t.path!=='/login';});
+  state.route='/index';
+  if(!state.tabs.some(function(t){return t.path==='/index';}))state.tabs.unshift({path:'/index',title:'事件總覽'});
+  renderShell();
+  toast('登入成功，歡迎回來');
+}
+
+/* ==================================================================
+   管理面
+   ================================================================== */
+function renderAdmin(){
+  const navHtml=MENU.map(function(m){
+    if(!m.children){
+      const act=state.route===m.path?' active':'';
+      return '<div class="nav-group"><div class="nav-item'+act+'" onclick="go(\''+m.path+'\')">'+
+        '<span class="ni">'+icon(m.icon,16)+'</span><span class="nl">'+m.label+'</span></div></div>';
+    }
+    const open=state.navOpen[m.key]?' open':'';
+    const isActive=m.children.some(function(c){return c.path===state.route;});
+    const subs=m.children.map(function(c){
+      return '<div class="nav-item'+(state.route===c.path?' active':'')+'" onclick="go(\''+c.path+'\')"><span class="nl">'+c.label+'</span></div>';
+    }).join('');
+    return '<div class="nav-group"><div class="nav-item'+(isActive?' active':'')+open+'" onclick="toggleNav(\''+m.key+'\')">'+
+      '<span class="ni">'+icon(m.icon,16)+'</span><span class="nl">'+m.label+'</span>'+
+      '<span class="caret">'+icon('chevron',13)+'</span></div>'+
+      '<div class="nav-sub'+open+'">'+subs+'</div></div>';
+  }).join('');
+  const tabsHtml=state.tabs.map(function(t){
+    const close=state.tabs.length>1?'<span class="x" onclick="closeTab(event,\''+t.path+'\')">'+icon('close',11)+'</span>':'';
+    return '<div class="tab'+(state.route===t.path?' active':'')+'" onclick="go(\''+t.path+'\')">'+t.title+close+'</div>';
+  }).join('');
+  return '<div class="app">'+
+    (state.drawer?'<div class="scrim" onclick="toggleDrawer(false)"></div>':'')+
+    '<aside class="sidebar'+(state.drawer?' open':'')+'">'+
+      '<div class="sb-brand"><svg width="26" height="19" viewBox="0 0 40 28" fill="none"><path d="M3 20C3 11 10 5 19 5c7 0 12 4 12 9 0 4-3 7-7 7" stroke="#2f6bf6" stroke-width="3.4" stroke-linecap="round"/><circle cx="30" cy="20" r="3.6" fill="#2f6bf6"/></svg>'+
+      '<span class="brand-name">數據中台</span></div>'+
+      '<nav class="nav">'+navHtml+'</nav>'+
+      '<div class="sb-foot"><span class="vnum" onclick="showVersion()" style="font-size:10px;padding:2px 6px">'+VERSION+'</span>'+
+      '<span style="color:#86909c;font-size:11px">原型設計</span></div></aside>'+
+    '<div class="main"><header class="admin-header">'+
+      '<button class="hamburger" onclick="toggleDrawer(true)">'+icon('menu',19)+'</button>'+
+      '<div class="header-spacer"></div><div class="header-right"><div class="divider-v"></div>'+
+      '<button class="hbtn" id="user-btn" onclick="showUserMenu()"><span class="avatar">S</span>Sky.r '+icon('chevron',13)+'</button>'+
+      '<button class="hbtn" onclick="toast(\'原型示意：語言切換\',\'info\')"><span class="flag"><svg width="16" height="16" viewBox="0 0 16 16"><rect width="16" height="16" fill="#de2910"/><circle cx="5" cy="5" r="2" fill="#ffde00"/></svg></span>繁體中文 '+icon('chevron',13)+'</button>'+
+      '<span class="clock num" id="clock"></span></div></header>'+
+      '<div class="tabs">'+tabsHtml+'</div>'+
+      '<main class="content" id="content">'+renderRoute()+'</main></div></div>';
+}
+const PAGES={
+  '/index':pageDashboard,'/event/list':pageEventList,'/event/category':pageCategory,
+  '/event/review':pageReview,'/event/betting-coefficient':pageCoefficient,
+  '/merchant/merchant/index':pageMerchant,'/system/user':pageUser,'/system/role':pageRole,
+  '/system/operation':pageOperation,'/system/role/create':pageRoleCreate,
+  '/merchant/merchant/detail':pageMerchantDetail,'/event/review/detail':pageReviewDetail,
+  '/login':pageLogin
+};
+function renderRoute(){return (PAGES[state.route]||pageDashboard)();}
+function go(path){
+  if(!ROUTE_TITLE[path])return;
+  state.route=path;state.drawer=false;
+  if(!state.tabs.some(function(t){return t.path===path;}))state.tabs.push({path:path,title:ROUTE_TITLE[path]});
+  renderShell();
+  const c=document.getElementById('content');
+  if(c)c.scrollTop=0;
+}
+function closeTab(e,path){
+  e.stopPropagation();
+  const i=state.tabs.findIndex(function(t){return t.path===path;});
+  if(i<0)return;
+  state.tabs.splice(i,1);
+  if(state.route===path){const nx=state.tabs[Math.max(0,i-1)];state.route=nx?nx.path:'/index';}
+  renderShell();
+}
+function toggleNav(k){state.navOpen[k]=!state.navOpen[k];renderShell();}
+function toggleDrawer(v){state.drawer=v;renderShell();}
+function tickClock(){
+  const el=document.getElementById('clock');
+  if(!el)return;
+  const d=new Date(),p=function(n){return String(n).padStart(2,'0');};
+  el.textContent=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+}
+
+/* ==================================================================
+   頁面：事件總覽
+   ================================================================== */
+function pageDashboard(){
+  const d=DASH;
+  const statsHtml=d.stats.map(function(s){
+    return '<div class="stat"><div class="stat-ico" style="background:'+s.bg+';color:'+s.color+'">'+icon(s.icon,17)+'</div>'+
+      '<div class="stat-main"><div class="stat-label">'+s.label+'</div>'+
+      '<div class="stat-value">'+s.value+'<small>'+s.unit+'</small></div>'+
+      (s.foot?'<div class="stat-foot">'+s.foot+'</div>':'')+'</div></div>';
+  }).join('');
+  const maxV=Math.max.apply(null,d.trend.values);
+  const ticks=[0,Math.round(maxV/5),Math.round(maxV*2/5),Math.round(maxV*3/5),Math.round(maxV*4/5),maxV];
+  const gridHtml=ticks.map(function(t,i){
+    return '<div class="gridline" style="bottom:'+((i/5)*190)+'px"><span>'+t.toLocaleString()+'</span></div>';
+  }).join('');
+  const barsHtml=d.trend.values.map(function(v,i){
+    return '<div class="bar-col"><div class="bar" style="height:'+Math.max(6,(v/maxV)*190)+'px" title="'+d.trend.labels[i]+'：'+v.toLocaleString()+'"></div></div>';
+  }).join('');
+  const xHtml=d.trend.labels.map(function(l){return '<span>'+l+'</span>';}).join('');
+  const cv=d.cats.values,cMax=Math.max.apply(null,cv);
+  const xs=[70,150,230,310,390,470,550];
+  const ys=cv.map(function(v){return 250-(v/cMax)*205;});
+  let area='M70,250 L70,'+ys[0].toFixed(1);
+  for(let i=1;i<xs.length;i++)area+=' L'+xs[i]+','+ys[i].toFixed(1);
+  area+=' L550,250 Z';
+  let line='M70,'+ys[0].toFixed(1);
+  for(let i=1;i<xs.length;i++)line+=' L'+xs[i]+','+ys[i].toFixed(1);
+  const catLabels=d.cats.labels.map(function(l,i){
+    return '<text x="'+xs[i]+'" y="272" font-size="10" fill="#86909c" text-anchor="middle" font-family="Outfit,sans-serif">'+l+'</text>';
+  }).join('');
+  const catValues=cv.map(function(v,i){
+    if(v<5000)return '';
+    return '<text x="'+xs[i]+'" y="'+(ys[i]-8).toFixed(1)+'" font-size="10" fill="#4e5969" text-anchor="middle" font-family="Outfit,sans-serif">'+v.toLocaleString()+'</text>';
+  }).join('');
+  const srcMax=Math.max.apply(null,d.sources.map(function(s){return s.v;}));
+  const srcHtml=d.sources.map(function(s,i){
+    const color=i===0?'linear-gradient(90deg,#a8c8ff,#2f6bf6)':'linear-gradient(90deg,#d8c6ff,#8b5cf6)';
+    return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'+
+      '<span style="width:78px;color:#4e5969;font-size:12px">'+s.name+'</span>'+
+      '<div style="flex:1;height:11px;background:#f4f7fc;border-radius:6px;overflow:hidden">'+
+      '<div style="width:'+((s.v/srcMax)*100)+'%;height:100%;background:'+color+';border-radius:6px"></div></div>'+
+      '<span class="num" style="width:78px;text-align:right;color:#86909c;font-size:11px">'+s.v.toLocaleString()+'</span></div>';
+  }).join('');
+  const isTotal=state.topRange==='total';
+  const topSrc=isTotal?d.topTotal:d.top;
+  const topHtml=topSrc.map(function(t,i){
+    return '<div class="top-row"><span class="rank '+(i<3?'r'+(i+1):'')+'">'+(i+1)+'</span>'+
+      '<span class="top-name">'+t.n+'</span><span class="top-val">'+t.v+'</span></div>';
+  }).join('');
+  const topSum=topSrc.reduce(function(a,b){return a+Number(b.v.replace(/,/g,''));},0);
+  return '<div class="stat-grid">'+statsHtml+'</div>'+
+  '<div class="grid-2">'+
+    '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>新增趨勢</div>'+
+      '<div class="right"><div class="seg"><button class="active">近 7 天</button><button onclick="toast(\'原型示意：切換近 30 天\',\'info\')">近 30 天</button></div>'+
+      '<input class="f-date" placeholder="開始日期 – 結束日期" readonly onclick="toast(\'原型示意：日期範圍選擇\',\'info\')" style="width:168px" /></div></div>'+
+      '<div class="legend" style="justify-content:flex-end;margin-bottom:4px"><i style="background:#5b8cff"></i>新增事件</div>'+
+      '<div class="chart-trend"><div class="bars">'+gridHtml+barsHtml+'</div><div class="bar-x">'+xHtml+'</div></div></section>'+
+    '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>類型分布</div>'+
+      '<div class="right"><select class="f-select" style="border:1px solid #e5e8ef;border-radius:6px;height:28px"><option>全部事件</option><option>Crypto</option><option>Sports</option></select></div></div>'+
+      '<div class="legend" style="justify-content:flex-end"><i style="background:#5b8cff"></i>事件數</div>'+
+      '<div class="chart-area"><svg viewBox="0 0 620 290" style="width:100%;height:100%">'+
+      '<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8fbaff" stop-opacity=".85"/><stop offset="100%" stop-color="#c9dcff" stop-opacity=".28"/></linearGradient></defs>'+
+      [0,1,2,3,4,5].map(function(i){
+        const y=250-i*41;
+        return '<line x1="40" y1="'+y+'" x2="600" y2="'+y+'" stroke="#f0f3f8" stroke-dasharray="3 3"/>'+
+          '<text x="34" y="'+(y+3)+'" font-size="9.5" fill="#c9cdd4" text-anchor="end" font-family="Outfit,sans-serif">'+(i*14018).toLocaleString()+'</text>';
+      }).join('')+
+      '<path d="'+area+'" fill="url(#ag)"/><path d="'+line+'" fill="none" stroke="#4d86ff" stroke-width="1.6"/>'+
+      catLabels+catValues+'</svg></div></section></div>'+
+  '<div class="grid-2">'+
+    '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>來源分布</div>'+
+      '<div class="right"><select class="f-select" style="border:1px solid #e5e8ef;border-radius:6px;height:28px"><option>全部事件</option><option>polymarket</option><option>predict.fun</option></select></div></div>'+
+      '<div class="legend" style="justify-content:flex-end;margin-bottom:10px"><i style="background:#5b8cff"></i>polymarket&nbsp;&nbsp;<i style="background:#a78bfa"></i>predict.fun</div>'+
+      '<div style="padding:6px 0 0">'+srcHtml+'</div>'+
+      '<div class="num" style="display:flex;justify-content:space-between;color:#c9cdd4;font-size:10.5px;padding-left:88px;margin-top:2px">'+
+      '<span>0</span><span>20,000</span><span>40,000</span><span>60,000</span><span>80,000</span><span>100,000</span><span>120,000</span><span>140,000</span></div></section>'+
+    '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>上游交易量 TOP10</div>'+
+      '<div class="right">'+
+      '<div class="seg">'+
+        '<button class="'+(isTotal?'':'active')+'" onclick="setTopRange(\'24h\')">24h 交易量</button>'+
+        '<button class="'+(isTotal?'active':'')+'" onclick="setTopRange(\'total\')">總交易量</button>'+
+      '</div></div></div>'+
+      '<div style="display:flex;align-items:center;gap:6px;margin:0 6px 8px;color:#86909c;font-size:11.5px">'+
+        '<span>'+(isTotal?'全週期累計':'近 24 小時')+'</span>'+
+        '<span style="color:#c9cdd4">·</span>'+
+        '<span>TOP8 合計 <b class="num" style="color:#4e5969;font-weight:600">$'+topSum.toLocaleString()+'</b></span>'+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:34px 1fr 132px;gap:10px;padding:0 6px 6px;color:#86909c;font-size:11px">'+
+      '<span style="text-align:center">排名</span><span>事件名稱</span><span style="text-align:right">交易量 ($)</span></div>'+
+      '<div class="top-list">'+topHtml+'</div></section></div>';
+}
+function setTopRange(r){ state.topRange=r; renderShell(); }
+
+/* ==================================================================
+   頁面：事件列表
+   ================================================================== */
+function pageEventList(){
+  const curCat=state.eventCat||CAT_TABS[0];
+  const strip=CAT_TABS.map(function(t){
+    return '<button class="cat-tab'+(t===curCat?' active':'')+'" onclick="setEventCat(\''+t+'\')">'+t+'</button>';
+  }).join('');
+  const rows=EVENTS.map(function(r){
+    const tags=r[7].map(function(t){return '<span class="chip">'+t+'</span>';}).join(' ');
+    const catChip=r[3]?'<span class="chip chip-blue" style="margin-left:6px">'+r[3]+'</span>':'';
+    return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></td>'+
+      '<td class="num" style="color:#86909c">'+r[0]+'</td>'+
+      '<td class="name"><div class="cell-clip" title="'+esc(r[1])+'">'+esc(r[1])+'</div></td>'+
+      '<td><div style="width:34px;height:24px;border-radius:3px;background:linear-gradient(135deg,#eef4ff,#dbe8ff);display:flex;align-items:center;justify-content:center;color:#9db8e8">'+icon('file',13)+'</div></td>'+
+      '<td>'+r[2]+catChip+'</td><td>'+statusBadge(r[4])+'</td>'+
+      '<td><span class="switch '+(r[5]==='on'?'on':'')+'" onclick="toast(\'原型示意：切換推送狀態\',\'info\')"></span></td>'+
+      '<td><span class="chip chip-line">'+r[6]+'</span></td><td>'+tags+'</td>'+
+      '<td class="actions"><span class="btn-text" onclick="toast(\'原型示意：國家過濾\',\'info\')">國家過濾</span>'+
+      '<span class="btn-text" onclick="openEventEdit(\''+r[0]+'\')">編輯</span>'+
+      '<span class="btn-text" onclick="openEventDetail(\''+r[0]+'\')">詳情</span></td></tr>';
+  }).join('');
+  return '<div class="card"><div class="cat-strip-wrap">'+
+    '<button class="cat-nav" onclick="scrollCat(-1)" aria-label="向前滾動">'+
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
+    '<div class="cat-strip" id="cat-strip">'+strip+'</div>'+
+    '<button class="cat-nav" onclick="scrollCat(1)" aria-label="向後滾動">'+
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
+    '</div>'+
+    '<div class="filters">'+
+    '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="搜尋 ID / 名稱" /></div>'+
+    '<div class="f-item"><select class="f-select"><option>全部</option><option>事件 ID</option><option>事件名稱</option></select></div>'+
+    '<div class="f-item"><select class="f-select"><option>二級分類</option><option>General Finance</option><option>Sports</option></select></div>'+
+    '<div class="f-item"><select class="f-select"><option>標籤</option><option>XAU</option><option>15M</option></select></div>'+
+    '<div class="f-item"><select class="f-select"><option>狀態</option><option>進行中</option><option>已創建</option><option>已結束</option></select></div>'+
+    '<div class="f-item"><select class="f-select"><option>推送狀態</option><option>已推送</option><option>未推送</option></select></div>'+
+    '<div class="f-item"><select class="f-select"><option>數據來源</option><option>polymarket</option><option>predict.fun</option></select></div>'+
+    '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:#4e5969;white-space:nowrap;font-size:13px">截止時間</span>'+
+    '<input class="f-date" placeholder="開始日期" readonly onclick="toast(\'原型示意：選擇開始日期\',\'info\')" />'+
+    '<span style="color:#c9cdd4">–</span>'+
+    '<input class="f-date" placeholder="結束日期" readonly onclick="toast(\'原型示意：選擇結束日期\',\'info\')" /></div>'+
+    '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button>'+
+    '<div style="margin-left:auto;display:flex;gap:6px">'+
+    '<button class="btn btn-ghost" style="width:34px;padding:0" onclick="toast(\'原型示意：列表檢視\',\'info\')">'+icon('list',15)+'</button>'+
+    '<button class="btn btn-ghost" style="width:34px;padding:0" onclick="toast(\'原型示意：欄位設定\',\'info\')">'+icon('grid',15)+'</button></div></div>'+
+    '<div class="table-wrap"><table><thead><tr>'+
+    '<th style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></th>'+
+    '<th>事件 ID</th><th>名稱</th><th>封面</th><th>二級分類</th><th>事件狀態</th><th>推送狀態</th><th>數據來源</th><th>關聯標籤</th><th>操作</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(240,1)+'</div>';
+}
+function setEventCat(c){
+  state.eventCat=c;
+  renderShell();
+  const s=document.getElementById('cat-strip');
+  if(s){
+    const a=s.querySelector('.cat-tab.active');
+    if(a) a.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+  }
+}
+function scrollCat(dir){
+  const s=document.getElementById('cat-strip');
+  if(s) s.scrollBy({left:dir*220,behavior:'smooth'});
+}
+function openEventEdit(id){  openModal(modalShell({
+    title:'編輯事件',
+    body:'<div class="field"><label class="field-label"><span class="req">*</span>事件名稱</label><input class="input" value="Gold Up or Down – November 4, 10AM ET" /></div>'+
+      '<div class="field"><label class="field-label">事件 ID</label><input class="input readonly num" value="'+id+'" readonly /></div>'+
+      '<div class="field"><label class="field-label"><span class="req">*</span>二級分類</label><select class="input"><option>General Finance</option><option>Sports</option><option>Crypto</option></select></div>'+
+      '<div class="field"><label class="field-label">關聯標籤</label><select class="input"><option>15M</option><option>XAU</option><option>Daily Up/Down</option></select></div>'+
+      '<div class="field"><label class="field-label">事件狀態</label><select class="input"><option>進行中</option><option>已創建</option><option>已結束</option></select></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="closeModal();toast(\'事件已更新\')">確認</button>'
+  }));
+}
+/* 事件詳情（事件列表 / 投注類係數調控 共用）：展示事件本身的屬性，不含複核語境 */
+function openEventDetail(id,name,cat,st,src){
+  const ev=EVENTS.find(function(e){return e[0]===id;});
+  const title=name || (ev?ev[1]:'—');
+  const catName=cat || (ev?ev[2]:'—');
+  const status=st || (ev?ev[4]:'ended');
+  const source=src || (ev?ev[6]:'polymarket');
+  const tags=ev&&ev[7]?ev[7].map(function(t){
+    return t.charAt(0)==='+'?'<span style="color:#86909c;font-size:11px">'+t+'</span>':'<span class="chip chip-line">'+t+'</span>';
+  }).join(' '):'<span class="muted">–</span>';
+  openModal(modalShell({
+    title:'事件詳情',size:'wide',
+    body:'<div class="detail-head"><div class="dh-ico">'+icon('file',17)+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<h3 class="dh-title" style="margin-bottom:10px">'+esc(title)+'</h3>'+
+        '<div class="dh-meta">'+statusBadge(status)+
+          '<span class="chip chip-blue">'+esc(catName)+'</span>'+
+          '<span class="chip chip-line">'+esc(source)+'</span></div>'+
+      '</div></div>'+
+      '<div class="info-grid">'+
+      '<div class="info-item"><div class="k">事件 ID <span class="copy" onclick="toast(\'已複製事件 ID\',\'info\')">'+icon('copy',12)+'</span></div><div class="v">'+esc(id)+'</div></div>'+
+      '<div class="info-item"><div class="k">源事件 ID</div><div class="v">1159904</div></div>'+
+      '<div class="info-item"><div class="k">源 slug</div><div class="v" style="font-size:11.5px;color:#86909c">nls-mu-ton-2026-10-10-exact-score</div></div>'+
+      '<div class="info-item"><div class="k">二級分類</div><div class="v">'+esc(catName)+'</div></div>'+
+      '<div class="info-item"><div class="k">開始時間</div><div class="v">2026-10-09 16:55:15</div></div>'+
+      '<div class="info-item"><div class="k">截止時間</div><div class="v">2026-10-10 14:00:00</div></div>'+
+      '<div class="info-item"><div class="k">入庫時間</div><div class="v">2026-10-10 10:17:28</div></div>'+
+      '<div class="info-item"><div class="k">更新時間</div><div class="v">2026-11-04 09:12:33</div></div>'+
+      '<div class="info-item"><div class="k">關聯標籤</div><div class="v">'+tags+'</div></div>'+
+      '</div>'+
+      '<div style="margin-top:18px;border-top:1px solid #eef1f6;padding-top:14px">'+
+      '<div class="card-title" style="margin-bottom:10px">規則</div>'+
+      '<div class="rule-text"><div class="h">基本規則</div>In the upcoming National League South game between Maidenhead United FC and Tonbridge Angels, scheduled for October 10, 2026 at 10:00 AM ET: This market will resolve based on the final score of the Maidenhead United FC vs. Tonbridge Angels match, considering only the result at the end of 90 minutes of regulation plus stoppage time.</div></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">關閉</button>'+
+      '<button class="btn btn-primary" onclick="closeModal();go(\'/event/list\')">前往事件列表</button>'
+  }));
+}
+
+/* ==================================================================
+   頁面：事件分類
+   ================================================================== */
+/* 分類樹數據：一級分類 + 子分類 */
+const CAT_TREE=[
+  {name:'Business',count:5,desc:'商業、企業、併購、商業事件',countries:'阿富汗、亞塞拜然、以色列、印度尼西亞、日本、菲律賓',tags:['Meta','Apple','Microsoft','NVIDIA','Tesla','google','amazon','+4'],
+   children:[
+     {name:'Big Tech Companies',desc:'大型科技公司相關事件'},
+     {name:'Earnings',desc:'企業季度財報、營收、利潤預期'},
+     {name:'Mergers',desc:'企業合併、收購、股權交易'},
+     {name:'IPO',desc:'公司上市、首次公開募股相關事件'}
+   ]},
+  {name:'Weather',count:4,desc:'氣候、天氣、自然災害',countries:'阿富汗、亞塞拜然、以色列',tags:['earthquake','hurricane','climate','Weather'],
+   children:[
+     {name:'Earthquakes',desc:'地震、地質活動相關事件'},
+     {name:'Hurricanes',desc:'熱帶氣旋、颱風路徑、強度、登陸預測'},
+     {name:'Climate Change',desc:'長期氣候趨勢、全球變暖、氣候政策相關事件'},
+     {name:'General Weather',desc:'泛天氣事件，包括溫度、降雨、降雪、風暴等'}
+   ]},
+  {name:'Culture',count:13,desc:'文化、娛樂、獎項、流行文化、名人',countries:'–',tags:['education','social','Mareil','Reality','TV','TikTok','YouTube','+11'],
+   children:[
+     {name:'Awards',desc:'影視、音樂、文學等獎項評選'},
+     {name:'Celebrity',desc:'名人動態、爭議、婚姻、事業變動'},
+     {name:'Movies',desc:'電影票房、上映、評價相關事件'},
+     {name:'Music',desc:'音樂榜單、專輯、演唱會相關事件'}
+   ]},
+  {name:'Science',count:14,desc:'科技、AI、航天、生物、醫學',countries:'–',tags:['astronomy','quantum','Medicine','health','FDA','vaccine','+19'],
+   children:[
+     {name:'AI',desc:'人工智慧模型、公司、監管相關事件'},
+     {name:'Space',desc:'航天發射、衛星、太空探索'},
+     {name:'Medicine',desc:'藥物審批、臨床試驗、公共衛生'}
+   ]},
+  {name:'Finance',count:12,desc:'經濟、宏觀經濟、股市、財報、利率、匯率',countries:'–',tags:['Pyth Finance','Finance Updown','Earnings','Oil','Commodities','+15'],
+   children:[
+     {name:'Macro',desc:'利率、通膨、就業、GDP 等宏觀指標'},
+     {name:'Equities',desc:'個股、指數、板塊漲跌相關事件'},
+     {name:'Commodities',desc:'原油、黃金、農產品等大宗商品'}
+   ]},
+  {name:'Crypto',count:14,desc:'加密貨幣、區塊鏈、NFT、DeFi',countries:'–',tags:['coinbase','binance','Stablecoins','Coin','token','nft','+7'],
+   children:[
+     {name:'BTC',desc:'比特幣價格、減半、ETF 相關事件'},
+     {name:'ETH',desc:'以太坊升級、價格、生態相關事件'},
+     {name:'Altcoins',desc:'其他代幣價格與生態事件'},
+     {name:'DeFi',desc:'去中心化金融協議、TVL、治理事件'}
+   ]},
+  {name:'Sports',count:15,desc:'體育/賽事，各類體育賽事、聯賽、盃賽',countries:'–',tags:['Rugby','Cricket','2026 Winter Games','Ncaa','F1','UFC','+23'],
+   children:[
+     {name:'Football',desc:'足球聯賽、盃賽、國際賽事'},
+     {name:'Basketball',desc:'NBA、CBA、歐洲籃球聯賽'},
+     {name:'Esports',desc:'LoL、CS2、Dota2 等電競賽事'},
+     {name:'Combat',desc:'拳擊、UFC、MMA 格鬥賽事'}
+   ]},
+  {name:'Politics',count:11,desc:'政治、政治選舉、地緣政治、政府決策、國際關係',countries:'–',tags:['Trump','China','England','UK','House','United States','USA','+21'],
+   children:[
+     {name:'Elections',desc:'各國選舉、民調、席位預測'},
+     {name:'Geopolitics',desc:'國際衝突、外交、制裁相關事件'},
+     {name:'Policy',desc:'立法、監管、政府決策相關事件'}
+   ]}
+];
+const CAT_COLLAPSED={};
+
+function pageCategory(){
+  let idx=0;
+  const body=CAT_TREE.map(function(g){
+    idx++;
+    const collapsed=CAT_COLLAPSED[g.name]===true;
+    const tags=g.tags.map(function(t){
+      return t.charAt(0)==='+'?'<span style="color:#86909c;font-size:11px">'+t+'</span>':'<span class="chip chip-line">'+t+'</span>';
+    }).join(' ');
+    let html='<tr class="cat-parent">'+
+      '<td class="num" style="width:56px;color:#86909c">'+idx+'</td>'+
+      '<td class="name" style="min-width:190px">'+
+        '<div style="display:flex;align-items:center;gap:6px">'+
+          '<button class="expander'+(collapsed?' collapsed':'')+'" onclick="toggleCat(\''+esc(g.name)+'\')" aria-label="展開子分類">'+
+            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+          '</button>'+
+          '<span>'+esc(g.name)+'</span>'+
+        '</div></td>'+
+      '<td class="num" style="width:96px">'+g.count+'</td>'+
+      '<td style="min-width:220px"><div class="cell-clip" title="'+esc(g.desc)+'">'+esc(g.desc)+'</div></td>'+
+      '<td style="min-width:210px"><div class="cell-clip" title="'+esc(g.countries)+'">'+(g.countries==='–'?'<span class="muted">–</span>':esc(g.countries))+'</div></td>'+
+      '<td style="min-width:230px"><div class="cell-clip">'+tags+'</div></td>'+
+      '<td style="width:64px"><span class="switch on" onclick="toast(\'原型示意：切換分類狀態\',\'info\')"></span></td>'+
+      '<td class="actions" style="width:230px">'+
+        '<span class="btn-text" onclick="openCategoryAdd(\''+esc(g.name)+'\')">新增分類</span>'+
+        '<span class="btn-text" onclick="openCountryFilter(\''+esc(g.name)+'\')">國家過濾</span>'+
+        '<span class="btn-text" onclick="openMoreMenu(\''+esc(g.name)+'\')">更多</span>'+
+      '</td></tr>';
+    if(!collapsed){
+      g.children.forEach(function(c){
+        html+='<tr class="cat-child">'+
+          '<td></td>'+
+          '<td class="name" style="padding-left:34px"><span style="color:#4e5969;font-weight:400">'+esc(c.name)+'</span></td>'+
+          '<td class="num muted">–</td>'+
+          '<td><div class="cell-clip" style="color:#86909c">'+esc(c.desc)+'</div></td>'+
+          '<td class="muted">–</td>'+
+          '<td class="muted">–</td>'+
+          '<td><span class="switch on" onclick="toast(\'原型示意：切換子分類狀態\',\'info\')"></span></td>'+
+          '<td class="actions">'+
+            '<span class="btn-text" onclick="openCategoryAdd(\''+esc(c.name)+'\')">新增分類</span>'+
+            '<span class="btn-text" onclick="openCountryFilter(\''+esc(c.name)+'\')">國家過濾</span>'+
+            '<span class="btn-text" onclick="openMoreMenu(\''+esc(c.name)+'\')">更多</span>'+
+          '</td></tr>';
+      });
+    }
+    return html;
+  }).join('');
+
+  return '<div class="card"><div class="filters">'+
+    '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="輸入分類名稱" style="min-width:200px" /></div>'+
+    '<div class="f-item"><select class="f-select"><option>狀態</option><option>啟用</option><option>停用</option></select></div>'+
+    '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
+    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openCategoryAdd()">'+icon('plus',14)+' 新增分類</button></div>'+
+    '<div class="table-wrap"><table style="min-width:1180px"><thead><tr>'+
+    '<th style="width:56px">序號</th><th>分類名稱</th><th style="width:96px">子分類數量</th><th>描述</th>'+
+    '<th>已過濾國家</th><th>關聯標籤</th><th style="width:64px">狀態</th><th style="width:230px">操作</th>'+
+    '</tr></thead><tbody>'+body+'</tbody></table></div>'+pager(8,1)+'</div>';
+}
+function toggleCat(name){
+  CAT_COLLAPSED[name]=!CAT_COLLAPSED[name];
+  renderShell();
+}
+function openCategoryAdd(name){
+  const init=name?esc(name)+'（副本）':'';
+  openModal(modalShell({
+    title:'新增分類',
+    body:'<div class="field"><label class="field-label"><span class="req">*</span>分類名稱</label>'+
+      '<input class="input" id="cat-name" maxlength="25" placeholder="輸入分類名稱" value="'+init+'" oninput="countChars(this,\'cat-name-c\',25)" />'+
+      '<div class="char-count num" id="cat-name-c">'+init.length+' / 25</div></div>'+
+      '<div class="field"><label class="field-label">狀態</label><div><span class="switch on" onclick="this.classList.toggle(\'on\')"></span></div></div>'+
+      '<div class="field"><label class="field-label">描述</label>'+
+      '<textarea class="textarea" id="cat-desc" maxlength="100" placeholder="輸入描述" oninput="countChars(this,\'cat-desc-c\',100)"></textarea>'+
+      '<div class="char-count num" id="cat-desc-c">0 / 100</div></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="submitCategory()">確認</button>'
+  }));
+}
+function countChars(el,id,max){
+  const t=document.getElementById(id);
+  if(t)t.textContent=(el.value||'').length+' / '+max;
+}
+function submitCategory(){
+  const n=(document.getElementById('cat-name').value||'').trim();
+  if(!n){toast('請輸入分類名稱','err');return;}
+  closeModal();toast('分類「'+n+'」已新增');
+}
+/* 國家數據：按大洲分組 */
+const COUNTRY_GROUPS=[
+  {key:'asia',label:'亞洲',list:['阿富汗','伊拉克','巴勒斯坦自治區','亞美尼亞','以色列','菲律賓','亞塞拜然','日本','卡達','巴林','約旦','沙烏地阿拉伯','孟加拉','哈薩克','新加坡','不丹','科威特','南韓','英屬印度洋領地','吉爾吉斯','斯里蘭卡','汶萊','泰國','敘利亞','柬埔寨','黎巴嫩','台灣','塔吉克','土庫曼','阿聯酋','烏茲別克','越南','葉門','中國','香港','澳門','印度','印尼','伊朗','馬來西亞','馬爾地夫','蒙古','緬甸','尼泊爾','阿曼','巴基斯坦']},
+  {key:'europe',label:'歐洲',list:['阿爾巴尼亞','安道爾','奧地利','白俄羅斯','比利時','波士尼亞','保加利亞','克羅埃西亞','賽普勒斯','捷克','丹麥','愛沙尼亞','芬蘭','法國','喬治亞','德國','希臘','匈牙利','冰島','愛爾蘭','義大利','科索沃','拉脫維亞','列支敦斯登','立陶宛','盧森堡','馬爾他','摩爾多瓦','摩納哥','蒙特內哥羅','荷蘭','北馬其頓','挪威','波蘭','葡萄牙','羅馬尼亞','俄羅斯','聖馬利諾','塞爾維亞','斯洛伐克','斯洛維尼亞','西班牙','瑞典','瑞士','土耳其','烏克蘭','英國','梵蒂岡']},
+  {key:'africa',label:'非洲',list:['阿爾及利亞','安哥拉','貝南','波札那','布吉納法索','蒲隆地','喀麥隆','維德角','中非共和國','查德','葛摩','剛果','吉布地','埃及','赤道幾內亞','厄利垂亞','史瓦帝尼','衣索比亞','加彭','甘比亞','迦納','幾內亞','幾內亞比索','象牙海岸','肯亞','賴索托','賴比瑞亞','利比亞','馬達加斯加','馬拉威','馬利','茅利塔尼亞','模里西斯','摩洛哥','莫三比克','納米比亞','尼日','奈及利亞','盧安達','聖多美','塞內加爾','塞席爾','獅子山','索馬利亞','南非','南蘇丹','蘇丹','坦尚尼亞','多哥','突尼西亞','烏干達','尚比亞','辛巴威']},
+  {key:'na',label:'北美洲',list:['安地卡及巴布達','巴哈馬','巴貝多','貝里斯','加拿大','哥斯大黎加','古巴','多米尼克','多明尼加','薩爾瓦多','格瑞那達','瓜地馬拉','海地','宏都拉斯','牙買加','墨西哥','尼加拉瓜','巴拿馬','聖克里斯多福','聖露西亞','聖文森','千里達','美國']},
+  {key:'sa',label:'南美洲',list:['阿根廷','玻利維亞','巴西','智利','哥倫比亞','厄瓜多','蓋亞那','巴拉圭','秘魯','蘇利南','烏拉圭','委內瑞拉']},
+  {key:'oceania',label:'大洋洲',list:['澳洲','斐濟','吉里巴斯','馬紹爾群島','密克羅尼西亞','諾魯','紐西蘭','帛琉','巴布亞紐幾內亞','薩摩亞','索羅門群島','東加','吐瓦魯','萬那杜']}
+];
+let cfState={group:'asia',selected:{},keyword:''};
+
+function openCountryFilter(name){
+  cfState={group:'asia',selected:{'阿富汗':true,'亞美尼亞':true,'亞塞拜然':true},keyword:''};
+  const total=COUNTRY_GROUPS.reduce(function(a,g){return a+g.list.length;},0);
+  openModal(
+    '<div class="modal cf-modal">'+
+      '<div class="modal-head"><div class="modal-title">國家過濾'+(name?' · '+name:'')+'</div>'+
+      '<button class="modal-close" onclick="closeCountryFilter()">'+icon('close',15)+'</button></div>'+
+      '<div class="modal-body" style="padding-top:0">'+
+        '<p style="color:#86909c;font-size:12px;margin:0 0 14px">請選擇要限制的國家/地區</p>'+
+        '<div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">'+
+          '<div class="f-item" style="flex:1;min-width:180px;height:34px">'+
+            '<input class="f-input" id="cf-search" placeholder="搜尋 輸入關鍵字查詢" style="min-width:0;flex:1" oninput="cfSearch(this.value)" />'+
+          '</div>'+
+          '<label class="check" style="white-space:nowrap"><input type="checkbox" id="cf-all" onchange="cfToggleAll(this.checked)" />全選</label>'+
+        '</div>'+
+        '<div style="display:flex;border:1px solid #eef1f6;border-radius:8px;overflow:hidden;min-height:340px">'+
+          '<div class="cf-side" id="cf-side">'+
+            COUNTRY_GROUPS.map(function(g){
+              return '<button class="cf-side-item'+(g.key===cfState.group?' active':'')+'" data-k="'+g.key+'" onclick="cfGroup(\''+g.key+'\')">'+g.label+'</button>';
+            }).join('')+
+          '</div>'+
+          '<div class="cf-list" id="cf-list"></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="modal-foot cf-foot">'+
+        '<span class="cf-count">已選 <b id="cf-count">3</b> 項</span>'+
+        '<button class="btn btn-ghost" onclick="closeCountryFilter()">關閉</button>'+
+        '<button class="btn btn-primary" onclick="cfSave()">保存</button>'+
+      '</div>'+
+    '</div>'
+  );
+  renderCfList();
+}
+function renderCfList(){
+  const g=COUNTRY_GROUPS.find(function(x){return x.key===cfState.group;});
+  const kw=(cfState.keyword||'').trim();
+  let list=g.list;
+  if(kw) list=list.filter(function(c){return c.indexOf(kw)>-1;});
+  const box=document.getElementById('cf-list');
+  if(!box)return;
+  if(!list.length){
+    box.innerHTML='<div style="padding:40px 20px;text-align:center;color:#c9cdd4;font-size:13px">未找到相關國家</div>';
+  } else {
+    box.innerHTML='<div class="cf-grid">'+list.map(function(c){
+      const on=!!cfState.selected[c];
+      return '<label class="cf-cell"><input type="checkbox" data-c="'+esc(c)+'"'+(on?' checked':'')+' onchange="cfPick(this)" /><span title="'+esc(c)+'">'+c+'</span></label>';
+    }).join('')+'</div>';
+  }
+  const cnt=Object.keys(cfState.selected).filter(function(k){return cfState.selected[k];}).length;
+  const ce=document.getElementById('cf-count'); if(ce)ce.textContent=cnt;
+  const all=document.getElementById('cf-all');
+  if(all) all.checked = list.length>0 && list.every(function(c){return cfState.selected[c];});
+  document.querySelectorAll('.cf-side-item').forEach(function(b){
+    b.classList.toggle('active',b.dataset.k===cfState.group);
+  });
+}
+function cfGroup(k){ cfState.group=k; cfState.keyword=''; const s=document.getElementById('cf-search'); if(s)s.value=''; renderCfList(); }
+function cfSearch(v){ cfState.keyword=v; renderCfList(); }
+function cfPick(el){
+  cfState.selected[el.dataset.c]=el.checked;
+  renderCfList();
+}
+function cfToggleAll(checked){
+  const g=COUNTRY_GROUPS.find(function(x){return x.key===cfState.group;});
+  const kw=(cfState.keyword||'').trim();
+  let list=g.list;
+  if(kw) list=list.filter(function(c){return c.indexOf(kw)>-1;});
+  list.forEach(function(c){ cfState.selected[c]=checked; });
+  renderCfList();
+}
+function closeCountryFilter(){ closeModal(); }
+function cfSave(){
+  const cnt=Object.keys(cfState.selected).filter(function(k){return cfState.selected[k];}).length;
+  closeModal();
+  toast('已保存，共過濾 '+cnt+' 個國家');
+}
+function openMoreMenu(name){
+  openModal(modalShell({
+    title:'更多操作'+(name?' · '+name:''),size:'narrow',
+    body:'<div style="display:flex;flex-direction:column;gap:2px">'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：編輯分類\',\'info\')">編輯分類</button>'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：關聯標籤設定\',\'info\')">關聯標籤</button>'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：子分類管理\',\'info\')">子分類管理</button>'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px;color:#f53f3f" onclick="closeModal();confirmDelete(\'分類\')">刪除分類</button></div>',
+    foot:false
+  }));
+}
+function confirmDelete(what){
+  openModal(modalShell({
+    title:'確認刪除',size:'narrow',
+    body:'<div style="display:flex;gap:10px;padding:4px 0 8px"><span style="color:#ff7d00;flex:0 0 auto">'+icon('warn',20)+'</span>'+
+      '<div style="color:#4e5969;line-height:1.7">刪除後將無法復原，且關聯的'+what+'資料會一併失效。<br/>確定要刪除嗎？</div></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-danger" onclick="closeModal();toast(\'已刪除\')">確定刪除</button>'
+  }));
+}
+
+/* ==================================================================
+   頁面：事件複核
+   ================================================================== */
+function pageReview(){
+  const done=state.reviewDone===true;
+  const src=done?REVIEWED:REVIEWS;
+  const thumb='<div style="width:26px;height:26px;border-radius:4px;background:linear-gradient(135deg,#eef4ff,#dbe8ff);flex:0 0 auto"></div>';
+
+  /* 待複核：事件 ID / 名稱 / 封面 / 複核類型 / 關聯標籤 / 事件狀態 / 操作 */
+  const rowsPending=REVIEWS.map(function(r){
+    return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></td>'+
+      '<td class="num" style="color:#86909c">'+r[0]+'</td>'+
+      '<td class="name"><div class="cell-clip" title="'+esc(r[1])+'">'+esc(r[1])+'</div></td>'+
+      '<td>'+thumb+'</td>'+
+      '<td><span class="chip chip-blue">'+r[3]+'</span></td>'+
+      '<td>'+(r[4]==='–'?'<span class="muted">–</span>':'<span class="chip chip-line">'+r[4]+'</span>')+'</td>'+
+      '<td>'+statusBadge(r[2])+'</td>'+
+      '<td class="actions">'+
+        '<span class="btn-text" onclick="openReviewModal(\''+r[0]+'\',\''+esc(r[1])+'\')">審核</span>'+
+        '<span class="btn-text" onclick="go(\'/event/review/detail\')">詳情</span>'+
+      '</td></tr>';
+  }).join('');
+
+  /* 已複核：事件 ID / 名稱 / 封面 / 複核類型 / 關聯標籤 / 事件狀態 / 審核狀態 / 審核備註 / 操作人 / 審核時間 / 截止時間 / 數據來源 / 操作 */
+  const rowsDone=REVIEWED.map(function(r){
+    const pass=r[4]==='通過';
+    return '<tr>'+
+      '<td style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></td>'+
+      '<td class="num" style="color:#86909c">'+esc(r[0])+'</td>'+
+      '<td class="name" style="min-width:210px"><div class="cell-clip" title="'+esc(r[1])+'">'+esc(r[1])+'</div></td>'+
+      '<td>'+thumb+'</td>'+
+      '<td><span class="chip chip-blue">'+esc(r[3])+'</span></td>'+
+      '<td>'+(r[2]==='–'?'<span class="muted">–</span>':'<span class="chip chip-line">'+esc(r[2])+'</span>')+'</td>'+
+      '<td>'+statusBadge(r[10])+'</td>'+
+      '<td><span class="dot-badge"><span class="d '+(pass?'d-on':'d-off')+'"></span>'+esc(r[4])+'</span></td>'+
+      '<td>'+(r[5]==='–'?'<span class="muted">–</span>':'<span style="color:#4e5969">'+esc(r[5])+'</span>')+'</td>'+
+      '<td style="color:#4e5969">'+esc(r[6])+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:#4e5969">'+esc(r[7])+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:#4e5969">'+esc(r[8])+'</td>'+
+      '<td><span class="chip chip-line">'+esc(r[9])+'</span></td>'+
+      '<td class="actions" style="white-space:nowrap">'+
+        '<span class="btn-text" onclick="go(\'/event/review/detail\')">詳情</span>'+
+        '<span class="btn-text" onclick="toast(\'原型示意：複核記錄\',\'info\')">複核記錄</span>'+
+      '</td></tr>';
+  }).join('');
+
+  const thead = done
+    ? '<th style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></th>'+
+      '<th style="width:88px">事件 ID</th><th>事件名稱</th><th style="width:56px">封面</th>'+
+      '<th style="width:96px">複核類型</th><th style="width:110px">關聯標籤</th><th style="width:100px">事件狀態</th>'+
+      '<th style="width:96px">審核狀態</th><th style="width:100px">審核備註</th><th style="width:110px">操作人</th>'+
+      '<th style="width:160px">審核時間</th><th style="width:160px">截止時間</th><th style="width:110px">數據來源</th>'+
+      '<th style="width:150px">操作</th>'
+    : '<th style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></th>'+
+      '<th>事件 ID</th><th>事件名稱</th><th>封面</th><th>複核類型</th><th>關聯標籤</th><th>事件狀態</th><th>操作</th>';
+
+  return '<div class="card"><div class="sub-tabs">'+
+    '<div class="sub-tab'+(done?'':' active')+'" onclick="setReviewList(false)">待複核列表</div>'+
+    '<div class="sub-tab'+(done?' active':'')+'" onclick="setReviewList(true)">已複核列表</div></div>'+
+    '<div class="filters">'+
+    '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="搜尋 ID / 名稱" /></div>'+
+    '<div class="f-item"><select class="f-select"><option>全部</option><option>事件 ID</option><option>事件名稱</option></select></div>'+
+    '<div class="f-item"><select class="f-select"><option>標籤</option><option>All</option><option>Judicial</option></select></div>'+
+    '<div class="f-item"><select class="f-select"><option>事件狀態</option><option>進行中</option><option>已結束</option></select></div>'+
+    '<div class="f-item"><select class="f-select"><option>複核類型</option><option>無法分類</option><option>已分類</option></select></div>'+
+    (done?'<div class="f-item"><select class="f-select"><option>審核狀態</option><option>通過</option><option>棄用</option></select></div>':'')+
+    '<div class="f-item"><select class="f-select"><option>數據來源</option><option>polymarket</option><option>predict.fun</option></select></div>'+
+    '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:#4e5969;white-space:nowrap;font-size:13px">截止時間</span>'+
+    '<input class="f-date" placeholder="開始日期" readonly onclick="toast(\'原型示意：選擇開始日期\',\'info\')" />'+
+    '<span style="color:#c9cdd4">–</span>'+
+    '<input class="f-date" placeholder="結束日期" readonly onclick="toast(\'原型示意：選擇結束日期\',\'info\')" /></div>'+
+    '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
+    '<div class="table-wrap"><table style="min-width:'+(done?'1620px':'960px')+'"><thead><tr>'+thead+
+    '</tr></thead><tbody>'+(done?rowsDone:rowsPending)+'</tbody></table></div>'+
+    pager(done?118:60,1)+'</div>';
+}
+function setReviewList(done){ state.reviewDone=done; renderShell(); }
+function openReviewModal(id,name){
+  openModal(modalShell({
+    title:'審核',
+    body:'<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>提示：審核通過後該事件將對外發佈；棄用該事件將不會對外發佈。</span></div>'+
+      '<div class="field"><label class="field-label">事件名稱</label><input class="input readonly" value="'+esc(name)+'" readonly /></div>'+
+      '<div class="field"><label class="field-label"><span class="req">*</span>分類</label>'+
+      '<select class="input"><option value="">選擇分類</option><option>Sports</option><option>Crypto</option><option>Politics</option><option>Finance</option></select></div>'+
+      '<div class="field"><label class="field-label"><span class="req">*</span>標籤</label>'+
+      '<select class="input"><option value="">選擇設定標籤</option><option>All</option><option>Judicial</option><option>Trump</option></select></div>'+
+      '<div class="field"><label class="field-label">審核備註</label><textarea class="textarea" placeholder="輸入內容"></textarea></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal();toast(\'該事件已棄用\',\'info\')">棄用</button>'+
+      '<button class="btn btn-primary" onclick="closeModal();toast(\'審核已通過，事件已發佈\')">通過</button>'
+  }));
+}
+
+/* ==================================================================
+   頁面：事件審核詳情
+   ================================================================== */
+function pageReviewDetail(){
+  const tab=state.reviewTab||'basic';
+  const tabsBar='<div class="sub-tabs">'+
+    ['basic|基本資訊','market|市場','position|倉位情況','mapping|欄位映射'].map(function(x){
+      const k=x.split('|')[0],n=x.split('|')[1];
+      return '<div class="sub-tab'+(tab===k?' active':'')+'" onclick="setReviewTab(\''+k+'\')">'+n+'</div>';
+    }).join('')+'</div>';
+  const head='<div class="card"><div class="detail-head"><div class="dh-ico">'+icon('file',17)+'</div>'+
+    '<div style="flex:1;min-width:0"><div class="dh-top">待複核事件 · 複核類型：無法分類</div>'+
+    '<h3 class="dh-title">Maidenhead United FC vs. Tonbridge Angels – Exact Score</h3>'+
+    '<div class="dh-meta">'+statusBadge('ended')+'<span class="chip chip-line">polymarket</span></div></div></div>'+
+    tabsBar+'</div>';
+
+  let body='';
+  if(tab==='basic') body=rdBasic();
+  else if(tab==='market') body=rdMarket();
+  else if(tab==='position') body=rdPosition();
+  else body=rdMapping();
+
+  return head+body+
+    '<div style="display:flex;justify-content:flex-end;margin-top:14px;gap:10px">'+
+    '<button class="btn btn-ghost" onclick="go(\'/event/review\')">返回列表</button>'+
+    '<button class="btn btn-primary" onclick="openReviewModal(\'108068\',\'Maidenhead United FC vs. Tonbridge Angels – Exact Score\')">審核</button></div>';
+}
+function setReviewTab(t){ state.reviewTab=t; renderShell(); }
+
+/* 基本資訊 */
+function rdBasic(){
+  return '<div class="card">'+
+    '<div class="collapse-bar" onclick="toast(\'原型示意：收合基礎資訊\',\'info\')" style="margin-bottom:16px">'+
+      '<span class="t">基礎資訊</span><span class="arrow">'+icon('chevron',15)+'</span></div>'+
+    '<div class="info-grid">'+
+    '<div class="info-item"><div class="k">事件 ID <span class="copy" onclick="toast(\'已複製事件 ID\',\'info\')">'+icon('copy',12)+'</span></div><div class="v">108068</div></div>'+
+    '<div class="info-item"><div class="k">源事件 ID <span class="copy" onclick="toast(\'已複製源事件 ID\',\'info\')">'+icon('copy',12)+'</span></div><div class="v">1159904</div></div>'+
+    '<div class="info-item"><div class="k">源 slug <span class="copy" onclick="toast(\'已複製源 slug\',\'info\')">'+icon('copy',12)+'</span></div><div class="v" style="font-size:11.5px;color:#86909c">nls-mu-ton-2026-10-10-exact-score</div></div>'+
+    '<div class="info-item"><div class="k">開始時間</div><div class="v">2026-10-09 16:55:15</div></div>'+
+    '<div class="info-item"><div class="k">截止時間</div><div class="v">2026-10-10 14:00:00</div></div>'+
+    '<div class="info-item"><div class="k">入庫時間</div><div class="v">2026-10-10 10:17:28</div></div>'+
+    '<div class="info-item"><div class="k">更新時間</div><div class="v">2026-11-03 16:03:32</div></div>'+
+    '<div class="info-item"><div class="k">標籤</div><div class="v" style="color:#c9cdd4">暫無數據</div></div>'+
+    '<div class="info-item"><div class="k">分類</div><div class="v" style="color:#c9cdd4">暫無數據</div></div></div></div>'+
+  '<div class="card"><div class="collapse-bar" onclick="toast(\'原型示意：收合賽事\',\'info\')">'+
+    '<span class="t">'+icon('trophy',16)+' 賽事 <span style="font-weight:400;color:#86909c;font-size:12px">Oct 10 · 2:00 PM</span></span>'+
+    '<span class="arrow">'+icon('chevron',15)+'</span></div>'+
+    '<div class="scoreboard">'+
+    '<div style="text-align:center"><div class="team-score">–</div><div style="font-size:11px;color:#86909c;margin-top:6px">主</div></div>'+
+    '<div class="score-mid"><div class="num" style="font-size:18px;color:#4e5969;letter-spacing:3px">– : –</div><div style="margin-top:6px">未開始</div></div>'+
+    '<div style="text-align:center"><div class="team-score">–</div><div style="font-size:11px;color:#86909c;margin-top:6px">客</div></div></div></div>'+
+  '<div class="card"><div class="collapse-bar" onclick="toast(\'原型示意：收合規則\',\'info\')">'+
+    '<span class="t">'+icon('doc',16)+' 規則</span><span class="arrow">'+icon('chevron',15)+'</span></div>'+
+    '<div class="rule-text"><div class="h">基本規則</div>In the upcoming National League South game between Maidenhead United FC and Tonbridge Angels, scheduled for October 10, 2026 at 10:00 AM ET: This market will resolve based on the final score of the Maidenhead United FC vs. Tonbridge Angels match originally scheduled for October 10, 2026 at 10:00 AM ET, considering only the result at the end of 90 minutes of regulation plus stoppage time; extra time and penalty shoot-outs are excluded.</div></div>';
+}
+
+/* 市場 */
+function rdMarket(){
+  const markets=[
+    ['1','5345507928','Any Other Score','0','0','0','1'],
+    ['2','5345507927','Maidenhead United FC 5 – 5 Tonbridge…','0','0','0','1'],
+    ['3','5345507926','Maidenhead United FC 5 – 4 Tonbridge…','0','0','0','1'],
+    ['4','5345507925','Maidenhead United FC 4 – 5 Tonbridge…','0','0','0','1'],
+    ['5','5345507924','Maidenhead United FC 5 – 3 Tonbridge…','0','0','0','1'],
+    ['6','5345507923','Maidenhead United FC 4 – 4 Tonbridge…','0','0','0','1'],
+    ['7','5345507922','Maidenhead United FC 3 – 5 Tonbridge…','0','0','0','1'],
+    ['8','5345507921','Maidenhead United FC 5 – 2 Tonbridge…','0','0','0','1'],
+    ['9','5345507920','Maidenhead United FC 4 – 3 Tonbridge…','0','0','0','1'],
+    ['10','5345507919','Maidenhead United FC 3 – 4 Tonbridge…','100','0','0','1'],
+    ['11','5345507918','Maidenhead United FC 2 – 5 Tonbridge…','0','0','0','1'],
+    ['12','5345507917','Maidenhead United FC 5 – 1 Tonbridge…','0','0','0','1'],
+    ['13','5345507916','Maidenhead United FC 4 – 2 Tonbridge…','0','0','0','1'],
+    ['14','5345507915','Maidenhead United FC 3 – 3 Tonbridge…','100','0','0','1'],
+    ['15','5345507914','Maidenhead United FC 2 – 4 Tonbridge…','0','0','0','1'],
+    ['16','5345507913','Maidenhead United FC 1 – 5 Tonbridge…','0','0','0','1'],
+    ['17','5345507912','Maidenhead United FC 5 – 0 Tonbridge…','4,994','0','0','1'],
+    ['18','5345507910','Maidenhead United FC 4 – 1 Tonbridge…','0','0','0','1']
+  ];
+  const rows=markets.map(function(m){
+    return '<tr><td class="num" style="color:#86909c">'+m[0]+'</td><td class="num" style="color:#86909c">'+m[1]+'</td>'+
+      '<td class="name"><div class="cell-clip">'+m[2]+'</div></td>'+
+      '<td class="num">'+m[3]+'</td><td class="num">'+m[4]+'</td>'+
+      '<td><span class="chip chip-gray">Yes '+m[5]+'</span></td>'+
+      '<td><span class="chip chip-gray">No '+m[6]+'</span></td>'+
+      '<td class="num">Yes –</td><td class="num">No –</td><td class="num">Yes –</td>'+
+      '<td class="actions"><span class="btn-text" onclick="toast(\'原型示意：市場詳情\',\'info\')">詳情</span></td></tr>';
+  }).join('');
+  return '<div class="card"><div class="card-head"><div class="card-title">市場</div>'+
+    '<div class="right"><span style="color:#86909c;font-size:12px">合共 37 個市場</span></div></div>'+
+    '<div class="table-wrap" style="margin-top:0"><table style="min-width:1100px"><thead><tr>'+
+    '<th style="width:48px">序號</th><th>市場 ID</th><th>名稱</th><th>成交量($)</th><th>流動性($k)</th>'+
+    '<th>雙方概率</th><th>買入雙方價格($)</th><th>賣出雙方價格($)</th><th>操作</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(37,1)+'</div>';
+}
+
+/* 倉位情況：YES / NO 左右分欄 */
+function rdPosition(){
+  const yes=[
+    ['5345507928','Any Other Score','0.00','0.00','0'],
+    ['5345507927','Maidenhead United FC 5 – 5','0.00','0.00','0'],
+    ['5345507926','Maidenhead United FC 5 – 4','0.00','0.00','0'],
+    ['5345507925','Maidenhead United FC 4 – 5','0.00','0.00','0'],
+    ['5345507924','Maidenhead United FC 5 – 3','0.00','0.00','0'],
+    ['5345507923','Maidenhead United FC 4 – 4','0.00','0.00','0']
+  ];
+  const no=[
+    ['5345507928','Any Other Score','0.00','0.00','0'],
+    ['5345507927','Maidenhead United FC 5 – 5','0.00','0.00','0'],
+    ['5345507926','Maidenhead United FC 5 – 4','0.00','0.00','0'],
+    ['5345507925','Maidenhead United FC 4 – 5','0.00','0.00','0'],
+    ['5345507924','Maidenhead United FC 5 – 3','0.00','0.00','0'],
+    ['5345507923','Maidenhead United FC 4 – 4','0.00','0.00','0']
+  ];
+  const mkRows=function(list){
+    return list.map(function(r){
+      return '<tr><td class="num" style="color:#86909c">'+r[0]+'</td>'+
+        '<td class="name"><div class="cell-clip">'+r[1]+'</div></td>'+
+        '<td class="num">'+r[2]+'</td><td class="num">'+r[3]+'</td><td class="num">'+r[4]+'</td></tr>';
+    }).join('');
+  };
+  return '<div class="cards-row">'+
+    '<div class="card"><div class="card-head"><div class="card-title">'+
+      '<span class="chip" style="background:#E8F8EC;color:#12923C">YES</span> 持倉</div>'+
+      '<div class="right"><span style="color:#86909c;font-size:12px">合共 37 條</span></div></div>'+
+      '<div class="table-wrap" style="margin-top:0"><table style="min-width:0"><thead><tr>'+
+      '<th>市場 ID</th><th>名稱</th><th>持倉量</th><th>均價</th><th>盈虧</th>'+
+      '</tr></thead><tbody>'+mkRows(yes)+'</tbody></table></div></div>'+
+    '<div class="card"><div class="card-head"><div class="card-title">'+
+      '<span class="chip" style="background:#FDECEC;color:#D33">NO</span> 持倉</div>'+
+      '<div class="right"><span style="color:#86909c;font-size:12px">合共 37 條</span></div></div>'+
+      '<div class="table-wrap" style="margin-top:0"><table style="min-width:0"><thead><tr>'+
+      '<th>市場 ID</th><th>名稱</th><th>持倉量</th><th>均價</th><th>盈虧</th>'+
+      '</tr></thead><tbody>'+mkRows(no)+'</tbody></table></div></div></div>'+
+    '<div class="card" style="margin-top:14px"><div class="card-head"><div class="card-title">倉位匯總</div></div>'+
+    '<div class="info-grid" style="grid-template-columns:repeat(4,1fr)">'+
+    '<div class="info-item"><div class="k">YES 總持倉</div><div class="v num">0.00</div></div>'+
+    '<div class="info-item"><div class="k">NO 總持倉</div><div class="v num">0.00</div></div>'+
+    '<div class="info-item"><div class="k">合計盈虧</div><div class="v num">0.00</div></div>'+
+    '<div class="info-item"><div class="k">風險敞口</div><div class="v num">0.00</div></div></div></div>';
+}
+
+/* 欄位映射：本地欄位 ↔ 原始欄位，共 44 條 */
+function rdMapping(){
+  const map=[
+    ['1','source_id','id','第三方事件ID'],
+    ['2','channel_id','Polymarket渠道ID','數據來源渠道'],
+    ['3','title','title','事件標題'],
+    ['4','cover_url','image','事件封面'],
+    ['5','rule','description','事件規則'],
+    ['6','rule_extend','resolution_source','補充規則/判定來源'],
+    ['7','active','active','是否激活'],
+    ['8','closed','closed','是否關閉'],
+    ['9','start_date','start_date','開始時間'],
+    ['10','end_date','end_date','結束時間'],
+    ['11','game_id','game_id (sports event)','對應體育賽事ID'],
+    ['12','source_id','id','第三方市場ID'],
+    ['13','event_id','event_id','所屬事件'],
+    ['14','title','groupItemTitle (沒有則question)','市場標題'],
+    ['15','question','question','市場問題'],
+    ['16','description','description','市場描述'],
+    ['17','active','active','是否開啟'],
+    ['18','closed','closed','是否關閉'],
+    ['19','outcome_yes','outcomes[0]','YES 選項名稱'],
+    ['20','outcome_no','outcomes[1]','NO 選項名稱'],
+    ['21','price_yes','outcomePrices[0]','YES 當前價格'],
+    ['22','price_no','outcomePrices[1]','NO 當前價格'],
+    ['23','volume','volume','市場成交量'],
+    ['24','liquidity','liquidity','市場流動性'],
+    ['25','start_date','startDate','市場開始時間'],
+    ['26','end_date','endDate','市場結束時間'],
+    ['27','image','image','市場封面'],
+    ['28','icon','icon','市場圖標'],
+    ['29','category','category','市場分類'],
+    ['30','tags','tags','市場標籤'],
+    ['31','condition_id','conditionId','條件 ID'],
+    ['32','question_id','questionID','問題 ID'],
+    ['33','slug','slug','市場 slug'],
+    ['34','description','description','市場詳細描述'],
+    ['35','resolution_source','resolutionSource','判定來源'],
+    ['36','clob_token_yes','clobTokenIds[0]','YES 訂單簿 Token'],
+    ['37','clob_token_no','clobTokenIds[1]','NO 訂單簿 Token'],
+    ['38','neg_risk','negRisk','是否負風險市場'],
+    ['39','order_price_min','orderPriceMinTickSize','最小價格變動'],
+    ['40','order_size_min','orderMinSize','最小下單量'],
+    ['41','volume_24h','volume24hr','24 小時成交量'],
+    ['42','volume_1w','volume1wk','一週成交量'],
+    ['43','volume_1m','volume1mo','一月成交量'],
+    ['44','updated_at','updatedAt','上游更新時間']
+  ];
+  const rows=map.map(function(m){
+    return '<tr><td class="num" style="color:#86909c">'+m[0]+'</td>'+
+      '<td style="color:#1d2129;font-weight:500">'+esc(m[1])+'</td>'+
+      '<td style="color:#4e5969">'+esc(m[2])+'</td>'+
+      '<td style="color:#86909c">'+esc(m[3])+'</td></tr>';
+  }).join('');
+  return '<div class="card"><div class="card-head"><div class="card-title">欄位映射</div>'+
+    '<div class="right"><span style="color:#86909c;font-size:12px">合共 44 條</span></div></div>'+
+    '<div class="table-wrap" style="margin-top:0"><table style="min-width:820px"><thead><tr>'+
+    '<th style="width:64px">序號</th><th style="width:220px">本地欄位</th><th style="width:280px">原始欄位</th><th>欄位說明</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(44,1)+'</div>';
+}
+
+/* ==================================================================
+   頁面：投注類係數調控
+   ================================================================== */
+function pageCoefficient(){
+  const tab=state.coefTab;
+  let body='';
+  if(tab==='global'){
+    body='<div class="coef-hero">'+
+      '<div class="hero-card"><h3 class="hero-title">計算公式</h3>'+
+      '<p class="hero-desc">調控係數越大，展示賠率越低</p>'+
+      '<div class="formula">Data_A = 1 / (Yes/No 機率 × 係數)</div>'+
+      '<p class="hero-note">Yes/No 機率為上游平台獲取的原始數據（市場 Yes/No 機率）。通過「機率 × 係數」計算得出 Yes/No 分別對應的賠率。</p></div>'+
+      '<div class="hero-card"><div style="display:flex;align-items:flex-start"><h3 class="hero-title">調控層級</h3>'+
+      '<button class="guide-link" style="margin-left:auto" onclick="openGuide()">'+icon('info',13)+' 關閉使用指引</button></div>'+
+      '<p class="hero-desc">高優先級設定將覆蓋低優先級設定</p>'+
+      '<div class="tier-flow">'+
+      '<div class="tier"><div class="tier-ico">'+icon('globe',20)+'</div><div class="tier-name">1 全域調控</div><div class="tier-tag">低優先級</div><div class="tier-desc">適用於全部商戶與事件</div></div>'+
+      '<span class="tier-arrow">'+icon('chevron',16)+'</span>'+
+      '<div class="tier"><div class="tier-ico">'+icon('shop',20)+'</div><div class="tier-name">2 按商戶調控</div><div class="tier-tag">中優先級</div><div class="tier-desc">僅影響指定商戶</div></div>'+
+      '<span class="tier-arrow">'+icon('chevron',16)+'</span>'+
+      '<div class="tier"><div class="tier-ico">'+icon('layers',20)+'</div><div class="tier-name">3 按事件調控</div><div class="tier-tag">高優先級</div><div class="tier-desc">僅影響指定事件</div></div>'+
+      '</div></div></div>'+
+      '<div class="card" style="margin-top:14px"><div class="card-head"><div class="card-title">全域係數設定</div>'+
+      '<span class="alert-inline">'+icon('warn',13)+' 修改後將影響全部事件與商戶，請謹慎操作。</span>'+
+      '<div class="right"><span class="btn-text" onclick="toast(\'原型示意：範圍設定\',\'info\')">範圍設定</span></div></div>'+
+      '<p style="color:#86909c;font-size:12px;margin:0 0 4px">統一調整所有市場的報價係數</p>'+
+      '<div class="coef-set"><span style="color:#4e5969">係數值</span>'+
+      '<div class="stepper"><button onclick="stepCoef(-0.01)">−</button>'+
+      '<input id="coef-val" value="1.04" onchange="syncCalc()" />'+
+      '<button onclick="stepCoef(0.01)">+</button></div>'+
+      '<span class="hint num">當前預設 1.04，建議範圍 0.01–10.00</span></div>'+
+      '<div style="display:flex;gap:10px;margin-top:18px">'+
+      '<button class="btn btn-ghost" onclick="document.getElementById(\'coef-val\').value=\'1.04\';syncCalc();toast(\'已還原為 1.04\',\'info\')">取消</button>'+
+      '<button class="btn btn-primary" onclick="saveCoef()">儲存設定</button></div></div>'+
+      '<div class="card" style="margin-top:14px"><div class="card-title" style="margin-bottom:12px">計算範例</div>'+
+      '<div class="calc-grid">'+
+      '<div class="calc yes"><span class="calc-badge">YES</span>'+
+      '<div class="calc-item"><b>47%</b><span>fair_p = 市場概率</span></div><span class="calc-eq">→</span>'+
+      '<div class="calc-item"><b id="yes-q">0.47 × 1.04 = 0.4888</b><span>quote_p = 調整後概率</span></div><span class="calc-eq">→</span>'+
+      '<div class="calc-item"><b id="yes-odd">1 / 0.4888 = 2.05x</b><span>DATA.BET Yes = 最終賠率</span></div></div>'+
+      '<div class="calc no"><span class="calc-badge">NO</span>'+
+      '<div class="calc-item"><b>53%</b><span>fair_p = 市場概率</span></div><span class="calc-eq">→</span>'+
+      '<div class="calc-item"><b id="no-q">0.53 × 1.04 = 0.5512</b><span>quote_p = 調整後概率</span></div><span class="calc-eq">→</span>'+
+      '<div class="calc-item"><b id="no-odd">1 / 0.5512 = 1.81x</b><span>DATA.BET No = 最終賠率</span></div></div></div></div>';
+  } else if(tab==='merchant'){
+    const rows=MERCHANTS.map(function(m,i){
+      const on=i===0;
+      return '<tr><td class="num" style="color:#86909c">'+(i+1)+'</td>'+
+        '<td class="name">'+esc(m[0])+'</td><td>'+statusBadge(on?'on':'off')+'</td>'+
+        '<td class="num">'+(on?'1.04':'<span class="muted">–</span>')+'</td>'+
+        '<td class="actions"><span class="btn-text" onclick="toggleMerchantCoef(\''+esc(m[0])+'\','+(on?'false':'true')+')">'+(on?'關閉調控':'開啟調控')+'</span>'+
+        '<span class="btn-text '+(on?'':'muted')+'" '+(on?'onclick="openMerchantCoef(\''+esc(m[0])+'\')"':'')+'>編輯</span></td></tr>';
+    }).join('');
+    body='<div class="filters">'+
+      '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="輸入商戶名稱" style="min-width:200px" /></div>'+
+      '<div class="f-item"><select class="f-select"><option>調控狀態</option><option>已調控</option><option>未調控</option></select></div>'+
+      '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
+      '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
+      '<div class="table-wrap"><table style="min-width:820px"><thead><tr>'+
+      '<th style="width:56px">序號</th><th>商戶名稱</th><th style="width:140px">調控狀態</th><th style="width:140px">調控係數</th><th style="width:180px">操作</th>'+
+      '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(19,1);
+  } else {
+    const rows=[
+      ['9558232','XRP Up or Down – October 15, 3:00 PM','1.00','ended','Crypto/XRP','+1','Crypto Prices','+7'],
+      ['9558220','Gold Up or Down – October 15, 10AM ET','1.04','live','General Finance','+2','XAU','+4'],
+      ['9558198','BTC Up or Down – October 15, 12PM ET','1.08','live','Crypto/BTC','+3','Crypto Prices','+9'],
+      ['9558171','ETH Up or Down – October 14, 8PM ET','1.02','ended','Crypto/ETH','+1','Crypto Prices','+6'],
+      ['9558160','Silver Up or Down – October 14, 6PM ET','1.00','ended','General Finance','+1','XAG','+3']
+    ].map(function(r){
+      return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></td>'+
+        '<td class="num" style="color:#86909c">'+r[0]+'</td>'+
+        '<td class="name"><div class="cell-clip">'+r[1]+'</div></td>'+
+        '<td class="num"><b style="color:#1d2129;font-weight:600">'+r[2]+'</b></td>'+
+        '<td>'+statusBadge(r[3])+'</td>'+
+        '<td><span class="dot-badge"><span class="d d-on"></span>上架</span></td>'+
+        '<td><span class="chip chip-line">'+r[4]+'</span> <span style="color:#86909c;font-size:11px">'+r[5]+'</span></td>'+
+        '<td><span class="chip chip-line">'+r[6]+'</span> <span style="color:#86909c;font-size:11px">'+r[7]+'</span></td>'+
+        '<td class="actions"><span class="btn-text" onclick="toggleMerchantCoef(\''+r[0]+'\',false)">關閉調控</span>'+
+        '<span class="btn-text" onclick="openMerchantCoef(\''+r[0]+'\')">編輯</span>'+
+        '<span class="btn-text" onclick="openEventDetail(\''+r[0]+'\',\''+esc(r[1])+'\',\''+esc(r[4])+'\',\''+r[3]+'\')">詳情</span></td></tr>';
+    }).join('');
+    body='<div class="filters">'+
+      '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="搜尋 ID / 名稱" /></div>'+
+      '<div class="f-item"><select class="f-select"><option>全部</option><option>事件 ID</option></select></div>'+
+      '<div class="f-item"><select class="f-select"><option>標籤</option><option>Crypto Prices</option></select></div>'+
+      '<div class="f-item"><select class="f-select"><option>事件狀態</option><option>進行中</option><option>已結束</option></select></div>'+
+      '<div class="f-item"><select class="f-select"><option>推送狀態</option><option>上架</option><option>下架</option></select></div>'+
+      '<div class="f-item"><select class="f-select"><option>分類</option><option>Crypto</option><option>Sports</option></select></div>'+
+      '<div class="f-item"><select class="f-select"><option>數據來源</option><option>polymarket</option></select></div>'+
+      '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
+      '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
+      '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openAddEventCoef()">'+icon('plus',14)+' 新增事件調控</button></div>'+
+      '<div class="table-wrap"><table style="min-width:1080px"><thead><tr>'+
+      '<th style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></th>'+
+      '<th>事件 ID</th><th>事件名稱</th><th>調控係數</th><th>事件狀態</th><th>推送狀態</th><th>分類</th><th>標籤</th><th>操作</th>'+
+      '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(1,1);
+  }
+  return '<div class="card"><div class="sub-tabs">'+
+    '<div class="sub-tab'+(tab==='global'?' active':'')+'" onclick="setCoefTab(\'global\')">全域調控</div>'+
+    '<div class="sub-tab'+(tab==='merchant'?' active':'')+'" onclick="setCoefTab(\'merchant\')">按商戶調控</div>'+
+    '<div class="sub-tab'+(tab==='event'?' active':'')+'" onclick="setCoefTab(\'event\')">按事件調控</div>'+
+    '</div>'+body+'</div>';
+}
+function setCoefTab(t){state.coefTab=t;renderShell();}
+function stepCoef(delta){
+  const el=document.getElementById('coef-val');
+  if(!el)return;
+  let v=parseFloat(el.value)||1;
+  v=Math.min(10,Math.max(0.01,+(v+delta).toFixed(2)));
+  el.value=v.toFixed(2);syncCalc();
+}
+function syncCalc(){
+  const el=document.getElementById('coef-val');
+  if(!el)return;
+  let k=parseFloat(el.value);
+  if(isNaN(k)||k<=0){k=1;el.value='1.00';}
+  const yq=0.47*k,nq=0.53*k;
+  const set=function(id,txt){const e=document.getElementById(id);if(e)e.textContent=txt;};
+  set('yes-q','0.47 × '+k.toFixed(2)+' = '+yq.toFixed(4));
+  set('yes-odd','1 / '+yq.toFixed(4)+' = '+(1/yq).toFixed(2)+'x');
+  set('no-q','0.53 × '+k.toFixed(2)+' = '+nq.toFixed(4));
+  set('no-odd','1 / '+nq.toFixed(4)+' = '+(1/nq).toFixed(2)+'x');
+}
+function saveCoef(){
+  const el=document.getElementById('coef-val');
+  const k=el?el.value:'1.04';
+  openModal(modalShell({
+    title:'確認儲存全域係數',size:'narrow',
+    body:'<div class="alert-tip"><span class="i">'+icon('warn',14)+'</span><span>係數 <b>'+esc(k)+'</b> 將套用至全部商戶與事件，預估影響 4,794 個進行中事件。</span></div>'+
+      '<div style="color:#4e5969;line-height:1.7">儲存後新報價即時生效，已成交訂單不受影響。確定要儲存嗎？</div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="closeModal();toast(\'全域係數已更新為 '+esc(k)+'\')">確定儲存</button>'
+  }));
+}
+function toggleMerchantCoef(name,on){
+  if(on){openMerchantCoef(name,true);return;}
+  openModal(modalShell({
+    title:'關閉調控',size:'narrow',
+    body:'<div style="color:#4e5969;line-height:1.7">關閉後「'+esc(name)+'」將回退至上層（全域）係數設定。<br/>確定要關閉嗎？</div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="closeModal();toast(\'已關閉「'+esc(name)+'」的調控\')">確定</button>'
+  }));
+}
+function openMerchantCoef(name,isNew){
+  openModal(modalShell({
+    title:(isNew?'開啟調控':'編輯調控')+' · '+name,
+    body:'<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>按商戶調控優先級高於全域調控，低於按事件調控。</span></div>'+
+      '<div class="field"><label class="field-label"><span class="req">*</span>調控係數</label>'+
+      '<input class="input num" id="mc-val" value="'+(isNew?'1.00':'1.04')+'" /></div>'+
+      '<div class="field"><label class="field-label">生效範圍</label><select class="input"><option>全部事件</option><option>僅指定分類</option></select></div>'+
+      '<div class="field"><label class="field-label">備註</label><textarea class="textarea" placeholder="輸入備註（選填）"></textarea></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="closeModal();toast(\'「'+esc(name)+'」調控已儲存\')">確認</button>'
+  }));
+}
+function openAddEventCoef(){
+  openModal(modalShell({
+    title:'新增事件調控',
+    body:'<div class="field"><label class="field-label"><span class="req">*</span>事件</label><input class="input" placeholder="搜尋事件 ID / 名稱" /></div>'+
+      '<div class="field"><label class="field-label"><span class="req">*</span>調控係數</label><input class="input num" value="1.00" /></div>'+
+      '<div class="field"><label class="field-label">備註</label><textarea class="textarea" placeholder="輸入備註（選填）"></textarea></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="closeModal();toast(\'事件調控已新增\')">確認</button>'
+  }));
+}
+function openGuide(){
+  openModal(modalShell({
+    title:'使用指引',
+    body:'<div style="line-height:1.85;color:#4e5969;font-size:13px">'+
+      '<p style="margin:0 0 12px"><b style="color:#1d2129">三層調控優先級</b></p>'+
+      '<p style="margin:0 0 8px">1. 全域調控（低）— 適用於全部商戶與事件</p>'+
+      '<p style="margin:0 0 8px">2. 按商戶調控（中）— 僅影響指定商戶</p>'+
+      '<p style="margin:0 0 16px">3. 按事件調控（高）— 僅影響指定事件</p>'+
+      '<p style="margin:0 0 12px"><b style="color:#1d2129">計算方式</b></p>'+
+      '<p style="margin:0 0 8px">quote_p = fair_p × 係數</p>'+
+      '<p style="margin:0">最終賠率 = 1 / quote_p</p></div>',
+    foot:'<button class="btn btn-primary" onclick="closeModal()">知道了</button>'
+  }));
+}
+
+/* ==================================================================
+   頁面：商戶列表
+   ================================================================== */
+function pageMerchant(){
+  const rows=MERCHANTS.map(function(m,i){
+    return '<tr><td class="num" style="color:#86909c">'+(i+1)+'</td>'+
+      '<td class="name">'+esc(m[0])+'</td>'+
+      '<td>'+(m[1]==='–'?'<span class="muted">–</span>':esc(m[1]))+'</td>'+
+      '<td class="num">'+(m[2]==='–'?'<span class="muted">–</span>':esc(m[2]))+'</td>'+
+      '<td><div class="cell-clip">'+(m[3]==='–'?'<span class="muted">–</span>':esc(m[3]))+'</div></td>'+
+      '<td class="num">'+m[4]+'</td><td class="num">'+m[5]+'</td>'+
+      '<td style="color:#86909c;font-size:12px">'+m[6]+'</td>'+
+      '<td style="color:#86909c;font-size:12px">'+m[7]+'</td>'+
+      '<td>'+(m[8]==='–'?'<span class="muted">–</span>':'<span class="chip chip-line">'+m[8]+'</span>')+'</td>'+
+      '<td class="actions"><span class="btn-text" onclick="openMerchantPerm(\''+esc(m[0])+'\')">權限設定</span>'+
+      '<span class="btn-text" onclick="openIpWhitelist(\''+esc(m[0])+'\')">IP白名單</span>'+
+      '<span class="btn-text" onclick="openMerchantMore(\''+esc(m[0])+'\')">更多</span></td></tr>';
+  }).join('');
+  return '<div class="card"><div class="filters">'+
+    '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="輸入商戶名稱" style="min-width:190px" /></div>'+
+    '<div class="f-item"><span class="f-label">電郵</span><input class="f-input" placeholder="輸入電郵地址" style="min-width:190px" /></div>'+
+    '<div class="f-item"><select class="f-select"><option>狀態</option><option>啟用</option><option>停用</option></select></div>'+
+    '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
+    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openMerchantAdd()">'+icon('plus',14)+' 新增商戶</button></div>'+
+    '<div class="table-wrap"><table style="min-width:1180px"><thead><tr>'+
+    '<th style="width:56px">序號</th><th>商戶名稱</th><th>聯絡人</th><th>聯絡電話</th><th>電郵</th>'+
+    '<th>過濾分類</th><th>過濾事件</th><th>API Key</th><th>密鑰</th><th>IP白名單</th><th>操作</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(19,1)+'</div>';
+}
+function openMerchantAdd(){
+  openModal(modalShell({
+    title:'新增商戶',
+    body:'<div class="field"><label class="field-label"><span class="req">*</span>商戶名稱</label><input class="input" id="m-name" placeholder="請輸入" /></div>'+
+      '<div class="field"><label class="field-label"><span class="req">*</span>電郵</label><input class="input" id="m-mail" placeholder="輸入電郵地址" /></div>'+
+      '<div class="field"><label class="field-label">聯絡人</label><input class="input" placeholder="請輸入" /></div>'+
+      '<div class="field"><label class="field-label">聯絡電話</label>'+
+      '<div class="phone-row"><select><option>+1</option><option>+86</option><option>+852</option><option>+886</option><option>+60</option></select>'+
+      '<input placeholder="請輸入" /></div></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="submitMerchant()">確認</button>'
+  }));
+}
+function submitMerchant(){
+  const n=(document.getElementById('m-name').value||'').trim();
+  const m=(document.getElementById('m-mail').value||'').trim();
+  if(!n){toast('請輸入商戶名稱','err');return;}
+  if(!m){toast('請輸入電郵地址','err');return;}
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m)){toast('電郵格式不正確','err');return;}
+  closeModal();toast('商戶「'+n+'」已新增，API Key 已生成');
+}
+function openMerchantPerm(name){go('/merchant/merchant/detail');toast('已開啟「'+name+'」權限設定','info');}
+function openIpWhitelist(name){
+  openModal(modalShell({
+    title:'IP 白名單 · '+name,
+    body:'<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>僅白名單內的 IP 可透過 API 存取該商戶數據。</span></div>'+
+      '<div class="field"><label class="field-label">新增 IP</label>'+
+      '<div style="display:flex;gap:8px"><input class="input" placeholder="例如 192.168.10.41" /><button class="btn btn-primary" onclick="toast(\'IP 已加入白名單\')">新增</button></div></div>'+
+      '<div style="border:1px solid #eef1f6;border-radius:8px;overflow:hidden">'+
+      ['192.168.10.41','10.0.0.28'].map(function(ip){
+        return '<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid #f4f6fa">'+
+          '<span class="num" style="flex:1;color:#4e5969">'+ip+'</span>'+
+          '<span class="switch on" onclick="this.classList.toggle(\'on\')"></span>'+
+          '<button class="btn-text" style="margin-left:10px;color:#f53f3f" onclick="toast(\'已移除 '+ip+'\',\'info\')">移除</button></div>';
+      }).join('')+'</div>',
+    foot:'<button class="btn btn-primary" onclick="closeModal()">完成</button>'
+  }));
+}
+function openMerchantMore(name){
+  openModal(modalShell({
+    title:'更多操作 · '+name,size:'narrow',
+    body:'<div style="display:flex;flex-direction:column;gap:2px">'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：編輯商戶\')">編輯商戶</button>'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'API Key 已重新生成\')">重新生成 API Key</button>'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px;color:#f53f3f" onclick="closeModal();confirmDelete(\'商戶\')">刪除商戶</button></div>',
+    foot:false
+  }));
+}
+
+/* ==================================================================
+   頁面：商戶權限設定
+   ================================================================== */
+function pageMerchantDetail(){
+  const tab=state.merchantTab||'type';
+  const tabsBar='<div class="sub-tabs" style="margin-top:16px">'+
+    ['type|類型','category|分類','source|數據源','filter|過濾事件'].map(function(x){
+      const k=x.split('|')[0],n=x.split('|')[1];
+      return '<div class="sub-tab'+(tab===k?' active':'')+'" onclick="setMerchantTab(\''+k+'\')">'+n+'</div>';
+    }).join('')+'</div>';
+  const head='<div class="card"><h2 class="page-title" style="margin:0 0 16px">55</h2>'+
+    '<div class="info-grid" style="grid-template-columns:repeat(4,1fr)">'+
+    '<div class="info-item"><div class="k">電郵</div><div class="v">5225@163.com</div></div>'+
+    '<div class="info-item"><div class="k">聯絡人</div><div class="v">www</div></div>'+
+    '<div class="info-item"><div class="k">聯絡電話</div><div class="v">+113528952633</div></div>'+
+    '<div class="info-item"><div class="k">IP白名單</div><div class="v"><span class="chip chip-line">192.168.10.41</span></div></div></div>'+
+    tabsBar+'</div>';
+  let body='';
+  if(tab==='type') body=mdType();
+  else if(tab==='category') body=mdCategory();
+  else if(tab==='source') body=mdSource();
+  else body=mdFilter();
+  return head+body;
+}
+function setMerchantTab(t){ state.merchantTab=t; renderShell(); }
+
+function mdType(){
+  return '<div class="card"><div class="card-head"><div class="card-title">類型權限</div>'+
+    '<div class="right"><span style="color:#86909c;font-size:12px">控制該商戶可存取的數據類型</span></div></div>'+
+    '<div class="table-wrap" style="margin-top:0"><table style="min-width:760px"><thead><tr>'+
+    '<th>類型</th><th style="width:220px">狀態</th><th style="width:120px">操作</th></tr></thead><tbody>'+
+    '<tr><td class="name">中台基礎數據</td><td><span class="dot-badge"><span class="d d-off"></span>未過濾</span></td><td class="muted">–</td></tr>'+
+    '<tr><td class="name">衍生交易數據</td><td><span class="dot-badge"><span class="d d-off"></span>未過濾</span></td>'+
+    '<td class="actions"><span class="btn-text" onclick="toast(\'原型示意：設定過濾\',\'info\')">過濾</span></td></tr>'+
+    '</tbody></table></div>'+pager(2,1)+'</div>';
+}
+
+function mdCategory(){
+  const cats=[
+    ['Sports','體育/賽事，各類體育賽事、聯賽、盃賽',true],
+    ['Crypto','加密貨幣、區塊鏈、NFT、DeFi 相關',true],
+    ['Politics','政治、選舉、地緣政治事件',true],
+    ['Finance','經濟、宏觀經濟、股市、財報',true],
+    ['Business','商業、企業、併購、商業事件',false],
+    ['Weather','氣候、天氣、自然災害',false],
+    ['Culture','文化、娛樂、獎項、流行文化',false],
+    ['Science','科技、AI、航天、生物、醫學',false]
+  ];
+  const rows=cats.map(function(c){
+    return '<tr><td class="name">'+c[0]+'</td>'+
+      '<td><div class="cell-clip">'+c[1]+'</div></td>'+
+      '<td><span class="switch '+(c[2]?'on':'')+'" onclick="toast(\'原型示意：切換分類權限\',\'info\')"></span></td></tr>';
+  }).join('');
+  return '<div class="card"><div class="card-head"><div class="card-title">分類權限</div>'+
+    '<div class="right"><span style="color:#86909c;font-size:12px">已開啟 4 / 8 個分類</span></div></div>'+
+    '<div class="table-wrap" style="margin-top:0"><table style="min-width:760px"><thead><tr>'+
+    '<th style="width:180px">分類名稱</th><th>描述</th><th style="width:90px">狀態</th></tr></thead><tbody>'+
+    rows+'</tbody></table></div>'+pager(8,1)+'</div>';
+}
+
+function mdSource(){
+  const src=[
+    ['polymarket','Polymarket','上游預測市場平台，事件與市場主來源','142,800','啟用'],
+    ['predict.fun','Predict.fun','衍生交易數據來源，含槓桿與合約','4,800','啟用'],
+    ['kalshi','Kalshi','合規事件合約交易所','0','停用']
+  ];
+  const rows=src.map(function(s,i){
+    const on=i<2;
+    return '<tr><td class="name">'+s[1]+'</td>'+
+      '<td><div class="cell-clip">'+s[2]+'</div></td>'+
+      '<td class="num">'+s[3]+'</td>'+
+      '<td><span class="dot-badge"><span class="d '+(on?'d-on':'d-off')+'"></span>'+(on?'啟用':'停用')+'</span></td>'+
+      '<td><span class="switch '+(on?'on':'')+'" onclick="toast(\'原型示意：切換數據源權限\',\'info\')"></span></td></tr>';
+  }).join('');
+  return '<div class="card"><div class="card-head"><div class="card-title">數據源權限</div>'+
+    '<div class="right"><span style="color:#86909c;font-size:12px">已啟用 2 / 3 個數據源</span></div></div>'+
+    '<div class="table-wrap" style="margin-top:0"><table style="min-width:860px"><thead><tr>'+
+    '<th style="width:150px">數據源</th><th>說明</th><th style="width:120px">事件數</th>'+
+    '<th style="width:110px">狀態</th><th style="width:80px">開關</th></tr></thead><tbody>'+
+    rows+'</tbody></table></div>'+pager(3,1)+'</div>';
+}
+
+function mdFilter(){
+  const rows=[
+    ['8016024137','Gold Up or Down – November 4, 10AM ET','General Finance','已過濾'],
+    ['8016024136','Silver Up or Down – November 4, 10AM ET','General Finance','已過濾'],
+    ['8015839204','KOSPI Composite Index (Korea) Up or Down','General Finance','已過濾']
+  ].map(function(r){
+    return '<tr><td class="num" style="color:#86909c">'+r[0]+'</td>'+
+      '<td class="name"><div class="cell-clip">'+r[1]+'</div></td>'+
+      '<td><span class="chip chip-line">'+r[2]+'</span></td>'+
+      '<td><span class="dot-badge"><span class="d d-off"></span>'+r[3]+'</span></td>'+
+      '<td class="actions"><span class="btn-text" onclick="toast(\'原型示意：移除過濾\',\'info\')">移除</span></td></tr>';
+  }).join('');
+  return '<div class="card"><div class="card-head"><div class="card-title">過濾事件</div>'+
+    '<div class="right"><button class="btn btn-primary" onclick="toast(\'原型示意：新增過濾事件\',\'info\')">'+icon('plus',14)+' 新增過濾</button></div></div>'+
+    '<div class="table-wrap" style="margin-top:0"><table style="min-width:820px"><thead><tr>'+
+    '<th>事件 ID</th><th>事件名稱</th><th>二級分類</th><th style="width:110px">狀態</th><th style="width:90px">操作</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(3,1)+'</div>';
+}
+
+/* ==================================================================
+   頁面：用戶管理
+   ================================================================== */
+function pageUser(){
+  const rows=USERS.map(function(u){
+    return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></td>'+
+      '<td class="num" style="color:#86909c">'+u[0]+'</td>'+
+      '<td style="max-width:110px"><div class="cell-clip num">'+u[1]+'</div></td>'+
+      '<td class="name">'+esc(u[2])+'</td>'+
+      '<td><span class="chip chip-gray">'+u[3]+'</span></td>'+
+      '<td><span class="switch '+(u[4]?'on':'')+'" onclick="toast(\'原型示意：切換用戶狀態\',\'info\')"></span></td>'+
+      '<td><span class="switch '+(u[5]?'on':'')+'" onclick="toast(\'原型示意：切換 MFA 狀態\',\'info\')"></span></td>'+
+      '<td class="muted">'+u[6]+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:#4e5969">'+u[7]+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:#4e5969">'+u[8]+'</td>'+
+      '<td class="actions"><span class="btn-text '+(u[5]?'':'muted')+'" '+(u[5]?'onclick="confirmUnbind(\''+esc(u[1])+'\')"':'')+'>解綁 Google 驗證</span>'+
+      '<span class="btn-text" onclick="openResetPwd(\''+esc(u[1])+'\')">重置密碼</span>'+
+      '<span class="btn-text" onclick="openUserMore(\''+esc(u[1])+'\')">更多</span></td></tr>';
+  }).join('');
+  return '<div class="card"><div class="filters">'+
+    '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="輸入帳號 / 用戶名稱搜尋" style="min-width:220px" /></div>'+
+    '<div class="f-item"><select class="f-select"><option>角色</option><option>超級管理員</option><option>測試</option><option>super admin</option></select></div>'+
+    '<div class="f-item"><select class="f-select"><option>用戶狀態</option><option>啟用</option><option>停用</option></select></div>'+
+    '<div class="f-item"><select class="f-select"><option>Google 驗證</option><option>已綁定</option><option>未綁定</option></select></div>'+
+    '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
+    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openUserAdd()">'+icon('plus',14)+' 新增用戶</button></div>'+
+    '<div class="table-wrap"><table style="min-width:1160px"><thead><tr>'+
+    '<th style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></th>'+
+    '<th>用戶編號</th><th>帳號</th><th>用戶名稱</th><th>角色</th><th>用戶狀態</th><th>Google 驗證狀態</th>'+
+    '<th>備註</th><th>創建時間</th><th>更新時間</th><th>操作</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(24,1)+'</div>';
+}
+function openUserAdd(){
+  openModal(modalShell({
+    title:'新增用戶',
+    body:'<div class="field"><label class="field-label"><span class="req">*</span>帳號</label><input class="input" id="u-acc" placeholder="輸入 6–20 位字母或數字" /></div>'+
+      '<div class="field"><label class="field-label"><span class="req">*</span>密碼</label><input class="input" id="u-pwd" type="password" placeholder="輸入 8–20 位密碼，且必須同時包含字母和數字" /></div>'+
+      '<div class="field"><label class="field-label"><span class="req">*</span>用戶名稱</label><input class="input" id="u-name" placeholder="請輸入" /></div>'+
+      '<div class="field"><label class="field-label"><span class="req">*</span>角色</label>'+
+      '<select class="input" id="u-role"><option value="">請選擇</option><option>超級管理員</option><option>測試</option><option>super admin</option><option>平臺角色</option></select></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="submitUser()">確認</button>'
+  }));
+}
+function submitUser(){
+  const acc=(document.getElementById('u-acc').value||'').trim();
+  const pwd=document.getElementById('u-pwd').value||'';
+  const nm=(document.getElementById('u-name').value||'').trim();
+  const role=document.getElementById('u-role').value;
+  if(!acc){toast('請輸入帳號','err');return;}
+  if(acc.length<6||acc.length>20){toast('帳號需為 6–20 位','err');return;}
+  if(!pwd||pwd.length<8||pwd.length>20||!/[A-Za-z]/.test(pwd)||!/\d/.test(pwd)){toast('密碼需 8–20 位且同時包含字母和數字','err');return;}
+  if(!nm){toast('請輸入用戶名稱','err');return;}
+  if(!role){toast('請選擇角色','err');return;}
+  closeModal();toast('用戶「'+acc+'」已新增');
+}
+function confirmUnbind(acc){
+  openModal(modalShell({
+    title:'解綁 Google 驗證',size:'narrow',
+    body:'<div style="color:#4e5969;line-height:1.7">解綁後「'+esc(acc)+'」登入時將不再需要 Google 驗證碼，帳號安全性會降低。<br/>確定要解綁嗎？</div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-danger" onclick="closeModal();toast(\'已解綁 Google 驗證\')">確定解綁</button>'
+  }));
+}
+function openResetPwd(acc){
+  openModal(modalShell({
+    title:'重置密碼 · '+acc,
+    body:'<div class="alert-tip"><span class="i">'+icon('warn',14)+'</span><span>重置後該用戶需使用新密碼重新登入，舊密碼立即失效。</span></div>'+
+      '<div class="field"><label class="field-label"><span class="req">*</span>新密碼</label><input class="input" type="password" placeholder="8–20 位，需含字母和數字" /></div>'+
+      '<div class="field"><label class="field-label"><span class="req">*</span>確認密碼</label><input class="input" type="password" placeholder="再次輸入新密碼" /></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="closeModal();toast(\'密碼已重置\')">確認重置</button>'
+  }));
+}
+function openUserMore(acc){
+  openModal(modalShell({
+    title:'更多操作 · '+acc,size:'narrow',
+    body:'<div style="display:flex;flex-direction:column;gap:2px">'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：編輯用戶\')">編輯用戶</button>'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：設定角色\')">設定角色</button>'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'已重置 MFA\')">重置 MFA</button>'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px;color:#f53f3f" onclick="closeModal();confirmDelete(\'用戶\')">刪除用戶</button></div>',
+    foot:false
+  }));
+}
+
+/* ==================================================================
+   頁面：角色管理
+   ================================================================== */
+function pageRole(){
+  const rows=ROLES.map(function(r,i){
+    const locked=i===ROLES.length-1;
+    return '<tr><td class="num" style="color:#86909c">'+(i+1)+'</td>'+
+      '<td class="name">'+esc(r[0])+'</td>'+
+      '<td>'+(r[1]==='–'?'<span class="muted">–</span>':esc(r[1]))+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:#4e5969">'+r[2]+'</td>'+
+      '<td class="actions">'+
+      (locked?'<span class="btn-text muted">編輯</span><span class="btn-text muted">刪除</span>'
+        :'<span class="btn-text" onclick="openRoleCreate(\''+esc(r[0])+'\')">編輯</span>'+
+         '<span class="btn-text" style="color:#f53f3f" onclick="confirmDelete(\'角色\')">刪除</span>')+
+      '</td></tr>';
+  }).join('');
+  return '<div class="card"><div class="filters">'+
+    '<div class="f-item"><span class="f-label">角色名稱</span><input class="f-input" placeholder="輸入角色名稱" style="min-width:180px" /></div>'+
+    '<div class="f-item"><span class="f-label">描述</span><input class="f-input" placeholder="輸入描述" style="min-width:180px" /></div>'+
+    '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
+    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openRoleCreate()">'+icon('plus',14)+' 新增角色</button></div>'+
+    '<div class="table-wrap"><table style="min-width:880px"><thead><tr>'+
+    '<th style="width:56px">序號</th><th>角色名稱</th><th>描述</th><th style="width:190px">創建時間</th><th style="width:140px">操作</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(17,1)+'</div>';
+}
+function openRoleCreate(name){
+  go('/system/role/create');
+  if(name)toast('編輯角色「'+name+'」','info');
+}
+
+/* ==================================================================
+   頁面：新增角色（權限樹）
+   ================================================================== */
+function pageRoleCreate(){
+  let idx=0;
+  const rows=PERM_TREE.map(function(g){
+    const gid='g'+(idx++);
+    if(!g.children){
+      return '<div class="perm-row"><div class="perm-c1"><label class="pcheck"><input type="checkbox" data-g="'+gid+'" onchange="toggleAllPerm(\''+gid+'\',this.checked)" />'+g.name+'</label></div>'+
+        '<div class="perm-c2"><span class="muted" style="font-size:12px">—</span></div></div>';
+    }
+    let html='<div class="perm-row"><div class="perm-c1"><span class="expander" onclick="togglePermGroup(this)">'+icon('chevron',12)+'</span>'+
+      '<label class="pcheck"><input type="checkbox" data-g="'+gid+'" onchange="toggleAllPerm(\''+gid+'\',this.checked)" />'+g.name+'</label></div>'+
+      '<div class="perm-c2"></div></div>';
+    g.children.forEach(function(c){
+      const cid='c'+(idx++);
+      const perms=c.perms.length
+        ?c.perms.map(function(p){return '<label class="pcheck"><input type="checkbox" data-g="'+gid+'" data-c="'+cid+'" onchange="syncGroup(\''+gid+'\')" />'+p+'</label>';}).join('')
+        :'<span class="muted" style="font-size:12px">—</span>';
+      html+='<div class="perm-row perm-body" data-parent="'+gid+'">'+
+        '<div class="perm-c1 child"><label class="pcheck"><input type="checkbox" data-g="'+gid+'" data-c="'+cid+'" onchange="toggleChild(\''+cid+'\',this.checked)" />'+c.name+'</label></div>'+
+        '<div class="perm-c2">'+perms+'</div></div>';
+    });
+    return html;
+  }).join('');
+  return '<div class="card"><div class="card-title" style="margin-bottom:16px">新增角色</div>'+
+    '<div class="field" style="max-width:360px"><label class="field-label"><span class="req">*</span>角色名稱</label><input class="input" id="role-name" placeholder="請輸入" /></div>'+
+    '<div class="field" style="max-width:520px"><label class="field-label">描述</label>'+
+    '<textarea class="textarea" maxlength="1000" placeholder="輸入描述" oninput="countChars(this,\'role-desc-c\',1000)"></textarea>'+
+    '<div class="char-count num" id="role-desc-c">0 / 1000</div></div></div>'+
+  '<div class="card"><div class="card-title" style="margin-bottom:14px">功能表權限</div>'+
+    '<div class="perm-table">'+
+    '<div class="perm-row head"><div class="perm-c1" style="background:#f7f9fc">功能表名稱</div><div class="perm-c2" style="background:#f7f9fc">功能表按鈕</div></div>'+
+    rows+'</div>'+
+    '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">'+
+    '<button class="btn btn-ghost" onclick="closeTabEvent(\'/system/role/create\')">取消</button>'+
+    '<button class="btn btn-primary" onclick="submitRole()">確認</button></div></div>';
+}
+function togglePermGroup(el){
+  const row=el.closest('.perm-row');
+  const gid=row.querySelector('input[data-g]').dataset.g;
+  const bodies=document.querySelectorAll('.perm-body[data-parent="'+gid+'"]');
+  const hidden=bodies.length&&bodies[0].style.display==='none';
+  bodies.forEach(function(b){b.style.display=hidden?'':'none';});
+  el.style.transform=hidden?'':'rotate(-90deg)';
+}
+function toggleChild(cid,checked){
+  document.querySelectorAll('input[data-c="'+cid+'"]').forEach(function(i){i.checked=checked;});
+  const gid=document.querySelector('input[data-c="'+cid+'"]').dataset.g;
+  syncGroup(gid);
+}
+function toggleAllPerm(gid,checked){
+  document.querySelectorAll('input[data-g="'+gid+'"]').forEach(function(i){i.checked=checked;});
+}
+function syncGroup(gid){
+  const all=document.querySelectorAll('input[data-g="'+gid+'"][data-c]');
+  const on=document.querySelectorAll('input[data-g="'+gid+'"][data-c]:checked');
+  const g=document.querySelector('input[data-g="'+gid+'"]:not([data-c])');
+  if(g)g.checked=all.length>0&&all.length===on.length;
+}
+function closeTabEvent(path){
+  const i=state.tabs.findIndex(function(t){return t.path===path;});
+  if(i>-1){state.tabs.splice(i,1);state.route='/system/role';renderShell();}
+}
+function submitRole(){
+  const n=(document.getElementById('role-name').value||'').trim();
+  if(!n){toast('請輸入角色名稱','err');return;}
+  closeTabEvent('/system/role/create');toast('角色「'+n+'」已建立');
+}
+
+/* ==================================================================
+   頁面：操作日誌
+   ================================================================== */
+function pageOperation(){
+  const rows=LOGS.map(function(l,i){
+    return '<tr><td class="num" style="color:#86909c">'+(i+1)+'</td>'+
+      '<td class="name">'+esc(l[0])+'</td><td>'+l[1]+'</td>'+
+      '<td><span class="chip chip-gray">'+l[2]+'</span></td>'+
+      '<td><div class="cell-clip">'+esc(l[3])+'</div></td>'+
+      '<td class="actions"><span class="btn-text" onclick="openLogDetail('+i+')">詳情</span></td></tr>';
+  }).join('');
+  return '<div class="card"><div class="filters">'+
+    '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="輸入關鍵字查詢" style="min-width:220px" /></div>'+
+    '<div class="f-item"><select class="f-select"><option>操作類型</option><option>新增白名單IP</option><option>設定IP白名單啟用狀態</option></select></div>'+
+    '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:#4e5969;white-space:nowrap;font-size:13px">操作時間</span>'+
+    '<input class="f-date" placeholder="開始時間" readonly onclick="toast(\'原型示意：選擇開始時間\',\'info\')" />'+
+    '<span style="color:#c9cdd4">–</span>'+
+    '<input class="f-date" placeholder="結束時間" readonly onclick="toast(\'原型示意：選擇結束時間\',\'info\')" /></div>'+
+    '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
+    '<div class="table-wrap"><table style="min-width:940px"><thead><tr>'+
+    '<th style="width:56px">序號</th><th style="width:150px">操作人</th><th style="width:210px">操作類型</th>'+
+    '<th style="width:100px">模組</th><th>操作描述</th><th style="width:90px">操作</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(118,1)+'</div>';
+}
+function openLogDetail(i){
+  const l=LOGS[i]||LOGS[0];
+  openModal(modalShell({
+    title:'操作日誌詳情',
+    body:'<div class="info-grid" style="grid-template-columns:1fr 1fr">'+
+      '<div class="info-item"><div class="k">操作人</div><div class="v">'+esc(l[0])+'</div></div>'+
+      '<div class="info-item"><div class="k">模組</div><div class="v">'+l[2]+'</div></div>'+
+      '<div class="info-item"><div class="k">操作類型</div><div class="v">'+l[1]+'</div></div>'+
+      '<div class="info-item"><div class="k">操作時間</div><div class="v">2026-11-04 09:32:18</div></div>'+
+      '<div class="info-item"><div class="k">IP 位址</div><div class="v">192.168.10.41</div></div>'+
+      '<div class="info-item"><div class="k">結果</div><div class="v" style="color:#00b42a">成功</div></div></div>'+
+      '<div style="margin-top:16px"><div style="color:#86909c;font-size:12px;margin-bottom:6px">操作描述</div>'+
+      '<div style="background:#f7f9fc;border-radius:6px;padding:10px 12px;color:#4e5969;line-height:1.7">'+esc(l[3])+'</div></div>'+
+      '<div style="margin-top:14px"><div style="color:#86909c;font-size:12px;margin-bottom:6px">請求參數</div>'+
+      '<pre style="margin:0;background:#f7f9fc;border-radius:6px;padding:10px 12px;color:#4e5969;font-size:11.5px;overflow-x:auto">'+esc('{\n  "merchant_id": 80058,\n  "ip": "192.168.10.41",\n  "enabled": true\n}')+'</pre></div>',
+    foot:'<button class="btn btn-primary" onclick="closeModal()">關閉</button>'
+  }));
+}
+
+/* ==================================================================
+   用戶菜單 / 版本記錄
+   ================================================================== */
+function showUserMenu(){
+  openPopover(
+    '<div class="popover-head">'+
+      '<span class="popover-avatar">'+icon('user',22)+'</span>'+
+      '<div><div class="popover-name">Sky.r</div><span class="popover-tag">測試</span></div>'+
+    '</div>'+
+    '<div class="popover-sep"></div>'+
+    '<button class="popover-item" onclick="closePopover();toast(\'原型示意：切換深色模式\',\'info\')">'+
+      '<span class="pi">'+icon('moon',17)+'</span><span class="pl">深色模式</span>'+
+      '<span class="switch" id="dark-sw" onclick="event.stopPropagation();this.classList.toggle(\'on\');toast(this.classList.contains(\'on\')?\'已切換為深色模式（原型示意）\':\'已切換為淺色模式\',\'info\')"></span>'+
+    '</button>'+
+    '<div class="popover-sep"></div>'+
+    '<button class="popover-item" onclick="closePopover();toast(\'原型示意：修改密碼\',\'info\')">'+
+      '<span class="pi">'+icon('lock',17)+'</span><span class="pl">修改密碼</span>'+
+      '<span class="pr">'+icon('chevronRight',15)+'</span></button>'+
+    '<button class="popover-item" onclick="onMfaClick()">'+
+      '<span class="pi">'+icon('google',17)+'</span>'+
+      (state.mfaBound
+        ? '<span class="pl">Google 驗證 <span class="state" style="color:#00b42a">（已綁定）</span></span>'+
+          '<span class="act" style="color:#86909c">解綁</span>'
+        : '<span class="pl">Google 驗證 <span class="state">（未綁定）</span></span>'+
+          '<span class="act">綁定</span>')+
+      '</button>'+
+    '<div class="popover-sep"></div>'+
+    '<button class="popover-item danger" onclick="doLogout()">'+
+      '<span class="pi">'+icon('logout',17)+'</span><span class="pl">登出系統</span>'+
+      '<span class="pr">'+icon('chevronRight',15)+'</span></button>',
+    document.getElementById('user-btn')
+  );
+}
+/* 下拉浮層：錨定觸發按鈕下方，右對齊 */
+let popoverEl=null;
+function openPopover(html,anchor){
+  closePopover();
+  if(!anchor)return;
+  const mask=document.createElement('div');
+  mask.className='popover-mask';
+  mask.onclick=closePopover;
+  const box=document.createElement('div');
+  box.className='popover';
+  box.innerHTML=html;
+  document.body.appendChild(mask);
+  document.body.appendChild(box);
+  const r=anchor.getBoundingClientRect();
+  const w=box.offsetWidth||252;
+  let left=r.right-w;
+  if(left<12)left=12;
+  let top=r.bottom+8;
+  box.style.left=left+'px';
+  box.style.top=top+'px';
+  popoverEl={mask:mask,box:box};
+}
+function closePopover(){
+  if(!popoverEl)return;
+  popoverEl.mask.remove();
+  popoverEl.box.remove();
+  popoverEl=null;
+}
+
+/* ==================================================================
+   Google 驗證（MFA）綁定 / 解綁
+   對齊原站 /profile/mfa/setup 與 /profile/mfa/confirm：
+   返回 challengeToken + otpauthUri，5 分鐘內需提交 6 位驗證碼
+   ================================================================== */
+const MFA_SECRET='UV7HGBTFASYXMKHCDT43PMO6DIMGUAZZ';
+let mfaTimer=null, mfaLeft=300;
+
+function onMfaClick(){
+  closePopover();
+  if(state.mfaBound) openMfaUnbind();
+  else openMfaBind();
+}
+
+/* 用純 CSS/HTML 生成一個示意二維碼（非真實可掃碼，僅原型展示） */
+function fakeQr(seed,size){
+  const n=25, cell=size/n;
+  let rects='';
+  let h=0;
+  for(let i=0;i<seed.length;i++) h=(h*31+seed.charCodeAt(i))>>>0;
+  const rnd=function(){ h=(h*1103515245+12345)>>>0; return h/4294967296; };
+  for(let y=0;y<n;y++){
+    for(let x=0;x<n;x++){
+      // 三個定位角保持實心
+      const inFinder=(x<7&&y<7)||(x>=n-7&&y<7)||(x<7&&y>=n-7);
+      if(inFinder) continue;
+      if(rnd()>0.55) rects+='<rect x="'+(x*cell).toFixed(2)+'" y="'+(y*cell).toFixed(2)+'" width="'+cell.toFixed(2)+'" height="'+cell.toFixed(2)+'" fill="#1d2129"/>';
+    }
+  }
+  const finder=function(fx,fy){
+    return '<rect x="'+(fx*cell).toFixed(2)+'" y="'+(fy*cell).toFixed(2)+'" width="'+(7*cell).toFixed(2)+'" height="'+(7*cell).toFixed(2)+'" fill="#1d2129"/>'+
+      '<rect x="'+((fx+1)*cell).toFixed(2)+'" y="'+((fy+1)*cell).toFixed(2)+'" width="'+(5*cell).toFixed(2)+'" height="'+(5*cell).toFixed(2)+'" fill="#fff"/>'+
+      '<rect x="'+((fx+2)*cell).toFixed(2)+'" y="'+((fy+2)*cell).toFixed(2)+'" width="'+(3*cell).toFixed(2)+'" height="'+(3*cell).toFixed(2)+'" fill="#1d2129"/>';
+  };
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" style="display:block">'+
+    '<rect width="'+size+'" height="'+size+'" fill="#fff"/>'+rects+
+    finder(0,0)+finder(n-7,0)+finder(0,n-7)+'</svg>';
+}
+
+function openMfaBind(){
+  const qr=fakeQr(MFA_SECRET,168);
+  openModal(modalShell({
+    title:'綁定 Google 驗證',
+    body:
+      '<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>綁定後登入需輸入 6 位動態驗證碼。請先安裝 Google Authenticator 或同類驗證器 App。</span></div>'+
+      '<div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">'+
+        '<div style="border:1px solid #eef1f6;border-radius:10px;padding:12px;background:#fff;flex:0 0 auto">'+qr+
+          '<div style="text-align:center;color:#86909c;font-size:11px;margin-top:8px">掃描此二維碼</div></div>'+
+        '<div style="flex:1;min-width:200px">'+
+          '<div style="font-size:13px;color:#4e5969;line-height:1.9;margin-bottom:14px">'+
+            '① 開啟驗證器 App，選擇「掃描二維碼」<br/>'+
+            '② 無法掃碼時，手動輸入下方密鑰<br/>'+
+            '③ 將 App 顯示的 6 位驗證碼填入下方'+
+          '</div>'+
+          '<div class="field" style="margin-bottom:12px">'+
+            '<label class="field-label">密鑰（手動輸入）</label>'+
+            '<div style="display:flex;gap:8px">'+
+              '<input class="input readonly" value="'+MFA_SECRET+'" readonly style="font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:.5px" />'+
+              '<button class="btn btn-ghost" style="flex:0 0 auto" onclick="copyMfaSecret()">複製</button>'+
+            '</div>'+
+          '</div>'+
+          '<div style="font-size:12px;color:#86909c">帳戶：<b style="color:#4e5969">DCP-Console : skytest</b></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="field" style="margin-top:18px;margin-bottom:8px">'+
+        '<label class="field-label"><span class="req">*</span>6 位驗證碼</label>'+
+        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+
+          '<input class="input" id="mfa-code" maxlength="6" inputmode="numeric" placeholder="請輸入 6 位數字" '+
+            'style="width:200px;font-size:18px;letter-spacing:8px;text-align:center;font-variant-numeric:tabular-nums" '+
+            'oninput="onMfaInput(this)" />'+
+          '<span id="mfa-count" style="color:#86909c;font-size:12px">有效時間 05:00</span>'+
+        '</div>'+
+        '<div class="form-error" id="mfa-err" style="display:none"></div>'+
+      '</div>',
+    foot:'<button class="btn btn-ghost" onclick="closeMfaBind()">取消</button>'+
+      '<button class="btn btn-primary" id="mfa-submit" onclick="submitMfaBind()">確認綁定</button>'
+  }));
+  mfaLeft=300;
+  startMfaCountdown();
+  setTimeout(function(){ const i=document.getElementById('mfa-code'); if(i&&i.focus)i.focus(); },80);
+}
+function startMfaCountdown(){
+  stopMfaCountdown();
+  mfaTimer=setInterval(function(){
+    mfaLeft--;
+    const el=document.getElementById('mfa-count');
+    if(!el){ stopMfaCountdown(); return; }
+    if(mfaLeft<=0){
+      el.textContent='已過期，請重新取得';
+      el.style.color='#f53f3f';
+      const s=document.getElementById('mfa-submit');
+      if(s){ s.disabled=true; s.style.background='#a9c4f8'; s.style.cursor='not-allowed'; }
+      stopMfaCountdown();
+      return;
+    }
+    const m=String(Math.floor(mfaLeft/60)).padStart(2,'0');
+    const s=String(mfaLeft%60).padStart(2,'0');
+    el.textContent='有效時間 '+m+':'+s;
+    el.style.color=mfaLeft<=60?'#ff7d00':'#86909c';
+  },1000);
+}
+function stopMfaCountdown(){ if(mfaTimer){ clearInterval(mfaTimer); mfaTimer=null; } }
+function onMfaInput(el){
+  el.value=el.value.replace(/\D/g,'').slice(0,6);
+  const err=document.getElementById('mfa-err');
+  if(err) err.style.display='none';
+}
+function copyMfaSecret(){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(MFA_SECRET).then(function(){toast('密鑰已複製','info');},function(){toast('複製失敗，請手動選取','err');});
+  } else { toast('密鑰：'+MFA_SECRET,'info'); }
+}
+function closeMfaBind(){ stopMfaCountdown(); closeModal(); }
+function submitMfaBind(){
+  const i=document.getElementById('mfa-code');
+  const err=document.getElementById('mfa-err');
+  const code=(i?i.value:'').trim();
+  if(code.length!==6){
+    if(err){ err.textContent='請輸入完整的 6 位驗證碼'; err.style.display='block'; }
+    if(i){ i.closest('.field').classList.add('has-error'); }
+    return;
+  }
+  stopMfaCountdown();
+  closeModal();
+  state.mfaBound=true;
+  renderShell();
+  toast('Google 驗證已綁定');
+}
+function openMfaUnbind(){
+  openModal(modalShell({
+    title:'解綁 Google 驗證',size:'narrow',
+    body:'<div style="display:flex;gap:10px;padding:4px 0 8px">'+
+      '<span style="color:#ff7d00;flex:0 0 auto">'+icon('warn',20)+'</span>'+
+      '<div style="color:#4e5969;line-height:1.75">解綁後登入將不再校驗動態驗證碼，帳號安全性降低。<br/>確定要解綁嗎？</div></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-danger" onclick="doUnbindMfa()">確定解綁</button>'
+  }));
+}
+function doUnbindMfa(){
+  closeModal();
+  state.mfaBound=false;
+  renderShell();
+  toast('已解綁 Google 驗證','info');
+}
+function doLogout(){
+  closePopover();
+  state.loggedIn=false;
+  state.route='/login';
+  if(!state.tabs.some(function(t){return t.path==='/login';}))state.tabs.push({path:'/login',title:'登錄頁'});
+  renderShell();
+  toast('已登出','info');
+}
+function showVersion(){
+  openModal(modalShell({
+    title:'原型版本記錄',
+    body:'<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>本原型為界面與交互演示，數據為業務化 mock，不含真實後端邏輯。</span></div>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:4px 0 16px">'+
+      '<div class="ver-card"><div class="k">當前版本</div><div class="v">'+VERSION+'</div></div>'+
+      '<div class="ver-card"><div class="k">發布日期</div><div class="v">'+BUILD_DATE+'</div></div>'+
+      '<div class="ver-card"><div class="k">框架參考</div><div class="v">'+BASE_REF+'</div></div></div>'+
+      '<div style="border-top:1px solid #eef1f6;padding-top:14px">'+
+      '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
+      '<div style="display:flex;gap:12px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 首次發布</div>'+
+      '依原站前端還原管理面 9 個業務頁面與 7 類彈窗；外框改為產品基線結構，新增「產品基線 · 規範」文檔頁；'+
+      '字體按基線規範統一為 Outfit + 系統中文字體，配色沿用原站藍色體系。</div></div></div>',
+    foot:'<button class="btn btn-primary" onclick="closeModal()">關閉</button>'
+  }));
+}
+
+/* ---------- 啟動 ---------- */
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    if(modalStack.length)closeModal();
+    else closePopover();
+  }
+});
+window.addEventListener('resize',closePopover);
+window.addEventListener('scroll',closePopover,true);
+setInterval(tickClock,1000);
+renderShell();
+
+</script>
+</body>
+</html>
