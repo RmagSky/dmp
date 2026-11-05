@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 管理面
-  原型版本：V1.1.1 ｜ 入口：index.html
+  原型版本：V1.1.2 ｜ 入口：index.html
   配色沿用原站 192.168.10.51:7080；字體按產品基線規範
 -->
 <html lang="zh-CN">
@@ -9,9 +9,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>管理面 · 數據中台管理系統 V1.1.1</title>
+<title>管理面 · 數據中台管理系統 V1.1.2</title>
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.1.1">
+<link rel="stylesheet" href="assets/app.css?v=1.1.2">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -24,7 +24,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 管理面</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.1.1</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.1.2</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -40,11 +40,11 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.1.1"></script>
+<script src="assets/core.js?v=1.1.2"></script>
 <script>
 /* ==================================================================
    數據中台管理系統 · 交互原型
-   框架參考產品基線；配色沿用原站；字體按基線規範
+   配色沿用原站；字體按基線規範
    ================================================================== */
 /* ---------- 選單 ---------- */
 const MENU=[
@@ -2239,15 +2239,19 @@ function showVersion(){
   openModal(modalShell({
     title:'原型版本記錄',
     body:'<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>本原型為界面與交互演示，數據為業務化 mock，不含真實後端邏輯。</span></div>'+
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:4px 0 16px">'+
+      '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:4px 0 16px">'+
       '<div class="ver-card"><div class="k">當前版本</div><div class="v">'+VERSION+'</div></div>'+
-      '<div class="ver-card"><div class="k">發布日期</div><div class="v">'+BUILD_DATE+'</div></div>'+
-      '<div class="ver-card"><div class="k">框架參考</div><div class="v">'+BASE_REF+'</div></div></div>'+
+      '<div class="ver-card"><div class="k">發布日期</div><div class="v">'+BUILD_DATE+'</div></div></div>'+
       '<div style="border-top:1px solid #eef1f6;padding-top:14px">'+
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
       '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 內容變更</div>'+
+      '規範頁 1.1 升版規則改為按位遞增：功能變更中間位 +1、尾數歸零，內容變更尾數 +1；'+
+      '新增協作場景的版本衝突處理順序，5.1 衝突規則同步改寫。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.1.1</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 內容變更</div>'+
       '規範頁 5.1 補緩存策略與驗證說明：Cloudflare 每次回源，GitHub Pages 的 HTML 緩存 10 分鐘；'+
       '上傳前檢查清單第 2 項擴展為版本號與變更記錄同查。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.1.0</span>'+
