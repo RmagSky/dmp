@@ -6,12 +6,18 @@
 
 ## 在線訪問
 
-**https://rmagsky.github.io/dmp/**
+主入口（Cloudflare Workers）：**https://dmp.arthems.workers.dev/**
+
+備用入口（GitHub Pages）：**https://rmagsky.github.io/dmp/**
 
 直接打開即可，無需本地環境。單頁入口：
 
-- 管理面 `https://rmagsky.github.io/dmp/dmp.html`
-- 產品基線 `https://rmagsky.github.io/dmp/rule.html`
+| 頁面 | Cloudflare | GitHub Pages |
+| --- | --- | --- |
+| 管理面 | `https://dmp.arthems.workers.dev/dmp` | `https://rmagsky.github.io/dmp/dmp.html` |
+| 產品基線 | `https://dmp.arthems.workers.dev/rule` | `https://rmagsky.github.io/dmp/rule.html` |
+
+Cloudflare 端省略 `.html` 後綴，帶後綴的地址會自動 307 跳轉到無後綴路徑。GitHub Pages 需保留後綴。
 
 ## 文件結構
 

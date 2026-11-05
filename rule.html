@@ -577,7 +577,8 @@ function specComp(){
 
 function specTeam(){
   const repo='https://github.com/RmagSky/dmp';
-  const site='https://rmagsky.github.io/dmp/';
+  const site='https://dmp.arthems.workers.dev/';
+  const site2='https://rmagsky.github.io/dmp/';
   return '<div class="spec-crumb">產品基線 / 團隊協作 / 團隊更新與上傳流程</div>'+
     '<h1 class="spec-h1">團隊更新與上傳流程</h1>'+
     '<p class="spec-lead">原型以 Git 倉庫為唯一事實來源，所有人直接在主線 main 上工作。每次動手前先拉取上游，上傳前先合併並驗證，五步按順序執行，不跳步。</p>'+
@@ -585,11 +586,12 @@ function specTeam(){
     '<div class="spec-block"><h3>一、倉庫與入口</h3>'+
       '<table class="spec-table"><thead><tr><th style="width:132px">項</th><th>內容</th></tr></thead><tbody>'+
       '<tr><td>倉庫</td><td><span class="mono-code">'+repo+'</span></td></tr>'+
-      '<tr><td>線上入口</td><td><span class="mono-code">'+site+'</span></td></tr>'+
+      '<tr><td>主入口</td><td><span class="mono-code">'+site+'</span>　Cloudflare Workers，省略 <span class="mono-code">.html</span> 後綴</td></tr>'+
+      '<tr><td>備用入口</td><td><span class="mono-code">'+site2+'</span>　GitHub Pages，保留 <span class="mono-code">.html</span> 後綴</td></tr>'+
       '<tr><td>主線分支</td><td><span class="mono-code">main</span>，唯一長期分支，不開個人分支</td></tr>'+
       '<tr><td>入口文件</td><td><span class="mono-code">index.html</span> 框架頁 ｜ <span class="mono-code">dmp.html</span> 管理面 ｜ <span class="mono-code">rule.html</span> 產品基線</td></tr>'+
       '<tr><td>共用資源</td><td><span class="mono-code">assets/app.css</span>、<span class="mono-code">assets/core.js</span> 被三個頁面共用，改動影響全部頁面</td></tr>'+
-      '<tr><td>發布方式</td><td>推送到 main 後 GitHub Pages 自動重建，約 1 分鐘生效</td></tr>'+
+      '<tr><td>發布方式</td><td>推送到 main 後 GitHub Pages 自動重建，約 1 分鐘生效；Cloudflare Workers 端同步更新</td></tr>'+
       '</tbody></table></div>'+
 
     '<div class="spec-block"><h3>二、五步流程</h3>'+
@@ -660,7 +662,7 @@ function specTeam(){
       '<tr><td class="num">4</td><td>無臨時文件</td><td>不含 <span class="mono-code">node_modules</span>、截圖、備份文件、編輯器配置</td></tr>'+
       '<tr><td class="num">5</td><td>改動範圍可控</td><td><span class="mono-code">git status</span> 列出的文件都是本次有意修改的</td></tr>'+
       '</tbody></table>'+
-      '<div class="spec-note blue"><span class="i">'+icon('info',15)+'</span><span>推送後打開線上入口確認：頁面可加載、字體正常（<span class="mono-code">_fonts/</span> 未 404）、改動處生效。Pages 重建期間訪問可能仍為舊版本，等重建完成再判斷。</span></div></div>'+
+      '<div class="spec-note blue"><span class="i">'+icon('info',15)+'</span><span>推送後打開主入口確認：頁面可加載、字體正常（<span class="mono-code">_fonts/</span> 未 404）、改動處生效。Pages 重建期間訪問可能仍為舊版本，等重建完成再判斷。</span></div></div>'+
 
     '<div class="spec-block"><h3>六、禁止事項</h3>'+
       '<table class="spec-table"><thead><tr><th style="width:200px">禁止操作</th><th>原因與替代做法</th></tr></thead><tbody>'+
