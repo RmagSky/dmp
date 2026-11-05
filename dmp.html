@@ -11,7 +11,7 @@
 <meta name="color-scheme" content="only light">
 <title>管理面 · 數據中台管理系統 V1.0.0</title>
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/app.css?v=1.0.0">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -40,7 +40,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js"></script>
+<script src="assets/core.js?v=1.0.0"></script>
 <script>
 /* ==================================================================
    數據中台管理系統 · 交互原型
@@ -87,6 +87,8 @@ const DASH={
     {label:'商戶總數',value:'19',unit:'家',icon:'shop',color:'#8b5cf6',bg:'#f3edff',foot:'啟用 19 家 · 停用 0 家'}
   ],
   trend:{labels:['10-29','10-30','10-31','11-1','11-2','11-3','11-4'],values:[2400,1700,3800,2300,1950,9240,4100]},
+  /* 30 天口徑：近 30 天分段切換使用 */
+  trend30:{labels:['10-06','10-10','10-14','10-18','10-22','10-26','10-30','11-04'],values:[3100,2650,4200,3800,5100,4600,6200,4100]},
   cats:{labels:['Crypto','Sports','Finance','Politics','Weather','Culture','Science'],values:[70086,57294,4794,3390,2755,658,657]},
   sources:[{name:'polymarket',v:142800},{name:'predict.fun',v:4800}],
   top:[
@@ -111,28 +113,54 @@ const DASH={
     {n:'LoL: Invictus Gaming vs LYON (BO3) - Worlds Group Stage',v:'58,236,910,447'}
   ]
 };
-const CAT_TABS=['CF測試83447','CF測試83350','zhenzhengr3','youtest002','MJHTEST','tech','Business','Weather','Culture','Science','Finance','Crypto'];
+/* 分類頁籤：與「事件分類」頁共用同一份分類樹，不另立數據源 */
+function catTabs(){ return CAT_TREE.map(function(g){ return g.name; }); }
 const EVENTS=[
-  ['8016024137','Gold Up or Down – November 4, 10AM ET','General Finance','','live','on','polymarket',['15M','+5']],
-  ['8016024136','Silver Up or Down – November 4, 10AM ET','General Finance','','live','on','polymarket',['15M','+5']],
-  ['8015839204','KOSPI Composite Index (Korea) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2']],
-  ['8015839203','UNITREE (宇樹科技) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2']],
-  ['8015839202','Gold Up or Down – November 4, 8AM ET','General Finance','+1','live','on','predict.fun',['XAU','+4']],
-  ['8015839201','HANG SENG INDEX (恆生指數) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+3']],
-  ['8015726418','SK Hynix Inc. Up or Down – Nov 4','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2']],
-  ['8015726417','Gold Up or Down – November 4, 6AM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
-  ['8015726416','Zhipu AI Up or Down – Nov 4','General Finance','+1','ended','on','predict.fun',['ZHIPU','+4']],
-  ['8015726415','Gold Up or Down – November 3, 10PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
-  ['8015726414','Gold Up or Down – November 3, 8PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
-  ['8015726413','SK Hynix Inc. Up or Down – Nov 3','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4']],
-  ['8015726412','SK Hynix Inc. Up or Down – Nov 3 (Late)','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4']],
-  ['8015726411','Gold Up or Down – November 3, 6PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
-  ['8015726410','Gold Up or Down – November 3, 4PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
-  ['8015621048','Unitree Robotics Up or Down – Nov 3','General Finance','+1','ended','on','predict.fun',['UNITREE','+4']],
-  ['8015621047','Unitree Robotics Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['UNITREE','+4']],
-  ['8015621046','Gold Up or Down – November 2, 10PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4']],
-  ['8015621045','Zhipu AI Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['ZHIPU','+4']],
-  ['8015621044','SK Hynix Inc. Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4']]
+  ['8016024137','Gold Up or Down – November 4, 10AM ET','General Finance','','live','on','polymarket',['15M','+5'],'Finance','Commodities'],
+  ['8016024136','Silver Up or Down – November 4, 10AM ET','General Finance','','live','on','polymarket',['15M','+5'],'Finance','Commodities'],
+  ['8015839204','KOSPI Composite Index (Korea) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2'],'Finance','Equities'],
+  ['8015839203','UNITREE (宇樹科技) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2'],'Business','Big Tech Companies'],
+  ['8015839202','Gold Up or Down – November 4, 8AM ET','General Finance','+1','live','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
+  ['8015839201','HANG SENG INDEX (恆生指數) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+3'],'Finance','Equities'],
+  ['8015726418','SK Hynix Inc. Up or Down – Nov 4','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2'],'Business','Earnings'],
+  ['8015726417','Gold Up or Down – November 4, 6AM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
+  ['8015726416','Zhipu AI Up or Down – Nov 4','General Finance','+1','ended','on','predict.fun',['ZHIPU','+4'],'Science','AI'],
+  ['8015726415','Gold Up or Down – November 3, 10PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
+  ['8015726414','Gold Up or Down – November 3, 8PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
+  ['8015726413','SK Hynix Inc. Up or Down – Nov 3','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4'],'Business','Earnings'],
+  ['8015726412','SK Hynix Inc. Up or Down – Nov 3 (Late)','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4'],'Business','Earnings'],
+  ['8015726411','Gold Up or Down – November 3, 6PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
+  ['8015726410','Gold Up or Down – November 3, 4PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
+  ['8015621048','Unitree Robotics Up or Down – Nov 3','General Finance','+1','ended','on','predict.fun',['UNITREE','+4'],'Business','Big Tech Companies'],
+  ['8015621047','Unitree Robotics Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['UNITREE','+4'],'Business','Big Tech Companies'],
+  ['8015621046','Gold Up or Down – November 2, 10PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
+  ['8015621045','Zhipu AI Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['ZHIPU','+4'],'Science','AI'],
+  ['8015621044','SK Hynix Inc. Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4'],'Business','Earnings'],
+  /* Weather */
+  ['8015512203','Hurricane Melissa landfall by Nov 6?','Weather','','live','on','polymarket',['hurricane','+3'],'Weather','Hurricanes'],
+  ['8015512202','Atlantic named storms above 18 in 2026?','Weather','','live','on','polymarket',['climate','+2'],'Weather','Climate Change'],
+  ['8015512201','Tokyo snowfall on Dec 25?','Weather','','created','on','polymarket',['Weather','+2'],'Weather','General Weather'],
+  ['8015512200','Magnitude 7+ earthquake before year end?','Weather','','ended','on','polymarket',['earthquake','+4'],'Weather','Earthquakes'],
+  /* Culture */
+  ['8015413305','Oscars 2027 Best Picture – Nominee','Culture','','live','on','polymarket',['Awards','+6'],'Culture','Awards'],
+  ['8015413304','Grammy Album of the Year 2027?','Culture','','live','on','predict.fun',['Music','+5'],'Culture','Music'],
+  ['8015413303','Top-grossing film of 2026?','Culture','','created','on','polymarket',['Movies','+7'],'Culture','Movies'],
+  ['8015413302','Taylor Swift announces new tour?','Culture','','ended','on','predict.fun',['Celebrity','+8'],'Culture','Celebrity'],
+  /* Crypto */
+  ['8015314407','BTC above $120K on Nov 30?','Crypto','','live','on','polymarket',['BTC','+9'],'Crypto','BTC'],
+  ['8015314406','ETH above $6K by year end?','Crypto','','live','on','predict.fun',['ETH','+6'],'Crypto','ETH'],
+  ['8015314405','Solana hits $500 in 2026?','Crypto','','created','on','polymarket',['Altcoins','+7'],'Crypto','Altcoins'],
+  ['8015314404','DeFi TVL above $300B?','Crypto','','ended','on','predict.fun',['DeFi','+5'],'Crypto','DeFi'],
+  /* Sports */
+  ['8015215508','Premier League: Man City vs Liverpool','Sports','','live','on','polymarket',['Rugby','+9'],'Sports','Football'],
+  ['8015215507','NBA: Lakers vs Celtics – Winner','Sports','','live','on','predict.fun',['Ncaa','+7'],'Sports','Basketball'],
+  ['8015215506','LoL Worlds 2026 – Champion','Sports','','created','on','polymarket',['Esports','+8'],'Sports','Esports'],
+  ['8015215505','UFC 320 main event winner?','Sports','','ended','on','predict.fun',['UFC','+6'],'Sports','Combat'],
+  /* Politics */
+  ['8015116609','Which party wins the House in 2026?','Politics','','live','on','polymarket',['Trump','+9'],'Politics','Elections'],
+  ['8015116608','Government shutdown before Dec 31?','Politics','','live','on','predict.fun',['USA','+7'],'Politics','Policy'],
+  ['8015116607','US–China tariff deal in 2026?','Politics','','created','on','polymarket',['China','+8'],'Politics','Geopolitics'],
+  ['8015116606','UK general election turnout above 70%?','Politics','','ended','on','predict.fun',['UK','+6'],'Politics','Elections']
 ];
 const CATEGORIES=[
   ['CF測試83447',2,'1212','阿富汗、亞美尼亞、亞塞拜然…',[],true,true],
@@ -294,7 +322,9 @@ const state={
   tabs:[{path:'/index',title:'事件總覽'}],
   navOpen:{event:true,merchant:false,system:false,auth:false},
   drawer:false, coefTab:'global', reviewTab:'basic', merchantTab:'type', specSection:'version',
-  topRange:'24h', mfaBound:false, eventCat:CAT_TABS[0]
+  topRange:'24h', mfaBound:false, eventCat:null, trendRange:'7',
+  /* 開關狀態：key 形如 'ev:8016024137:push'，避免重繪後狀態丟失 */
+  sw:{}
 };
 
 function renderShell(){
@@ -438,21 +468,24 @@ function tickClock(){
    ================================================================== */
 function pageDashboard(){
   const d=DASH;
+  /* 圖表時間口徑：7 天 / 30 天 */
+  const range=state.trendRange||'7';
+  const tr=range==='30'?d.trend30:d.trend;
   const statsHtml=d.stats.map(function(s){
     return '<div class="stat"><div class="stat-ico" style="background:'+s.bg+';color:'+s.color+'">'+icon(s.icon,17)+'</div>'+
       '<div class="stat-main"><div class="stat-label">'+s.label+'</div>'+
       '<div class="stat-value">'+s.value+'<small>'+s.unit+'</small></div>'+
       (s.foot?'<div class="stat-foot">'+s.foot+'</div>':'')+'</div></div>';
   }).join('');
-  const maxV=Math.max.apply(null,d.trend.values);
+  const maxV=Math.max.apply(null,tr.values);
   const ticks=[0,Math.round(maxV/5),Math.round(maxV*2/5),Math.round(maxV*3/5),Math.round(maxV*4/5),maxV];
   const gridHtml=ticks.map(function(t,i){
     return '<div class="gridline" style="bottom:'+((i/5)*190)+'px"><span>'+t.toLocaleString()+'</span></div>';
   }).join('');
-  const barsHtml=d.trend.values.map(function(v,i){
-    return '<div class="bar-col"><div class="bar" style="height:'+Math.max(6,(v/maxV)*190)+'px" title="'+d.trend.labels[i]+'：'+v.toLocaleString()+'"></div></div>';
+  const barsHtml=tr.values.map(function(v,i){
+    return '<div class="bar-col"><div class="bar" style="height:'+Math.max(6,(v/maxV)*190)+'px" title="'+tr.labels[i]+'：'+v.toLocaleString()+'"></div></div>';
   }).join('');
-  const xHtml=d.trend.labels.map(function(l){return '<span>'+l+'</span>';}).join('');
+  const xHtml=tr.labels.map(function(l){return '<span>'+l+'</span>';}).join('');
   const cv=d.cats.values,cMax=Math.max.apply(null,cv);
   const xs=[70,150,230,310,390,470,550];
   const ys=cv.map(function(v){return 250-(v/cMax)*205;});
@@ -487,8 +520,8 @@ function pageDashboard(){
   return '<div class="stat-grid">'+statsHtml+'</div>'+
   '<div class="grid-2">'+
     '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>新增趨勢</div>'+
-      '<div class="right"><div class="seg"><button class="active">近 7 天</button><button onclick="toast(\'原型示意：切換近 30 天\',\'info\')">近 30 天</button></div>'+
-      '<input class="f-date" placeholder="開始日期 – 結束日期" readonly onclick="toast(\'原型示意：日期範圍選擇\',\'info\')" style="width:168px" /></div></div>'+
+      '<div class="right"><div class="seg"><button class="'+(range==='7'?'active':'')+'" onclick="setTrendRange(\'7\')">近 7 天</button><button class="'+(range==='30'?'active':'')+'" onclick="setTrendRange(\'30\')">近 30 天</button></div>'+
+      '<input class="f-date" id="dp-chart" placeholder="開始日期 – 結束日期" readonly onclick="openDatePicker({mode:\'range\',target:\'dp-chart\',title:\'新增趨勢 · 日期範圍\'})" style="width:168px" /></div></div>'+
       '<div class="legend" style="justify-content:flex-end;margin-bottom:4px"><i style="background:#5b8cff"></i>新增事件</div>'+
       '<div class="chart-trend"><div class="bars">'+gridHtml+barsHtml+'</div><div class="bar-x">'+xHtml+'</div></div></section>'+
     '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>類型分布</div>'+
@@ -526,29 +559,35 @@ function pageDashboard(){
       '<div class="top-list">'+topHtml+'</div></section></div>';
 }
 function setTopRange(r){ state.topRange=r; renderShell(); }
+function setTrendRange(r){ state.trendRange=r; renderShell(); }
 
 /* ==================================================================
    頁面：事件列表
    ================================================================== */
 function pageEventList(){
-  const curCat=state.eventCat||CAT_TABS[0];
-  const strip=CAT_TABS.map(function(t){
+  const tabs=catTabs();
+  const curCat=state.eventCat&&tabs.indexOf(state.eventCat)>=0?state.eventCat:tabs[0];
+  const strip=tabs.map(function(t){
     return '<button class="cat-tab'+(t===curCat?' active':'')+'" onclick="setEventCat(\''+t+'\')">'+t+'</button>';
   }).join('');
-  const rows=EVENTS.map(function(r){
+  /* 按當前分類篩選；分類下無事件時顯示空態 */
+  const list=EVENTS.filter(function(r){ return r[8]===curCat; });
+  const rows=list.map(function(r){
     const tags=r[7].map(function(t){return '<span class="chip">'+t+'</span>';}).join(' ');
-    const catChip=r[3]?'<span class="chip chip-blue" style="margin-left:6px">'+r[3]+'</span>':'';
+    const catChip=r[9]?'<span class="chip chip-blue" style="margin-left:6px">'+r[9]+'</span>':'';
     return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></td>'+
       '<td class="num" style="color:#86909c">'+r[0]+'</td>'+
       '<td class="name"><div class="cell-clip" title="'+esc(r[1])+'">'+esc(r[1])+'</div></td>'+
       '<td><div style="width:34px;height:24px;border-radius:3px;background:linear-gradient(135deg,#eef4ff,#dbe8ff);display:flex;align-items:center;justify-content:center;color:#9db8e8">'+icon('file',13)+'</div></td>'+
       '<td>'+r[2]+catChip+'</td><td>'+statusBadge(r[4])+'</td>'+
-      '<td><span class="switch '+(r[5]==='on'?'on':'')+'" onclick="toast(\'原型示意：切換推送狀態\',\'info\')"></span></td>'+
+      '<td><span class="switch '+(swGet('ev:'+r[0]+':push',r[5]==='on')?'on':'')+'" data-label="推送狀態" onclick="toggleSwitch(this,\'ev:'+r[0]+':push\')"></span></td>'+
       '<td><span class="chip chip-line">'+r[6]+'</span></td><td>'+tags+'</td>'+
-      '<td class="actions"><span class="btn-text" onclick="toast(\'原型示意：國家過濾\',\'info\')">國家過濾</span>'+
+      '<td class="actions"><span class="btn-text" onclick="openCountryFilter(\''+esc(r[1])+'\',\'event\')">國家過濾</span>'+
       '<span class="btn-text" onclick="openEventEdit(\''+r[0]+'\')">編輯</span>'+
       '<span class="btn-text" onclick="openEventDetail(\''+r[0]+'\')">詳情</span></td></tr>';
   }).join('');
+  const bodyHtml=rows||'<tr><td colspan="10"><div class="empty-state">'+
+      icon('file',26)+'<p>「'+esc(curCat)+'」分類下暫無事件</p></div></td></tr>';
   return '<div class="card"><div class="cat-strip-wrap">'+
     '<button class="cat-nav" onclick="scrollCat(-1)" aria-label="向前滾動">'+
       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
@@ -565,9 +604,9 @@ function pageEventList(){
     '<div class="f-item"><select class="f-select"><option>推送狀態</option><option>已推送</option><option>未推送</option></select></div>'+
     '<div class="f-item"><select class="f-select"><option>數據來源</option><option>polymarket</option><option>predict.fun</option></select></div>'+
     '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:#4e5969;white-space:nowrap;font-size:13px">截止時間</span>'+
-    '<input class="f-date" placeholder="開始日期" readonly onclick="toast(\'原型示意：選擇開始日期\',\'info\')" />'+
+    '<input class="f-date" id="dp-ev-start" placeholder="開始日期" readonly onclick="openDatePicker({mode:\'single\',target:\'dp-ev-start\',title:\'截止時間 · 開始\'})" />'+
     '<span style="color:#c9cdd4">–</span>'+
-    '<input class="f-date" placeholder="結束日期" readonly onclick="toast(\'原型示意：選擇結束日期\',\'info\')" /></div>'+
+    '<input class="f-date" id="dp-ev-end" placeholder="結束日期" readonly onclick="openDatePicker({mode:\'single\',target:\'dp-ev-end\',title:\'截止時間 · 結束\'})" /></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
     '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button>'+
     '<div style="margin-left:auto;display:flex;gap:6px">'+
@@ -576,7 +615,7 @@ function pageEventList(){
     '<div class="table-wrap"><table><thead><tr>'+
     '<th style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></th>'+
     '<th>事件 ID</th><th>名稱</th><th>封面</th><th>二級分類</th><th>事件狀態</th><th>推送狀態</th><th>數據來源</th><th>關聯標籤</th><th>操作</th>'+
-    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(240,1)+'</div>';
+    '</tr></thead><tbody>'+bodyHtml+'</tbody></table></div>'+pager(Math.max(list.length,1),1)+'</div>';
 }
 function setEventCat(c){
   state.eventCat=c;
@@ -722,10 +761,10 @@ function pageCategory(){
       '<td style="min-width:220px"><div class="cell-clip" title="'+esc(g.desc)+'">'+esc(g.desc)+'</div></td>'+
       '<td style="min-width:210px"><div class="cell-clip" title="'+esc(g.countries)+'">'+(g.countries==='–'?'<span class="muted">–</span>':esc(g.countries))+'</div></td>'+
       '<td style="min-width:230px"><div class="cell-clip">'+tags+'</div></td>'+
-      '<td style="width:64px"><span class="switch on" onclick="toast(\'原型示意：切換分類狀態\',\'info\')"></span></td>'+
+      '<td style="width:64px"><span class="switch '+(swGet('cat:'+g.name+':on',true)?'on':'')+'" data-label="分類狀態" onclick="toggleSwitch(this,\'cat:'+esc(g.name)+':on\')"></span></td>'+
       '<td class="actions" style="width:230px">'+
         '<span class="btn-text" onclick="openCategoryAdd(\''+esc(g.name)+'\')">新增分類</span>'+
-        '<span class="btn-text" onclick="openCountryFilter(\''+esc(g.name)+'\')">國家過濾</span>'+
+        '<span class="btn-text" onclick="openCountryFilter(\''+esc(g.name)+'\',\'category\')">國家過濾</span>'+
         '<span class="btn-text" onclick="openMoreMenu(\''+esc(g.name)+'\')">更多</span>'+
       '</td></tr>';
     if(!collapsed){
@@ -737,10 +776,10 @@ function pageCategory(){
           '<td><div class="cell-clip" style="color:#86909c">'+esc(c.desc)+'</div></td>'+
           '<td class="muted">–</td>'+
           '<td class="muted">–</td>'+
-          '<td><span class="switch on" onclick="toast(\'原型示意：切換子分類狀態\',\'info\')"></span></td>'+
+          '<td><span class="switch '+(swGet('subcat:'+c.name+':on',true)?'on':'')+'" data-label="子分類狀態" onclick="toggleSwitch(this,\'subcat:'+esc(c.name)+':on\')"></span></td>'+
           '<td class="actions">'+
             '<span class="btn-text" onclick="openCategoryAdd(\''+esc(c.name)+'\')">新增分類</span>'+
-            '<span class="btn-text" onclick="openCountryFilter(\''+esc(c.name)+'\')">國家過濾</span>'+
+            '<span class="btn-text" onclick="openCountryFilter(\''+esc(c.name)+'\',\'category\')">國家過濾</span>'+
             '<span class="btn-text" onclick="openMoreMenu(\''+esc(c.name)+'\')">更多</span>'+
           '</td></tr>';
       });
@@ -770,7 +809,7 @@ function openCategoryAdd(name){
     body:'<div class="field"><label class="field-label"><span class="req">*</span>分類名稱</label>'+
       '<input class="input" id="cat-name" maxlength="25" placeholder="輸入分類名稱" value="'+init+'" oninput="countChars(this,\'cat-name-c\',25)" />'+
       '<div class="char-count num" id="cat-name-c">'+init.length+' / 25</div></div>'+
-      '<div class="field"><label class="field-label">狀態</label><div><span class="switch on" onclick="this.classList.toggle(\'on\')"></span></div></div>'+
+      '<div class="field"><label class="field-label">狀態</label><div><span class="switch on" data-label="角色狀態" onclick="toggleSwitch(this,\'role:new:on\')"></span></div></div>'+
       '<div class="field"><label class="field-label">描述</label>'+
       '<textarea class="textarea" id="cat-desc" maxlength="100" placeholder="輸入描述" oninput="countChars(this,\'cat-desc-c\',100)"></textarea>'+
       '<div class="char-count num" id="cat-desc-c">0 / 100</div></div>',
@@ -798,15 +837,20 @@ const COUNTRY_GROUPS=[
 ];
 let cfState={group:'asia',selected:{},keyword:''};
 
-function openCountryFilter(name){
+/* 國家過濾彈窗：事件列表 / 事件分類（一級、二級）共用同一實現
+   name 用於標題區分來源；scope 區分過濾粒度（event=單一事件，category=分類下全部事件） */
+function openCountryFilter(name,scope){
   cfState={group:'asia',selected:{'阿富汗':true,'亞美尼亞':true,'亞塞拜然':true},keyword:''};
+  const hint=scope==='event'
+    ? '所選國家/地區將從該事件中過濾，不推送至商戶。'
+    : '所選國家/地區將從該分類下所有事件中過濾，不推送至商戶。';
   const total=COUNTRY_GROUPS.reduce(function(a,g){return a+g.list.length;},0);
   openModal(
     '<div class="modal cf-modal">'+
       '<div class="modal-head"><div class="modal-title">國家過濾'+(name?' · '+name:'')+'</div>'+
       '<button class="modal-close" onclick="closeCountryFilter()">'+icon('close',15)+'</button></div>'+
       '<div class="modal-body" style="padding-top:0">'+
-        '<p style="color:#86909c;font-size:12px;margin:0 0 14px">請選擇要限制的國家/地區</p>'+
+        '<p style="color:#86909c;font-size:12px;margin:0 0 14px">'+hint+'</p>'+
         '<div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">'+
           '<div class="f-item" style="flex:1;min-width:180px;height:34px">'+
             '<input class="f-input" id="cf-search" placeholder="搜尋 輸入關鍵字查詢" style="min-width:0;flex:1" oninput="cfSearch(this.value)" />'+
@@ -873,6 +917,201 @@ function cfSave(){
   const cnt=Object.keys(cfState.selected).filter(function(k){return cfState.selected[k];}).length;
   closeModal();
   toast('已保存，共過濾 '+cnt+' 個國家');
+}
+
+/* ==================================================================
+   開關切換（通用）
+   狀態存於 state.sw[key]，重繪後保持；key 由「頁面:行標識:字段」組成
+   聯動開關（計數、徽標、按鈕可用態依賴它）在 key 前綴命中時觸發重繪
+   調用：toggleSwitch(this,'ev:8016024137:push')
+   ================================================================== */
+/* 需要重繪的 key 前綴：這些開關有派生內容，切換後必須重新渲染 */
+const SW_RERENDER=['src:','usr:'];
+function swGet(key,def){
+  const v=state.sw[key];
+  return v===undefined?!!def:v;
+}
+function toggleSwitch(el,key){
+  const next=!el.classList.contains('on');
+  state.sw[key]=next;
+  el.classList.toggle('on',next);
+  const label=el.getAttribute('data-label')||'狀態';
+  const needRerender=SW_RERENDER.some(function(p){ return key.indexOf(p)===0; });
+  if(needRerender&&typeof renderShell==='function') renderShell();
+  if(typeof toast==='function') toast(label+(next?'已開啟':'已關閉'),next?'ok':'info');
+}
+
+/* ==================================================================
+   日期選擇彈窗（通用）
+   檢索篩選與圖表區共用；支持單日 / 日期範圍 / 時間範圍三種模式
+   調用：openDatePicker({mode:'range'|'single'|'time', target:'元素 id', title:'標題'})
+   ================================================================== */
+let dpState={start:null,end:null,view:new Date()};
+const DP_WEEK=['日','一','二','三','四','五','六'];
+
+function dpPad(n){ return n<10?'0'+n:''+n; }
+function dpFmt(d){ return d.getFullYear()+'-'+dpPad(d.getMonth()+1)+'-'+dpPad(d.getDate()); }
+function dpSame(a,b){ return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
+
+function openDatePicker(opt){
+  opt=opt||{};
+  const mode=opt.mode||'range';
+  const today=new Date();
+  /* 逐字段赋值，不替换对象引用，避免外部持有旧引用 */
+  dpState.start=null;
+  dpState.end=null;
+  dpState.view=new Date(today.getFullYear(),today.getMonth(),1);
+  dpState.mode=mode;
+  dpState.target=opt.target||'';
+  dpState.title=opt.title||'選擇日期';
+  openModal(
+    '<div class="modal dp-modal">'+
+      '<div class="modal-head"><div class="modal-title">'+esc(dpState.title)+'</div>'+
+      '<button class="modal-close" onclick="closeModal()">'+icon('close',15)+'</button></div>'+
+      '<div class="modal-body" style="padding-top:0">'+
+        (mode==='time'?'':'<div class="dp-quick" id="dp-quick"></div>')+
+        (mode==='time'?dpTimeBody():'<div class="dp-cal" id="dp-cal"></div>')+
+        '<div class="dp-picked" id="dp-picked"></div>'+
+      '</div>'+
+      '<div class="modal-foot">'+
+        '<button class="btn btn-ghost" onclick="dpClear()">清空</button>'+
+        '<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+        '<button class="btn btn-primary" onclick="dpConfirm()">確定</button>'+
+      '</div>'+
+    '</div>'
+  );
+  if(mode!=='time') renderDpQuick();
+  renderDpCal();
+  renderDpPicked();
+}
+
+function dpQuickList(){
+  const t=new Date(); const y=t.getFullYear(); const m=t.getMonth(); const d=t.getDate();
+  return [
+    {k:'today',label:'今天',range:[new Date(y,m,d),new Date(y,m,d)]},
+    {k:'7d',label:'近 7 天',range:[new Date(y,m,d-6),new Date(y,m,d)]},
+    {k:'30d',label:'近 30 天',range:[new Date(y,m,d-29),new Date(y,m,d)]},
+    {k:'m',label:'本月',range:[new Date(y,m,1),new Date(y,m,d)]},
+    {k:'lm',label:'上月',range:[new Date(y,m-1,1),new Date(y,m,0)]}
+  ];
+}
+function renderDpQuick(){
+  const box=document.getElementById('dp-quick');
+  if(!box)return;
+  box.innerHTML=dpQuickList().map(function(q){
+    return '<button class="dp-qbtn" onclick="dpQuick(\''+q.k+'\')">'+q.label+'</button>';
+  }).join('');
+}
+function dpQuick(k){
+  const q=dpQuickList().find(function(x){return x.k===k;});
+  if(!q)return;
+  if(dpState.mode==='single'){ dpState.start=q.range[1]; dpState.end=null; }
+  else { dpState.start=q.range[0]; dpState.end=q.range[1]; }
+  renderDpCal(); renderDpPicked();
+}
+
+function renderDpCal(){
+  const box=document.getElementById('dp-cal');
+  if(!box)return;
+  const v=dpState.view;
+  const y=v.getFullYear(); const m=v.getMonth();
+  const first=new Date(y,m,1);
+  const lead=first.getDay();
+  const days=new Date(y,m+1,0).getDate();
+  const prevDays=new Date(y,m,0).getDate();
+  const today=new Date();
+
+  let cells='';
+  for(let i=lead-1;i>=0;i--){
+    cells+='<button class="dp-cell out" disabled>'+(prevDays-i)+'</button>';
+  }
+  for(let d=1;d<=days;d++){
+    const cur=new Date(y,m,d);
+    const isToday=dpSame(cur,today);
+    const isStart=dpSame(cur,dpState.start);
+    const isEnd=dpSame(cur,dpState.end);
+    const inRange=dpState.start&&dpState.end&&cur>dpState.start&&cur<dpState.end;
+    let cls='dp-cell';
+    if(isStart||isEnd)cls+=' sel';
+    else if(inRange)cls+=' in-range';
+    if(isToday)cls+=' today';
+    cells+='<button class="'+cls+'" onclick="dpPick('+y+','+m+','+d+')">'+d+'</button>';
+  }
+  const tail=(7-((lead+days)%7))%7;
+  for(let i=1;i<=tail;i++) cells+='<button class="dp-cell out" disabled>'+i+'</button>';
+
+  box.innerHTML=
+    '<div class="dp-cal-head">'+
+      '<button class="dp-nav" onclick="dpShift(-1)">'+icon('chevron',14)+'</button>'+
+      '<div class="dp-cal-title">'+y+' 年 '+(m+1)+' 月</div>'+
+      '<button class="dp-nav" style="transform:rotate(180deg)" onclick="dpShift(1)">'+icon('chevron',14)+'</button>'+
+    '</div>'+
+    '<div class="dp-week">'+DP_WEEK.map(function(w){return '<span>'+w+'</span>';}).join('')+'</div>'+
+    '<div class="dp-grid">'+cells+'</div>';
+}
+function dpShift(n){
+  const v=dpState.view;
+  dpState.view=new Date(v.getFullYear(),v.getMonth()+n,1);
+  renderDpCal();
+}
+function dpPick(y,m,d){
+  const cur=new Date(y,m,d);
+  if(dpState.mode==='single'){
+    dpState.start=cur; dpState.end=null;
+  } else {
+    if(!dpState.start||dpState.end){ dpState.start=cur; dpState.end=null; }
+    else if(cur<dpState.start){ dpState.end=dpState.start; dpState.start=cur; }
+    else { dpState.end=cur; }
+  }
+  renderDpCal(); renderDpPicked();
+}
+
+function dpTimeBody(){
+  const hrs=[]; for(let i=0;i<24;i++)hrs.push(dpPad(i));
+  const mins=[]; for(let i=0;i<60;i+=5)mins.push(dpPad(i));
+  return '<div class="dp-time">'+
+    '<div class="dp-time-row"><span class="dp-time-label">開始</span>'+
+      '<input class="f-date" id="dp-th1" placeholder="時" style="width:58px" /><span>:</span>'+
+      '<input class="f-date" id="dp-tm1" placeholder="分" style="width:58px" /></div>'+
+    '<div class="dp-time-row"><span class="dp-time-label">結束</span>'+
+      '<input class="f-date" id="dp-th2" placeholder="時" style="width:58px" /><span>:</span>'+
+      '<input class="f-date" id="dp-tm2" placeholder="分" style="width:58px" /></div>'+
+    '<div class="dp-time-tip">按 24 小時制輸入，分鐘以 5 為間隔</div></div>';
+}
+
+function renderDpPicked(){
+  const box=document.getElementById('dp-picked');
+  if(!box)return;
+  if(dpState.mode==='time'){ box.innerHTML=''; return; }
+  if(!dpState.start){ box.innerHTML='<span class="dp-empty">尚未選擇日期</span>'; return; }
+  const s=dpFmt(dpState.start);
+  const e=dpState.end?dpFmt(dpState.end):'';
+  box.innerHTML='<span class="dp-picked-label">已選</span>'+
+    '<span class="dp-picked-val">'+s+(e?' 至 '+e:'')+'</span>';
+}
+
+function dpClear(){
+  dpState.start=null; dpState.end=null;
+  renderDpCal(); renderDpPicked();
+}
+
+function dpConfirm(){
+  const target=dpState.target?document.getElementById(dpState.target):null;
+  if(dpState.mode==='time'){
+    const h1=document.getElementById('dp-th1'), m1=document.getElementById('dp-tm1');
+    const h2=document.getElementById('dp-th2'), m2=document.getElementById('dp-tm2');
+    const v1=(h1&&h1.value?h1.value:'00')+':'+(m1&&m1.value?m1.value:'00');
+    const v2=(h2&&h2.value?h2.value:'23')+':'+(m2&&m2.value?m2.value:'59');
+    if(target)target.value=v1+' – '+v2;
+    closeModal(); toast('已設定時間範圍 '+v1+' – '+v2);
+    return;
+  }
+  if(!dpState.start){ toast('請先選擇日期','err'); return; }
+  const s=dpFmt(dpState.start);
+  const e=dpState.end?dpFmt(dpState.end):'';
+  if(target)target.value=e?s+' – '+e:s;
+  closeModal();
+  toast(e?'已設定日期範圍 '+s+' 至 '+e:'已選擇 '+s);
 }
 function openMoreMenu(name){
   openModal(modalShell({
@@ -963,9 +1202,9 @@ function pageReview(){
     (done?'<div class="f-item"><select class="f-select"><option>審核狀態</option><option>通過</option><option>棄用</option></select></div>':'')+
     '<div class="f-item"><select class="f-select"><option>數據來源</option><option>polymarket</option><option>predict.fun</option></select></div>'+
     '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:#4e5969;white-space:nowrap;font-size:13px">截止時間</span>'+
-    '<input class="f-date" placeholder="開始日期" readonly onclick="toast(\'原型示意：選擇開始日期\',\'info\')" />'+
+    '<input class="f-date" id="dp-rv-start" placeholder="開始日期" readonly onclick="openDatePicker({mode:\'single\',target:\'dp-rv-start\',title:\'截止時間 · 開始\'})" />'+
     '<span style="color:#c9cdd4">–</span>'+
-    '<input class="f-date" placeholder="結束日期" readonly onclick="toast(\'原型示意：選擇結束日期\',\'info\')" /></div>'+
+    '<input class="f-date" id="dp-rv-end" placeholder="結束日期" readonly onclick="openDatePicker({mode:\'single\',target:\'dp-rv-end\',title:\'截止時間 · 結束\'})" /></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
     '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
     '<div class="table-wrap"><table style="min-width:'+(done?'1620px':'960px')+'"><thead><tr>'+thead+
@@ -1432,7 +1671,7 @@ function openIpWhitelist(name){
       ['192.168.10.41','10.0.0.28'].map(function(ip){
         return '<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid #f4f6fa">'+
           '<span class="num" style="flex:1;color:#4e5969">'+ip+'</span>'+
-          '<span class="switch on" onclick="this.classList.toggle(\'on\')"></span>'+
+          '<span class="switch '+(swGet('ip:'+ip+':on',true)?'on':'')+'" data-label="IP 啟用" onclick="toggleSwitch(this,\'ip:'+ip+':on\')"></span>'+
           '<button class="btn-text" style="margin-left:10px;color:#f53f3f" onclick="toast(\'已移除 '+ip+'\',\'info\')">移除</button></div>';
       }).join('')+'</div>',
     foot:'<button class="btn btn-primary" onclick="closeModal()">完成</button>'
@@ -1500,7 +1739,7 @@ function mdCategory(){
   const rows=cats.map(function(c){
     return '<tr><td class="name">'+c[0]+'</td>'+
       '<td><div class="cell-clip">'+c[1]+'</div></td>'+
-      '<td><span class="switch '+(c[2]?'on':'')+'" onclick="toast(\'原型示意：切換分類權限\',\'info\')"></span></td></tr>';
+      '<td><span class="switch '+(swGet('mcat:'+c[0]+':on',c[2])?'on':'')+'" data-label="分類權限" onclick="toggleSwitch(this,\'mcat:'+c[0]+':on\')"></span></td></tr>';
   }).join('');
   return '<div class="card"><div class="card-head"><div class="card-title">分類權限</div>'+
     '<div class="right"><span style="color:#86909c;font-size:12px">已開啟 4 / 8 個分類</span></div></div>'+
@@ -1516,15 +1755,15 @@ function mdSource(){
     ['kalshi','Kalshi','合規事件合約交易所','0','停用']
   ];
   const rows=src.map(function(s,i){
-    const on=i<2;
+    const on=swGet('src:'+s[0]+':on',i<2);
     return '<tr><td class="name">'+s[1]+'</td>'+
       '<td><div class="cell-clip">'+s[2]+'</div></td>'+
       '<td class="num">'+s[3]+'</td>'+
       '<td><span class="dot-badge"><span class="d '+(on?'d-on':'d-off')+'"></span>'+(on?'啟用':'停用')+'</span></td>'+
-      '<td><span class="switch '+(on?'on':'')+'" onclick="toast(\'原型示意：切換數據源權限\',\'info\')"></span></td></tr>';
+      '<td><span class="switch '+(swGet('src:'+s[0]+':on',on)?'on':'')+'" data-label="數據源權限" onclick="toggleSwitch(this,\'src:'+s[0]+':on\')"></span></td></tr>';
   }).join('');
   return '<div class="card"><div class="card-head"><div class="card-title">數據源權限</div>'+
-    '<div class="right"><span style="color:#86909c;font-size:12px">已啟用 2 / 3 個數據源</span></div></div>'+
+    '<div class="right"><span style="color:#86909c;font-size:12px">已啟用 '+src.filter(function(s,i){return swGet('src:'+s[0]+':on',i<2);}).length+' / '+src.length+' 個數據源</span></div></div>'+
     '<div class="table-wrap" style="margin-top:0"><table style="min-width:860px"><thead><tr>'+
     '<th style="width:150px">數據源</th><th>說明</th><th style="width:120px">事件數</th>'+
     '<th style="width:110px">狀態</th><th style="width:80px">開關</th></tr></thead><tbody>'+
@@ -1560,12 +1799,12 @@ function pageUser(){
       '<td style="max-width:110px"><div class="cell-clip num">'+u[1]+'</div></td>'+
       '<td class="name">'+esc(u[2])+'</td>'+
       '<td><span class="chip chip-gray">'+u[3]+'</span></td>'+
-      '<td><span class="switch '+(u[4]?'on':'')+'" onclick="toast(\'原型示意：切換用戶狀態\',\'info\')"></span></td>'+
-      '<td><span class="switch '+(u[5]?'on':'')+'" onclick="toast(\'原型示意：切換 MFA 狀態\',\'info\')"></span></td>'+
+      '<td><span class="switch '+(swGet('usr:'+u[0]+':on',u[4])?'on':'')+'" data-label="用戶狀態" onclick="toggleSwitch(this,\'usr:'+u[0]+':on\')"></span></td>'+
+      '<td><span class="switch '+(swGet('usr:'+u[0]+':mfa',u[5])?'on':'')+'" data-label="MFA 狀態" onclick="toggleSwitch(this,\'usr:'+u[0]+':mfa\')"></span></td>'+
       '<td class="muted">'+u[6]+'</td>'+
       '<td class="num" style="white-space:nowrap;color:#4e5969">'+u[7]+'</td>'+
       '<td class="num" style="white-space:nowrap;color:#4e5969">'+u[8]+'</td>'+
-      '<td class="actions"><span class="btn-text '+(u[5]?'':'muted')+'" '+(u[5]?'onclick="confirmUnbind(\''+esc(u[1])+'\')"':'')+'>解綁 Google 驗證</span>'+
+      '<td class="actions"><span class="btn-text '+(swGet('usr:'+u[0]+':mfa',u[5])?'':'muted')+'" '+(swGet('usr:'+u[0]+':mfa',u[5])?'onclick="confirmUnbind(\''+esc(u[1])+'\')"':'')+'>解綁 Google 驗證</span>'+
       '<span class="btn-text" onclick="openResetPwd(\''+esc(u[1])+'\')">重置密碼</span>'+
       '<span class="btn-text" onclick="openUserMore(\''+esc(u[1])+'\')">更多</span></td></tr>';
   }).join('');
@@ -1753,9 +1992,9 @@ function pageOperation(){
     '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="輸入關鍵字查詢" style="min-width:220px" /></div>'+
     '<div class="f-item"><select class="f-select"><option>操作類型</option><option>新增白名單IP</option><option>設定IP白名單啟用狀態</option></select></div>'+
     '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:#4e5969;white-space:nowrap;font-size:13px">操作時間</span>'+
-    '<input class="f-date" placeholder="開始時間" readonly onclick="toast(\'原型示意：選擇開始時間\',\'info\')" />'+
+    '<input class="f-date" id="dp-op-time" placeholder="開始時間" readonly onclick="openDatePicker({mode:\'time\',target:\'dp-op-time\',title:\'操作時間 · 時間範圍\'})" style="min-width:104px" />'+
     '<span style="color:#c9cdd4">–</span>'+
-    '<input class="f-date" placeholder="結束時間" readonly onclick="toast(\'原型示意：選擇結束時間\',\'info\')" /></div>'+
+    '<input class="f-date" id="dp-op-time2" placeholder="結束時間" readonly onclick="openDatePicker({mode:\'time\',target:\'dp-op-time2\',title:\'操作時間 · 時間範圍\'})" style="min-width:104px" /></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
     '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
     '<div class="table-wrap"><table style="min-width:940px"><thead><tr>'+
