@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 產品基線規範
-  原型版本：V1.2.0 ｜ 入口：index.html
+  原型版本：V1.2.1 ｜ 入口：index.html
 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>產品基線 · 數據中台管理系統 V1.2.0</title>
+<title>產品基線 · 數據中台管理系統 V1.2.1</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.2.0">
-<link rel="stylesheet" href="assets/rule.css?v=1.2.0">
+<link rel="stylesheet" href="assets/app.css?v=1.2.1">
+<link rel="stylesheet" href="assets/rule.css?v=1.2.1">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -25,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 產品基線</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.2.0</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.2.1</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -41,7 +41,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.2.0"></script>
+<script src="assets/core.js?v=1.2.1"></script>
 <script>
 
 /* ==================================================================
@@ -174,6 +174,7 @@ function specContent(){
 
 function specVersion(){
   const changes=[
+    ['V1.2.1','2026-11-05','內容變更','事件總覽「類型分布」改為按容器實際寬度繪製，消除固定 viewBox 等比縮放造成的兩側留白；並排卡片改為頂部對齊，來源分布不再被右欄撐高。'],
     ['V1.2.0','2026-11-05','功能新增','合併「API 調用監控」兩項功能：商戶列表更多選單新增 OpenAPI 調用詳情（概覽 / API 調用詳情 / WSS 調用詳情），系統設置新增 API 推送異常（P0 監控指標卡 / 告警列表 / 告警詳情與處理流轉）。新增 api-detail.html、api-alarm.html 兩個嵌入子頁，頁面清單、菜單分組與覆蓋數同步更新。'],
     ['V1.1.2','2026-11-05','內容變更','1.1 升版規則改為按位遞增：功能變更中間位 +1、尾數歸零，內容變更尾數 +1；新增「協作場景的版本衝突」三條處理順序；5.1 衝突處理規則同步改寫版本號與變更記錄的處理方式。'],
     ['V1.1.1','2026-11-05','內容變更','5.1 倉庫與入口補緩存策略：Cloudflare 每次回源，GitHub Pages 的 HTML 被瀏覽器與 CDN 各緩存 10 分鐘；新增驗證說明，區分構建延遲與緩存未過期；上傳前檢查清單第 2 項擴展為版本號與變更記錄同查。'],
@@ -716,7 +717,12 @@ function showVersion(){
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 功能新增</div>'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 內容變更</div>'+
+      '事件總覽「類型分布」改為按容器實際寬度繪製，消除兩側留白；'+
+      '並排卡片改為頂部對齊。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.2.0</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 功能新增</div>'+
       '合併 API 調用監控兩項功能：商戶列表「更多」新增 OpenAPI 調用詳情（概覽 / API / WSS 三頁籤），'+
       '系統設置新增 API 推送異常（P0 指標卡 / 告警列表 / 告警詳情與處理流轉）。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.1.2</span>'+

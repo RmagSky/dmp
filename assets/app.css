@@ -217,7 +217,7 @@ td.name{color:var(--text);font-weight:500}
 .stat-foot{font-size:var(--fs-tag);color:var(--text-help);margin-top:4px}
 .up{color:#f53f3f}
 .down{color:#00b42a}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;align-items:start}
 /* 並排卡片：子卡片不繼承 .card + .card 的上外距，避免左右錯位 */
 .cards-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;margin-top:14px}
 .cards-row > .card{margin-top:0}
