@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 產品基線規範
-  原型版本：V1.1.0 ｜ 入口：index.html
+  原型版本：V1.1.1 ｜ 入口：index.html
   框架參考：中台商户 SaaS 投注交易平台 · 交互原型 V1.5.5
 -->
 <html lang="zh-CN">
@@ -9,10 +9,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>產品基線 · 數據中台管理系統 V1.1.0</title>
+<title>產品基線 · 數據中台管理系統 V1.1.1</title>
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.1.0">
-<link rel="stylesheet" href="assets/rule.css?v=1.1.0">
+<link rel="stylesheet" href="assets/app.css?v=1.1.1">
+<link rel="stylesheet" href="assets/rule.css?v=1.1.1">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -25,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 產品基線</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.1.0</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.1.1</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -41,7 +41,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.1.0"></script>
+<script src="assets/core.js?v=1.1.1"></script>
 <script>
 
 /* ==================================================================
@@ -174,6 +174,7 @@ function specContent(){
 
 function specVersion(){
   const changes=[
+    ['V1.1.1','2026-11-05','內容變更','5.1 倉庫與入口補緩存策略：Cloudflare 每次回源，GitHub Pages 的 HTML 被瀏覽器與 CDN 各緩存 10 分鐘；新增驗證說明，區分構建延遲與緩存未過期；上傳前檢查清單第 2 項擴展為版本號與變更記錄同查。'],
     ['V1.1.0','2026-11-05','功能新增','新增「團隊協作」分組，補入團隊更新與上傳流程：倉庫與入口、五步流程（拉取上游 / 檢查新提交 / 合併 / 衝突修正 / 上傳更新）、衝突處理規則、提交信息格式、上傳前檢查清單、禁止事項。'],
     ['V1.0.0','2026-11-04','首次發布','依原站（192.168.10.51:7080）前端還原管理面 9 個業務頁面：事件總覽、事件列表、事件分類、事件複核、投注類係數調控、商戶列表、用戶管理、角色管理、操作日誌。覆蓋 7 類彈窗與 3 個跳轉頁。外框改為產品基線結構，新增本規範文檔頁，含基線總覽、全局規範、公共說明、組件與規範四部分。字體按基線統一為 Outfit + 系統中文字體，配色沿用原站藍色體系。']
   ];
@@ -591,8 +592,10 @@ function specTeam(){
       '<tr><td>主線分支</td><td><span class="mono-code">main</span>，唯一長期分支，不開個人分支</td></tr>'+
       '<tr><td>入口文件</td><td><span class="mono-code">index.html</span> 框架頁 ｜ <span class="mono-code">dmp.html</span> 管理面 ｜ <span class="mono-code">rule.html</span> 產品基線</td></tr>'+
       '<tr><td>共用資源</td><td><span class="mono-code">assets/app.css</span>、<span class="mono-code">assets/core.js</span> 被三個頁面共用，改動影響全部頁面</td></tr>'+
-      '<tr><td>發布方式</td><td>推送到 main 後 GitHub Pages 自動重建，約 1 分鐘生效；Cloudflare Workers 端同步更新</td></tr>'+
-      '</tbody></table></div>'+
+      '<tr><td>發布方式</td><td>推送到 main 後兩個入口同時重建：Cloudflare Workers 立即生效，GitHub Pages 需 30–60 秒構建</td></tr>'+
+      '<tr><td>緩存策略</td><td>Cloudflare <span class="mono-code">max-age=0, must-revalidate</span>，每次回源；GitHub Pages <span class="mono-code">max-age=600</span>，HTML 被瀏覽器與 CDN 各緩存 10 分鐘</td></tr>'+
+      '</tbody></table>'+
+      '<div class="spec-note"><span class="i">'+icon('warn',15)+'</span><span><b>驗證更新時區分兩件事：</b>① 構建延遲 — 推送後 Pages 需 30–60 秒重建，此時訪問確為舊版，等構建完成再看；② 緩存未過期 — 重建已完成但瀏覽器仍顯示舊版，屬 <span class="mono-code">max-age=600</span> 未到期。<span class="mono-code">?v=</span> 版本串只加在 <span class="mono-code">assets/*</span> 上，HTML 文檔本身不受其控制，故改頁面內容時受 10 分鐘緩存約束。用 <span class="mono-code">Ctrl+Shift+R</span> 或無痕窗口核對。</span></div></div>'+
 
     '<div class="spec-block"><h3>二、五步流程</h3>'+
       '<p class="sub">本地工作目錄即倉庫根目錄，以下指令在根目錄執行。</p>'+
@@ -657,7 +660,7 @@ function specTeam(){
       '<p class="sub">五項全部通過再推送，任一項不通過則不上傳。</p>'+
       '<table class="spec-table"><thead><tr><th style="width:52px">序</th><th style="width:220px">檢查項</th><th>通過標準</th></tr></thead><tbody>'+
       '<tr><td class="num">1</td><td>三個頁面可打開</td><td><span class="mono-code">index.html</span>、<span class="mono-code">dmp.html</span>、<span class="mono-code">rule.html</span> 本地打開無控制台報錯，管理面各頁可切換</td></tr>'+
-      '<tr><td class="num">2</td><td>版本號一致</td><td>三處展示位、<span class="mono-code">core.js</span> 的 <span class="mono-code">VERSION</span>、1.1 記錄表首行三者相同</td></tr>'+
+      '<tr><td class="num">2</td><td>版本號與變更記錄</td><td>三處展示位、<span class="mono-code">core.js</span> 的 <span class="mono-code">VERSION</span>、1.1 記錄表首行三者相同，且記錄表已補入本次變更</td></tr>'+
       '<tr><td class="num">3</td><td>靜態資源版本串</td><td>改動過 <span class="mono-code">assets/*</span> 時同步更新 <span class="mono-code">?v=</span> 串，避免瀏覽器用舊緩存</td></tr>'+
       '<tr><td class="num">4</td><td>無臨時文件</td><td>不含 <span class="mono-code">node_modules</span>、截圖、備份文件、編輯器配置</td></tr>'+
       '<tr><td class="num">5</td><td>改動範圍可控</td><td><span class="mono-code">git status</span> 列出的文件都是本次有意修改的</td></tr>'+
@@ -692,7 +695,12 @@ function showVersion(){
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 功能新增</div>'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 內容變更</div>'+
+      '5.1 補緩存策略與驗證說明：Cloudflare 每次回源，GitHub Pages 的 HTML 緩存 10 分鐘；'+
+      '上傳前檢查清單第 2 項擴展為版本號與變更記錄同查。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.1.0</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 功能新增</div>'+
       '規範頁新增「團隊協作」分組與團隊更新上傳流程：倉庫與入口、五步流程、衝突處理規則、'+
       '提交信息格式、上傳前檢查清單、禁止事項。</div></div>'+
       '<div style="display:flex;gap:12px"><span class="vnum" style="align-self:flex-start">V1.0.0</span>'+
