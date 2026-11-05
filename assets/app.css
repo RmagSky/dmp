@@ -552,3 +552,19 @@ tr.cat-parent:hover > td{background:#fafcff}
   .proto-brand .name{font-size:var(--fs-table)}
   .proto-brand small{display:none}
 }
+
+
+/* ==========================================================
+   V1.2.0 新增：API 調用詳情 / API 推送異常（iframe 嵌入子頁）
+   色值取 :root 變數；字號取 --fs-* 七檔，符合 4.1 / 4.2 基線
+   ========================================================== */
+.nav-new{margin-left:auto;font-size:var(--fs-tag);font-weight:500;line-height:1.5;
+  color:var(--card);background:var(--danger);border-radius:9px;padding:1px 6px}
+.embed-wrap{display:flex;flex-direction:column;gap:12px;min-height:560px;
+  height:calc(100vh - var(--proto-bar-h) - var(--admin-header-h) - var(--tabs-h) - 32px)}
+html.is-embedded .embed-wrap{height:calc(100vh - var(--admin-header-h) - var(--tabs-h) - 32px)}
+.embed-bar{display:flex;align-items:center;gap:12px;flex:none;padding:10px 14px;
+  background:var(--card);border:1px solid var(--border);border-radius:8px}
+.embed-title{font-size:var(--fs-page);font-weight:600;color:var(--text)}
+.embed-tip{font-size:var(--fs-help);color:var(--text-help)}
+.embed-frame{flex:1;display:block;width:100%;min-height:0;border:0;background:transparent}

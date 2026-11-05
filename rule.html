@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 產品基線規範
-  原型版本：V1.1.2 ｜ 入口：index.html
+  原型版本：V1.2.0 ｜ 入口：index.html
 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>產品基線 · 數據中台管理系統 V1.1.2</title>
+<title>產品基線 · 數據中台管理系統 V1.2.0</title>
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.1.2">
-<link rel="stylesheet" href="assets/rule.css?v=1.1.2">
+<link rel="stylesheet" href="assets/app.css?v=1.2.0">
+<link rel="stylesheet" href="assets/rule.css?v=1.2.0">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -24,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 產品基線</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.1.2</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.2.0</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -40,7 +41,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.1.2"></script>
+<script src="assets/core.js?v=1.2.0"></script>
 <script>
 
 /* ==================================================================
@@ -173,6 +174,7 @@ function specContent(){
 
 function specVersion(){
   const changes=[
+    ['V1.2.0','2026-11-05','功能新增','合併「API 調用監控」兩項功能：商戶列表更多選單新增 OpenAPI 調用詳情（概覽 / API 調用詳情 / WSS 調用詳情），系統設置新增 API 推送異常（P0 監控指標卡 / 告警列表 / 告警詳情與處理流轉）。新增 api-detail.html、api-alarm.html 兩個嵌入子頁，頁面清單、菜單分組與覆蓋數同步更新。'],
     ['V1.1.2','2026-11-05','內容變更','1.1 升版規則改為按位遞增：功能變更中間位 +1、尾數歸零，內容變更尾數 +1；新增「協作場景的版本衝突」三條處理順序；5.1 衝突處理規則同步改寫版本號與變更記錄的處理方式。'],
     ['V1.1.1','2026-11-05','內容變更','5.1 倉庫與入口補緩存策略：Cloudflare 每次回源，GitHub Pages 的 HTML 被瀏覽器與 CDN 各緩存 10 分鐘；新增驗證說明，區分構建延遲與緩存未過期；上傳前檢查清單第 2 項擴展為版本號與變更記錄同查。'],
     ['V1.1.0','2026-11-05','功能新增','新增「團隊協作」分組，補入團隊更新與上傳流程：倉庫與入口、五步流程（拉取上游 / 檢查新提交 / 合併 / 衝突修正 / 上傳更新）、衝突處理規則、提交信息格式、上傳前檢查清單、禁止事項。'],
@@ -185,8 +187,8 @@ function specVersion(){
       '<div class="ver-cards" style="grid-template-columns:repeat(4,1fr)">'+
       '<div class="ver-card"><div class="k">當前版本</div><div class="v">'+VERSION+'</div></div>'+
       '<div class="ver-card"><div class="k">發布日期</div><div class="v">'+BUILD_DATE+'</div></div>'+
-      '<div class="ver-card"><div class="k">覆蓋功能單元</div><div class="v">12</div></div>'+
-      '<div class="ver-card"><div class="k">覆蓋頁面</div><div class="v">10 頁</div></div></div></div>'+
+      '<div class="ver-card"><div class="k">覆蓋功能單元</div><div class="v">14</div></div>'+
+      '<div class="ver-card"><div class="k">覆蓋頁面</div><div class="v">12 頁</div></div></div></div>'+
     '<div class="spec-block"><h3>原型版本變更記錄</h3><p class="sub">按版本倒序，首行為當前生效版本。</p>'+
       '<table class="spec-table"><thead><tr><th style="width:86px">版本</th><th style="width:104px">日期</th><th style="width:96px">變更類型</th><th>變更摘要</th></tr></thead><tbody>'+
       changes.map(function(c){
@@ -234,22 +236,24 @@ function specStructure(){
     ['角色管理','/system/role','角色表格、編輯跳轉至權限樹、刪除確認'],
     ['新增角色','/system/role/create','角色名稱/描述 + 功能表權限樹（4 組 9 子項）'],
     ['操作日誌','/system/operation','日誌表格（6 列）、詳情彈窗（含請求參數）'],
-    ['事件審核詳情','/event/review/detail','四頁籤 + 基本資訊 + 賽事比分 + 規則 + 市場明細']
+    ['事件審核詳情','/event/review/detail','四頁籤 + 基本資訊 + 賽事比分 + 規則 + 市場明細'],
+    ['OpenAPI 調用詳情','/merchant/api-detail','商戶資訊頭 + 三頁籤：概覽 / API 調用詳情 / WSS 調用詳情，指標下鑽與原始日誌'],
+    ['API 推送異常','/system/api-alarm','P0 監控指標卡、告警列表與篩選、告警詳情與處理流轉']
   ];
   return '<div class="spec-crumb">產品基線 / 基線總覽 / 產品信息結構</div>'+
     '<h1 class="spec-h1">產品信息結構</h1>'+
-    '<p class="spec-lead">原型覆蓋管理面單端，共 9 個一級業務頁面與 3 個跳轉頁，按左側菜單四組組織。</p>'+
+    '<p class="spec-lead">原型覆蓋管理面單端，共 11 個一級業務頁面與 3 個跳轉頁，按左側菜單四組組織。</p>'+
     '<div class="spec-block"><h3>頁面清單</h3><p class="sub">路由與頁面承載內容對照。</p>'+
       '<table class="spec-table"><thead><tr><th style="width:140px">頁面</th><th style="width:220px">路由</th><th>承載內容</th></tr></thead><tbody>'+
       pages.map(function(p){
         return '<tr><td>'+p[0]+'</td><td><span class="mono-code">'+p[1]+'</span></td><td style="color:#4e5969">'+p[2]+'</td></tr>';
       }).join('')+'</tbody></table></div>'+
-    '<div class="spec-block"><h3>菜單分組</h3><p class="sub">與原站左側導航一致，四組共 9 個二級入口。</p>'+
+    '<div class="spec-block"><h3>菜單分組</h3><p class="sub">與原站左側導航一致，四組共 10 個二級入口。</p>'+
       '<table class="spec-table"><thead><tr><th style="width:150px">一級菜單</th><th>二級菜單</th></tr></thead><tbody>'+
       '<tr><td>事件總覽</td><td>—（直接進入頁面）</td></tr>'+
       '<tr><td>事件管理</td><td>事件列表 / 事件分類 / 事件複核 / 投注類係數調控</td></tr>'+
       '<tr><td>商戶管理</td><td>商戶列表</td></tr>'+
-      '<tr><td>系統設置</td><td>用戶管理 / 角色管理 / 操作日誌</td></tr>'+
+      '<tr><td>系統設置</td><td>用戶管理 / 角色管理 / 操作日誌 / API 推送異常</td></tr>'+
       '</tbody></table></div>'+
     '<div class="spec-block"><h3>權限顆粒度</h3><p class="sub">角色權限按「功能表 × 按鈕」兩級配置，與角色管理頁的權限樹一致。</p>'+
       '<table class="spec-table"><thead><tr><th style="width:150px">功能表</th><th>按鈕權限</th></tr></thead><tbody>'+
@@ -712,7 +716,12 @@ function showVersion(){
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 內容變更</div>'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 功能新增</div>'+
+      '合併 API 調用監控兩項功能：商戶列表「更多」新增 OpenAPI 調用詳情（概覽 / API / WSS 三頁籤），'+
+      '系統設置新增 API 推送異常（P0 指標卡 / 告警列表 / 告警詳情與處理流轉）。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.1.2</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 內容變更</div>'+
       '1.1 升版規則改為按位遞增：功能變更中間位 +1、尾數歸零，內容變更尾數 +1；'+
       '新增協作場景的版本衝突處理順序，5.1 衝突規則同步改寫。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.1.1</span>'+

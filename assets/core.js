@@ -3,7 +3,7 @@
    被 dmp.html / rule.html 共用；修改此處會同時影響兩端
    ========================================================== */
 
-const VERSION='V1.1.2';
+const VERSION='V1.2.0';
 const BUILD_DATE='2026-11-05';
 
 const ICONS={

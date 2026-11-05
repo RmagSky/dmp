@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head><link rel="stylesheet" href="_fonts/outfit.css">
+<link rel="icon" href="data:,">
+
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OpenAPI 調用詳情 · 數據中台管理系統</title>
+<style>
+/* ===== 數據中台 原型樣式（貼合線上 Element Plus 風格） ===== */
+:root{
+  --primary:#2e6bf0; --primary-hover:#4a82f5; --primary-light:#eaf1fe;
+  --bg:#f3f6fb; --card:#ffffff; --border:#e6ebf3; --border-dark:#d9e1ec;
+  --text:#1f2d3d; --text-2:#5e6d82; --text-3:#8a97ab;
+  --success:#16a34a; --success-bg:#e8f8ee;
+  --danger:#e5484d; --danger-bg:#feecec;
+  --warning:#d97706; --warning-bg:#fef3e2;
+  --info:#0891b2; --info-bg:#e6f7fb;
+  --sidebar-w:208px; --topbar-h:56px; --tabs-h:40px;
+  --radius:8px;
+  --shadow:0 1px 3px rgba(31,45,61,.06),0 4px 16px rgba(31,45,61,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans CJK TC",sans-serif;
+  font-size:13px;color:var(--text);background:var(--bg)}
+a{color:var(--primary);text-decoration:none;cursor:pointer}
+a:hover{color:var(--primary-hover)}
+
+/* ===== 佈局 ===== */
+.layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;height:100vh;overflow:hidden}
+.sidebar{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.logo{display:flex;align-items:center;gap:8px;padding:16px 18px;font-size:17px;font-weight:700;color:var(--primary);letter-spacing:.5px}
+.logo .logo-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2e6bf0,#5f9bff);
+  display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
+.menu{padding:4px 10px 20px}
+.menu-item,.menu-group-title{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:6px;
+  color:var(--text-2);cursor:pointer;font-size:13.5px;user-select:none;position:relative}
+.menu-item:hover,.menu-group-title:hover{background:#f4f7fd;color:var(--text)}
+.menu-item.active{color:var(--primary);background:var(--primary-light);font-weight:600}
+.menu-item .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.55;margin-left:2px}
+.menu-sub{padding-left:14px}
+.menu-sub .menu-item{padding:8px 12px 8px 31px;font-size:13px}
+.menu-sub .menu-item.active::before{content:"";position:absolute;left:18px;top:50%;transform:translateY(-50%);
+  width:4px;height:4px;border-radius:50%;background:var(--primary)}
+.menu-item .icon,.menu-group-title .icon{width:16px;text-align:center;flex:none}
+.caret{margin-left:auto;font-size:10px;color:var(--text-3);transition:transform .2s}
+.badge-new{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:9px;font-weight:600;transform:scale(.92)}
+
+.main{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:var(--topbar-h);background:#fff;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:flex-end;gap:18px;padding:0 20px;flex:none}
+.topbar .clock{color:var(--text-2);font-variant-numeric:tabular-nums}
+.topbar .user{display:flex;align-items:center;gap:6px;color:var(--text);cursor:pointer}
+.topbar .avatar{width:24px;height:24px;border-radius:50%;background:var(--primary-light);color:var(--primary);
+  display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.pagetabs{height:var(--tabs-h);background:#eef2f8;display:flex;align-items:flex-end;gap:6px;padding:6px 12px 0;flex:none}
+.pagetab{background:#dde5f0;color:var(--text-2);padding:7px 16px;border-radius:8px 8px 0 0;font-size:12.5px;cursor:default}
+.pagetab.active{background:#fff;color:var(--primary);font-weight:600}
+.pagetab .x{margin-left:8px;color:var(--text-3);font-size:11px}
+.content{flex:1;overflow:auto;padding:16px 18px 40px}
+
+/* ===== 卡片 ===== */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card + .card{margin-top:14px}
+.card-head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border)}
+.card-head .bar{width:4px;height:15px;border-radius:2px;background:var(--primary)}
+.card-head h3{font-size:14px;font-weight:600}
+.card-head .extra{margin-left:auto;color:var(--text-3);font-size:12px;display:flex;gap:14px;align-items:center}
+.card-body{padding:16px}
+
+/* ===== 篩選欄 ===== */
+.filterbar{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:flex-end;padding:14px 16px}
+.f-item{display:flex;align-items:center;gap:8px}
+.f-item label{color:var(--text-2);white-space:nowrap;font-size:12.5px}
+.input,.select{height:32px;border:1px solid var(--border-dark);border-radius:6px;padding:0 10px;font-size:12.5px;
+  color:var(--text);background:#fff;outline:none;min-width:170px;transition:border-color .15s}
+.input:focus,.select:focus{border-color:var(--primary)}
+.input::placeholder{color:#aab4c4}
+select.select{cursor:pointer}
+.btn{height:32px;padding:0 16px;border-radius:6px;border:1px solid var(--border-dark);background:#fff;
+  color:var(--text-2);font-size:12.5px;cursor:pointer;transition:all .15s}
+.btn:hover{border-color:var(--primary);color:var(--primary)}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover);color:#fff}
+.btn-danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn-sm{height:26px;padding:0 10px;font-size:12px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;pointer-events:none}
+
+/* ===== 表格 ===== */
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl thead th{background:#f7f9fc;color:var(--text-2);font-weight:600;text-align:left;
+  padding:11px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl tbody td{padding:11px 12px;border-bottom:1px solid #f0f3f9;white-space:nowrap;color:var(--text)}
+.tbl tbody tr:hover{background:#f7faff}
+.tbl .num{font-variant-numeric:tabular-nums}
+.tbl .link{color:var(--primary);cursor:pointer}
+.tbl .link:hover{text-decoration:underline}
+.sort-th{cursor:pointer;user-select:none}
+.sort-th .arr{font-size:10px;color:var(--text-3);margin-left:4px}
+.mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:12px}
+.cell-sub{color:var(--text-3);font-size:11.5px;margin-top:2px}
+
+/* ===== 標籤 / 狀態 ===== */
+.tag{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:4px;font-size:12px;line-height:18px;border:1px solid transparent}
+.tag .s-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.tag-success{background:var(--success-bg);color:var(--success)}
+.tag-danger{background:var(--danger-bg);color:var(--danger)}
+.tag-warning{background:var(--warning-bg);color:var(--warning)}
+.tag-info{background:var(--info-bg);color:var(--info)}
+.tag-gray{background:#f0f2f5;color:var(--text-2)}
+.col-scope{font-size:12.5px;color:var(--text-2)}
+.scope-ellipsis{display:block;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scope-tip{position:fixed;z-index:9999;max-width:480px;background:#1f2733;color:#fff;font-size:12.5px;line-height:1.75;padding:9px 11px;border-radius:7px;box-shadow:0 8px 24px rgba(15,23,42,.28);pointer-events:none;white-space:normal;word-break:break-word}
+.tag-blue{background:var(--primary-light);color:var(--primary)}
+.method{font-weight:700;font-size:11.5px;padding:1px 7px;border-radius:4px}
+.m-get{background:#e8f8ee;color:var(--success)} .m-post{background:var(--primary-light);color:var(--primary)}
+.m-put{background:var(--warning-bg);color:var(--warning)} .m-del{background:var(--danger-bg);color:var(--danger)}
+.code-2xx{color:var(--success)} .code-3xx{color:var(--info)} .code-4xx{color:var(--warning)} .code-5xx{color:var(--danger);font-weight:600}
+
+/* ===== 指標卡 ===== */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px}
+.stat{border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;background:#fff;position:relative;transition:box-shadow .15s}
+.stat:hover{box-shadow:var(--shadow)}
+.stat .s-label{color:var(--text-2);font-size:12px;display:flex;align-items:center;gap:5px}
+.stat .s-value{font-size:24px;font-weight:700;margin-top:8px;font-variant-numeric:tabular-nums;line-height:1.15}
+.stat .s-value .unit{font-size:12px;color:var(--text-3);font-weight:400;margin-left:3px}
+.stat .s-foot{margin-top:7px;font-size:11.5px;color:var(--text-3)}
+.stat .s-foot .up{color:var(--danger)} .stat .s-foot .down{color:var(--success)}
+.stat.status-ok .s-value{color:var(--success)} .stat.status-bad .s-value{color:var(--danger)}
+.help{width:14px;height:14px;border-radius:50%;border:1px solid var(--text-3);color:var(--text-3);
+  display:inline-flex;align-items:center;justify-content:center;font-size:10px;cursor:help;position:relative;flex:none}
+.help:hover{border-color:var(--primary);color:var(--primary)}
+.help:hover::after{content:attr(data-tip);position:absolute;left:-8px;bottom:calc(100% + 7px);
+  background:#1f2d3d;color:#fff;font-size:12px;font-weight:400;line-height:1.75;padding:9px 12px;border-radius:6px;
+  width:290px;max-width:70vw;white-space:pre-line;text-align:left;z-index:90;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+.help:hover::before{content:"";position:absolute;left:2px;bottom:calc(100% + 1px);
+  border:6px solid transparent;border-top-color:#1f2d3d;z-index:90}
+
+/* ===== 頁簽（詳情頁大頁簽） ===== */
+.bigtabs{display:flex;gap:4px;border-bottom:1px solid var(--border);background:#fff;padding:0 16px;border-radius:var(--radius) var(--radius) 0 0}
+.bigtab{padding:13px 20px;cursor:pointer;color:var(--text-2);font-size:13.5px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.bigtab:hover{color:var(--primary)}
+.bigtab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+
+/* ===== 分頁 ===== */
+.pagination{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding:13px 16px;color:var(--text-2);font-size:12.5px;flex-wrap:wrap}
+.pagination .total{margin-right:auto}
+.pg-btn{min-width:28px;height:28px;border:1px solid var(--border-dark);border-radius:5px;background:#fff;color:var(--text-2);
+  cursor:pointer;padding:0 8px;font-size:12.5px}
+.pg-btn:hover{border-color:var(--primary);color:var(--primary)}
+.pg-btn.cur{background:var(--primary);border-color:var(--primary);color:#fff}
+.pg-btn[disabled]{opacity:.4;cursor:not-allowed}
+.pg-jump .input{min-width:0;width:48px;height:28px;text-align:center}
+
+/* ===== 抽屜 / 彈窗 ===== */
+.mask{position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}
+.mask.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:620px;max-width:92vw;background:#fff;z-index:101;
+  transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column;box-shadow:-6px 0 24px rgba(0,0,0,.12)}
+.drawer.show{transform:none}
+.drawer-head{display:flex;align-items:center;padding:15px 20px;border-bottom:1px solid var(--border)}
+.drawer-head h3{font-size:15px}
+.drawer-head .close{margin-left:auto;cursor:pointer;color:var(--text-3);font-size:18px;line-height:1;padding:2px 6px;border-radius:4px}
+.drawer-head .close:hover{background:#f0f2f5;color:var(--text)}
+.drawer-body{flex:1;overflow:auto;padding:18px 20px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:10px 16px;font-size:12.5px}
+.kv .k{color:var(--text-3)}
+.kv .v{color:var(--text);word-break:break-all}
+.log-block{margin-top:16px;background:#0f172a;color:#c9d6e8;border-radius:8px;padding:14px 16px;
+  font-family:Consolas,monospace;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.section-title{font-size:13px;font-weight:600;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:"";width:3px;height:12px;background:var(--primary);border-radius:2px}
+
+.dialog{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);background:#fff;border-radius:10px;
+  z-index:102;width:420px;max-width:92vw;opacity:0;pointer-events:none;transition:all .18s;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.dialog.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.dialog-body{padding:24px 22px 12px;font-size:13.5px;line-height:1.7}
+.dialog-foot{display:flex;justify-content:flex-end;gap:10px;padding:12px 18px 18px}
+.dialog-x{position:absolute;top:10px;right:12px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  color:var(--text-3);font-size:15px;line-height:1;border-radius:6px;cursor:pointer;z-index:2;user-select:none;transition:background .15s,color .15s}
+.dialog-x:hover{background:#f0f2f5;color:var(--text)}
+.dialog-bare .dialog-body{padding-bottom:22px}
+
+/* ===== 空態 ===== */
+.empty{padding:56px 20px;text-align:center;color:var(--text-3)}
+.empty .e-icon{font-size:40px;opacity:.5;margin-bottom:12px}
+.empty .e-text{font-size:13px}
+
+/* ===== 提示條 / 刷新 ===== */
+.banner{display:flex;align-items:center;gap:9px;border-radius:8px;padding:10px 14px;font-size:12.5px;margin-bottom:14px}
+.banner-warn{background:var(--warning-bg);color:var(--warning);border:1px solid #f5ddb3}
+.banner-info{background:var(--info-bg);color:var(--info);border:1px solid #b9e6f0}
+.refresh-meta{display:flex;align-items:center;gap:10px;color:var(--text-3);font-size:12px}
+.refresh-meta .dot-live{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px rgba(22,163,74,.15)}
+.refresh-meta .count{font-variant-numeric:tabular-nums;color:var(--text-2)}
+
+/* ===== 吐司 ===== */
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-8px);background:#fff;border:1px solid var(--border);
+  box-shadow:var(--shadow);border-radius:8px;padding:10px 18px;z-index:300;font-size:13px;opacity:0;transition:all .2s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:#b7ebc6;color:var(--success)}
+.toast.error{border-color:#f5c2c4;color:var(--danger)}
+
+/* ===== 演示控制 ===== */
+.demo-fab{position:fixed;right:18px;bottom:18px;z-index:200}
+.demo-fab .fab-btn{background:#1f2d3d;color:#fff;border:none;border-radius:20px;padding:8px 16px;cursor:pointer;font-size:12.5px;box-shadow:var(--shadow)}
+.demo-fab .fab-panel{position:absolute;right:0;bottom:42px;width:230px;background:#fff;border:1px solid var(--border);
+  border-radius:10px;box-shadow:var(--shadow);padding:12px;display:none}
+.demo-fab.open .fab-panel{display:block}
+.fab-panel h4{font-size:12.5px;margin-bottom:8px;color:var(--text-2)}
+.fab-panel .opt{display:block;width:100%;text-align:left;border:1px solid var(--border);background:#fff;border-radius:6px;
+  padding:6px 10px;margin-bottom:6px;cursor:pointer;font-size:12px;color:var(--text)}
+.fab-panel .opt.on{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+
+/* ===== 下拉（更多） ===== */
+.dropdown{position:relative;display:inline-block}
+.dropdown-menu{position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--border);border-radius:8px;
+  box-shadow:var(--shadow);min-width:140px;padding:6px;display:none;z-index:50}
+.dropdown.open .dropdown-menu{display:block}
+.dropdown-menu .dd-item{padding:8px 14px;border-radius:6px;font-size:12.5px;color:var(--text);cursor:pointer;white-space:nowrap}
+.dropdown-menu .dd-item:hover{background:var(--primary-light);color:var(--primary)}
+.dropdown-menu .dd-item.danger{color:var(--danger)}
+.dropdown-menu .dd-item.danger:hover{background:var(--danger-bg)}
+
+/* ===== 頭部資訊條（詳情頁） ===== */
+.page-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.page-head h2{font-size:17px}
+.page-head .back{display:inline-flex;align-items:center;gap:5px;color:var(--text-2);cursor:pointer;font-size:13px}
+.page-head .back:hover{color:var(--primary)}
+.head-tags{display:flex;gap:8px;align-items:center}
+.head-right{margin-left:auto}
+
+/* ===== 圖表容器 ===== */
+.chart{width:100%;height:230px}
+.chart-lg{height:260px}
+.chart-legend{display:flex;gap:16px;font-size:12px;color:var(--text-2);margin-bottom:6px}
+.chart-legend .lg{display:inline-flex;align-items:center;gap:6px}
+.chart-legend .lg i{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:1200px){.two-col{grid-template-columns:1fr}}
+.rule-table td,.rule-table td{white-space:normal !important}
+
+/* ===== 商戶詳情頭部（與線上商戶明細一致） ===== */
+.mh-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 24px;margin-top:16px}
+.mh-label{color:var(--text-3);font-size:12px}
+.mh-value{font-size:13px;margin-top:5px;color:var(--text);word-break:break-all}
+.mh-name{font-size:16px;font-weight:700;line-height:1.3}
+
+/* ===== 大号中间弹窗 ===== */
+.dialog-lg{width:760px;max-width:94vw}
+.dialog-body{max-height:72vh;overflow:auto}
+
+/* ===== 日期時間範圍选择器 ===== */
+.drp{position:relative;display:inline-flex;align-items:center;gap:10px;height:32px;border:1px solid var(--border-dark);
+  border-radius:6px;background:#fff;padding:0 10px;cursor:pointer;min-width:270px;transition:border-color .15s;user-select:none}
+.drp:hover,.drp.open{border-color:var(--primary)}
+.drp .drp-val{font-size:12.5px;color:var(--text);white-space:nowrap}
+.drp .drp-val.placeholder{color:#aab4c4}
+.drp .drp-icon{color:var(--text-3);margin-left:auto;font-size:13px}
+.drp-panel{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--border);border-radius:8px;
+  box-shadow:var(--shadow);padding:14px;width:360px;z-index:60;display:none;cursor:default}
+.drp.open .drp-panel{display:block}
+.drp-panel .presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.drp-panel .preset{border:1px solid var(--border);border-radius:5px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--text-2)}
+.drp-panel .preset:hover{border-color:var(--primary);color:var(--primary)}
+.drp-panel .dt-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:12px;color:var(--text-2);white-space:nowrap}
+.drp-panel .dt-row input{flex:1;min-width:0;height:30px;border:1px solid var(--border-dark);border-radius:6px;padding:0 8px;font-size:12px;color:var(--text)}
+
+/* ===== 調用趨勢：時間維度选择器 + 自定義日历 ===== */
+.trend-bar{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:14px;
+  background:#fff;border:1px solid var(--border-dark);font-size:12px;color:var(--text-2);cursor:pointer}
+.chip:hover{border-color:var(--primary);color:var(--primary)}
+.trend-dim{position:relative;display:inline-flex;align-items:center;gap:8px;height:32px;border:1px solid var(--border-dark);
+  border-radius:6px;background:#fff;padding:0 12px;cursor:pointer;user-select:none;transition:border-color .15s}
+.trend-dim:hover,.trend-dim.open{border-color:var(--primary)}
+.td-label{color:var(--text-2);font-size:12.5px}
+.td-cur{font-size:12.5px;color:var(--text);white-space:nowrap}
+.td-caret{color:var(--text-3);font-size:10px}
+.td-panel{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--border);border-radius:8px;
+  box-shadow:var(--shadow);z-index:70;display:none;cursor:default}
+.trend-dim.open .td-panel{display:flex}
+.td-menu{padding:8px;min-width:118px}
+.td-panel.with-cal .td-menu{border-right:1px solid var(--border)}
+.td-opt{padding:8px 14px;border-radius:6px;font-size:12.5px;color:var(--text);cursor:pointer;display:flex;
+  justify-content:space-between;gap:10px;white-space:nowrap;align-items:center}
+.td-opt:hover{background:var(--primary-light)}
+.td-opt.on{color:var(--primary);font-weight:600}
+.td-check{margin-left:auto}
+.td-cal{padding:12px;width:600px}
+.cal-head{display:flex;align-items:center;margin-bottom:8px}
+.cal-nav{cursor:pointer;color:var(--text-2);padding:2px 10px;border-radius:4px;font-size:15px}
+.cal-nav:hover{background:#f0f2f5;color:var(--text)}
+.cal-body{display:flex;gap:18px}
+.cal-month{flex:1}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cal-w{color:var(--text-3);font-size:11.5px;padding:4px 0}
+.cal-d{font-size:12px;padding:5px 0;border-radius:6px;cursor:pointer;color:var(--text)}
+.cal-d:hover{background:var(--primary-light)}
+.cal-d.dis{color:#c6cedb;pointer-events:none}
+.cal-d.insel{background:var(--primary-light)}
+.cal-d.edge{background:var(--primary);color:#fff;font-weight:600}
+
+/* ===== 時間維度选择器（列表篩選用） ===== */
+.dim-pick{position:relative;display:inline-flex;align-items:center;gap:8px;height:32px;border:1px solid var(--border-dark);
+  border-radius:6px;background:#fff;padding:0 12px;cursor:pointer;user-select:none;transition:border-color .15s}
+.dim-pick:hover,.dim-pick.open{border-color:var(--primary)}
+.dim-pick .td-panel{display:none}
+.dim-pick.open .td-panel{display:flex}
+.dim-pick .td-panel.with-dt{display:none;flex-direction:column}
+.dim-pick.open .td-panel.with-dt{display:flex}
+.dim-pick .with-dt .td-menu{min-width:230px}
+.dt-inline{border-top:1px solid var(--border);margin-top:6px;padding:10px 6px 4px}
+.dt-inline .dt-row{margin-bottom:8px}
+
+/* ===== 指標卡時間切换（REST / WSS 各自独立） ===== */
+.metric-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+.metric-bar-label{font-size:12px;color:var(--text-2)}
+.metric-seg{display:inline-flex;border:1px solid var(--border-dark);border-radius:6px;overflow:hidden;background:#fff}
+.metric-seg .ms-opt{padding:6px 13px;font-size:12px;color:var(--text-2);cursor:pointer;
+  border-right:1px solid var(--border-dark);user-select:none;white-space:nowrap;transition:background .15s,color .15s}
+.metric-seg .ms-opt:last-child{border-right:none}
+.metric-seg .ms-opt:hover{background:var(--primary-light);color:var(--primary)}
+.metric-seg .ms-opt.on{background:var(--primary);color:#fff;font-weight:600}
+.metric-note{font-size:11.5px;color:var(--text-3)}
+.fixed-badge{display:inline-flex;align-items:center;height:16px;padding:0 5px;border-radius:3px;
+  background:#f0f2f5;color:var(--text-3);font-size:10px;font-weight:500;line-height:1;letter-spacing:.2px}
+.metric-seg .ms-custom{border-left:1px solid var(--border-dark)}
+.metric-bar{position:relative}
+.metric-custom{display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:70;
+  padding:14px 16px 12px;background:#fff;border:1px solid var(--border);border-radius:8px;
+  box-shadow:0 8px 24px rgba(0,0,0,.14)}
+.metric-custom.open{display:block}
+.metric-custom .cal-body{display:flex;gap:22px}
+.metric-custom .cal-month{width:252px}
+.metric-custom .cal-head{display:flex;align-items:center;margin-bottom:8px}
+.cal-nav{cursor:pointer;color:var(--text-2);padding:2px 8px;border-radius:4px;font-size:14px;user-select:none}
+.cal-nav:hover{background:#f0f2f5;color:var(--text)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}
+.cal-w{color:var(--text-3);font-size:11.5px;padding:5px 0}
+.cal-d{font-size:12px;padding:6px 0;border-radius:5px;cursor:pointer;color:var(--text)}
+.cal-d:hover{background:var(--primary-light)}
+.cal-d.dis{color:#c6cedb;pointer-events:none}
+.cal-d.insel{background:var(--primary-light)}
+.cal-d.edge{background:var(--primary);color:#fff;font-weight:600}
+.cal-d.today{color:var(--primary);font-weight:600}
+.cal-d.edge.today{color:#fff}
+.cal-foot{display:flex;align-items:center;margin-top:10px;padding-top:9px;border-top:1px solid var(--border)}
+.cal-hint{font-size:12px;color:var(--text-3)}
+
+</style>
+<style>
+.eye{cursor:pointer;opacity:.6;margin-right:4px;font-size:12px}
+.eye:hover{opacity:1}
+.key-txt{font-family:Consolas,monospace;font-size:11.5px;color:var(--text-2)}
+.pagetab{cursor:pointer}
+</style>
+<style>
+/* ===== 產品基線對齊（rule.html 4.1 / 4.2）：色值只用 CSS 變數 ===== */
+:root{
+  --primary:#2F6BF6; --primary-hover:#1F5AE8; --primary-light:#EAF1FF;
+  --bg:#EAF1F9; --card:#FFFFFF; --border:#E5E8EF; --border-dark:#C9CDD4;
+  --text:#1D2129; --text-2:#4E5969; --text-3:#86909C;
+  --success:#00B42A; --success-bg:#E8F8EC;
+  --danger:#F53F3F; --danger-bg:#FEECEC;
+  --warning:#FF7D00; --warning-bg:#FFF3E2;
+  --info:#2F6BF6; --info-bg:#E6F7FB;
+  --radius:8px;
+  --shadow:0 1px 3px rgba(31,45,61,.06),0 4px 16px rgba(31,45,61,.05);
+}
+body{
+  font-family:Outfit,"Noto Sans SC","Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微軟雅黑",Arial,sans-serif;
+  background:var(--bg);
+}
+.num,.s-value,.mh-value,.key-txt,.tbl .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+/* 作為 iframe 子頁載入：收起外層留白，由管理面統一提供導航與頁籤 */
+.content{padding:18px 20px 48px;min-height:100vh}
+</style>
+</head>
+<body>
+<template id="tpl-detail">
+  <div class="card">
+    <div class="card-body" style="padding:16px 20px 0">
+      <div style="display:flex;align-items:flex-start;gap:20px">
+        <div style="flex:1;min-width:0">
+          <div class="mh-name" id="h-name"></div>
+          <div class="mh-grid">
+            <div><div class="mh-label">邮箱:</div><div class="mh-value" id="h-email"></div></div>
+            <div><div class="mh-label">联络人:</div><div class="mh-value" id="h-contact"></div></div>
+            <div><div class="mh-label">联系电话:</div><div class="mh-value" id="h-phone"></div></div>
+            <div><div class="mh-label">IP白名單:</div><div class="mh-value" id="h-ip"></div></div>
+          </div>
+        </div>
+        <div class="refresh-meta" id="refresh-meta" style="margin-top:2px;flex:none"></div>
+      </div>
+    </div>
+    <div class="bigtabs" style="margin-top:16px;border-radius:0;box-shadow:none">
+      <div class="bigtab active" data-tab="overview">概覽</div>
+      <div class="bigtab" data-tab="api">API 調用詳情</div>
+      <div class="bigtab" data-tab="wss">WSS 調用詳情</div>
+    </div>
+    <div id="tab-body"></div>
+  </div>
+</template>
+<div class="content" id="content"></div>
+<div class="mask" id="mask"></div>
+<div class="toast" id="toast"></div>
+<script>
+/* ===== 公共布局 + 工具 ===== */
+const MENU = [
+  { key:'dashboard', label:'事件总览', icon:'◉', href:'index.html' },
+  { key:'event', label:'事件管理', icon:'▦', children:[
+    { label:'事件列表', href:'#' }, { label:'事件分类', href:'#' },
+    { label:'事件复核', href:'#' }, { label:'投注类系数调控', href:'#' },
+  ]},
+  { key:'merchant', label:'商戶管理', icon:'▣', children:[
+    { label:'商戶列表', href:'merchant.html', key:'merchant-list' },
+  ]},
+  { key:'system', label:'系统設置', icon:'⚙', children:[
+    { label:'用户管理', href:'#' }, { label:'角色管理', href:'#' },
+    { label:'操作日誌', href:'#' },
+    { label:'API推送異常', href:'api-alarm.html', key:'api-alarm', isNew:true },
+  ]},
+];
+
+function renderLayout(opts){
+  const { active, pageTab } = opts;
+  const menuHtml = MENU.map(g => {
+    if (!g.children) {
+      return `<div class="menu-item ${active===g.key?'active':''}" onclick="${g.href==='#'?`toast('演示原型未包含该頁面')`:`location.href='${g.href}'`}"><span class="icon">${g.icon}</span>${g.label}</div>`;
+    }
+    const sub = g.children.map(c =>
+      `<div class="menu-item ${active===c.key?'active':''}" onclick="${c.href==='#'?`toast('演示原型未包含该頁面')`:`location.href='${c.href}'`}">${c.label}${c.isNew?'<span class="badge-new">NEW</span>':''}</div>`
+    ).join('');
+    return `<div class="menu-group-title" data-g="${g.key}"><span class="icon">${g.icon}</span>${g.label}<span class="caret">▾</span></div><div class="menu-sub">${sub}</div>`;
+  }).join('');
+
+  document.body.insertAdjacentHTML('afterbegin', `
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo"><span class="logo-mark">D</span>數據中台</div>
+      <nav class="menu">${menuHtml}</nav>
+    </aside>
+    <div class="main">
+      <div class="topbar">
+        <span class="clock" id="top-clock"></span>
+        <span style="color:var(--text-3)">繁体中文 ▾</span>
+        <span class="user"><span class="avatar">q</span>qwer1234 ▾</span>
+      </div>
+      <div class="pagetabs"><span class="pagetab active">${pageTab}<span class="x">✕</span></span></div>
+      <div class="content" id="content"></div>
+    </div>
+  </div>
+  <div class="mask" id="mask"></div>
+  <div class="toast" id="toast"></div>`);
+
+  const tpl = document.getElementById('page-tpl');
+  document.getElementById('content').appendChild(tpl.content.cloneNode(true));
+
+  const clock = document.getElementById('top-clock');
+  const tick = () => { clock.textContent = fmtTime(Date.now(), true); };
+  tick(); setInterval(tick, 1000);
+
+  document.getElementById('mask').addEventListener('click', closeAllLayers);
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.dropdown.open').forEach(d => { if (!d.contains(e.target)) d.classList.remove('open'); });
+    document.querySelectorAll('.drp.open').forEach(d => { if (!d.contains(e.target)) d.classList.remove('open'); });
+    document.querySelectorAll('.trend-dim.open').forEach(d => { if (!d.contains(e.target)) { d.classList.remove('open'); if (window._syncTrend) window._syncTrend(); } });
+  });
+}
+
+/* ===== 時間 / 数字 ===== */
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmtTime(ts, withSec){
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+function fmtTimeHM(ts){ const d=new Date(ts); return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; }
+function fmtNum(n){ return n==null?'-':Number(n).toLocaleString('en-US'); }
+function fmtPct(n){ return (n*100).toFixed(2)+'%'; }
+function fmtDur(ms){
+  if (ms==null) return '-';
+  const s = Math.floor(ms/1000);
+  const p2 = n => String(n).padStart(2,'0');
+  if (s < 60) return s + '秒';
+  const m = Math.floor(s/60), ss = s % 60;
+  if (m < 60) return m + '分' + p2(ss) + '秒';
+  const h = Math.floor(m/60), mm = m % 60;
+  if (h < 24) return h + '小時' + p2(mm) + '分';
+  const d = Math.floor(h/24), hh = h % 24;
+  return d + '天' + p2(hh) + '小時' + p2(mm) + '分';
+}
+function uuid(){
+  return 'xxxxxxxx-xxxx-4xxx'.replace(/x/g, () => (Math.random()*16|0).toString(16));
+}
+
+/* ===== 交互 ===== */
+let toastTimer = null;
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + (type||'');
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=> t.className='toast', 2200);
+}
+function openDrawer(html){
+  closeAllLayers();
+  document.getElementById('mask').classList.add('show');
+  document.body.insertAdjacentHTML('beforeend',
+    `<div class="drawer" id="drawer"><div class="drawer-head"><h3>詳情</h3><span class="close" onclick="closeAllLayers()">✕</span></div><div class="drawer-body">${html}</div></div>`);
+  requestAnimationFrame(()=> document.getElementById('drawer').classList.add('show'));
+}
+function openDialog(html, footHtml, cls){
+  closeAllLayers();
+  document.getElementById('mask').classList.add('show');
+  document.body.insertAdjacentHTML('beforeend',
+    `<div class="dialog ${cls||''}${footHtml?'':' dialog-bare'}" id="dialog">
+       <span class="dialog-x" onclick="closeAllLayers()" aria-label="關閉">✕</span>
+       <div class="dialog-body">${html}</div>
+       ${footHtml ? `<div class="dialog-foot">${footHtml}</div>` : ''}
+     </div>`);
+  requestAnimationFrame(()=> document.getElementById('dialog').classList.add('show'));
+}
+function closeAllLayers(){
+  const d = document.getElementById('drawer'); if (d) d.remove();
+  const g = document.getElementById('dialog'); if (g) g.remove();
+  const m = document.getElementById('mask'); if (m) m.classList.remove('show');
+}
+
+/* ===== 分頁组件 ===== */
+function renderPagination(el, total, page, pageSize, onPage){
+  const pages = Math.max(1, Math.ceil(total/pageSize));
+  let nums = [];
+  if (pages <= 7) nums = Array.from({length:pages},(_,i)=>i+1);
+  else if (page <= 4) nums = [1,2,3,4,5,'…',pages];
+  else if (page >= pages-3) nums = [1,'…',pages-4,pages-3,pages-2,pages-1,pages];
+  else nums = [1,'…',page-1,page,page+1,'…',pages];
+  el.innerHTML = `
+    <span class="total">合共 ${fmtNum(total)} 條</span>
+    <button class="pg-btn" ${page<=1?'disabled':''} data-p="${page-1}">‹</button>
+    ${nums.map(n => n==='…' ? `<button class="pg-btn" disabled>…</button>` :
+      `<button class="pg-btn ${n===page?'cur':''}" data-p="${n}">${n}</button>`).join('')}
+    <button class="pg-btn" ${page>=pages?'disabled':''} data-p="${page+1}">›</button>
+    <select class="select" style="min-width:0;height:28px"><option>${pageSize} 條 / 頁</option></select>
+    <span class="pg-jump">前往 <input class="input" id="pg-jump-in" /> 頁</span>`;
+  el.querySelectorAll('.pg-btn[data-p]').forEach(b => b.onclick = () => onPage(+b.dataset.p));
+  const ji = el.querySelector('#pg-jump-in');
+  ji.onkeydown = e => { if (e.key==='Enter'){ const p = Math.min(pages, Math.max(1, +ji.value||1)); onPage(p); } };
+}
+
+/* ===== 下拉（更多） ===== */
+function moreDropdown(items){
+  return `<div class="dropdown"><a onclick="event.stopPropagation();this.parentNode.classList.toggle('open')">更多 ▾</a>
+    <div class="dropdown-menu">${items.map(i=>`<div class="dd-item ${i.danger?'danger':''}" onclick="${i.onclick}">${i.label}</div>`).join('')}</div></div>`;
+}
+
+/* ===== 日期時間範圍选择器 ===== */
+function toLocalInput(ts){
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function fmtRange(ts){ const d = new Date(ts); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+
+function dateRangePicker(el, opts){
+  // opts: {start, end, onApply(startTs|null, endTs|null)}；null 表示不限
+  let st = opts.start, en = opts.end;
+  el.classList.add('drp');
+  const renderVal = () => {
+    el.querySelector('.drp-val').textContent = (st==null||en==null) ? '開始日期 - 結束日期' : `${fmtRange(st)} - ${fmtRange(en)}`;
+    el.querySelector('.drp-val').classList.toggle('placeholder', st==null||en==null);
+  };
+  el.innerHTML = `
+    <span class="drp-val"></span><span class="drp-icon">📅</span>
+    <div class="drp-panel" onclick="event.stopPropagation()">
+      <div class="dt-row"><span>開始</span><input type="datetime-local" class="drp-s"><span>結束</span><input type="datetime-local" class="drp-e"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn btn-sm drp-clear">清 空</button>
+        <button class="btn btn-primary btn-sm drp-ok">确 定</button>
+      </div>
+    </div>`;
+  const panel = el.querySelector('.drp-panel');
+  const sIn = el.querySelector('.drp-s'), eIn = el.querySelector('.drp-e');
+  const syncInputs = () => { sIn.value = st==null?'':toLocalInput(st); eIn.value = en==null?'':toLocalInput(en); };
+  renderVal(); syncInputs();
+  el.onclick = e => {
+    if (e.target.closest('.drp-panel')) return;
+    document.querySelectorAll('.drp.open').forEach(d => { if (d !== el) d.classList.remove('open'); });
+    el.classList.toggle('open'); syncInputs();
+  };
+  el.querySelector('.drp-ok').onclick = () => {
+    st = sIn.value ? new Date(sIn.value).getTime() : null;
+    en = eIn.value ? new Date(eIn.value).getTime() : null;
+    if (st && en && st > en){ toast('開始時間不能晚于結束時間', 'error'); return; }
+    renderVal(); el.classList.remove('open');
+    opts.onApply(st, en);
+  };
+  el.querySelector('.drp-clear').onclick = () => {
+    st = null; en = null; syncInputs(); renderVal(); el.classList.remove('open');
+    opts.onApply(null, null);
+  };
+}
+
+/* ===== SVG 折线图 ===== */
+function lineChart(el, opts){
+  // opts: {labels:[], series:[{name,color,data[],area}], yFmt}
+  const W = el.clientWidth || 600, H = el.clientHeight || 230;
+  const P = { l:46, r:14, t:14, b:26 };
+  const iw = W-P.l-P.r, ih = H-P.t-P.b;
+  const all = opts.series.flatMap(s=>s.data);
+  const max = Math.max(...all)*1.15 || 1, min = 0;
+  const n = opts.labels.length;
+  const x = i => P.l + iw*(i/(n-1));
+  const y = v => P.t + (H-P.t-P.b)*(1-(v-min)/(max-min));
+  let svg = `<svg width="100%" height="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block">`;
+  for (let g=0; g<=4; g++){
+    const gy = P.t + (H-P.t-P.b)*g/4;
+    const gv = max*(1-g/4);
+    svg += `<line x1="${P.l}" y1="${gy}" x2="${W-P.r}" y2="${gy}" stroke="#eef2f8"/>`;
+    svg += `<text x="${P.l-8}" y="${gy+4}" text-anchor="end" font-size="10" fill="#8a97ab">${opts.yFmt?opts.yFmt(gv):Math.round(gv)}</text>`;
+  }
+  opts.labels.forEach((lb,i)=>{
+    if (n<=8 || i%Math.ceil(n/8)===0)
+      svg += `<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="10" fill="#8a97ab">${lb}</text>`;
+  });
+  opts.series.forEach(s=>{
+    const pts = s.data.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+    if (s.area){
+      svg += `<defs><linearGradient id="g${s.name.replace(/\W/g,'')}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${s.color}" stop-opacity=".25"/><stop offset="1" stop-color="${s.color}" stop-opacity="0"/>
+        </linearGradient></defs>`;
+      svg += `<polygon points="${P.l},${P.t+ih} ${pts} ${x(n-1)},${P.t+ih}" fill="url(#g${s.name.replace(/\W/g,'')})"/>`;
+    }
+    svg += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round"/>`;
+    s.data.forEach((v,i)=> svg += `<circle cx="${x(i)}" cy="${y(v)}" r="2.4" fill="#fff" stroke="${s.color}" stroke-width="1.6"><title>${opts.labels[i]}：${opts.yFmt?opts.yFmt(v):v}</title></circle>`);
+  });
+  svg += `</svg>`;
+  el.innerHTML = svg;
+}
+
+/* ===== 空态 ===== */
+function emptyState(text){
+  return `<div class="empty"><div class="e-icon">🗂</div><div class="e-text">${text}</div></div>`;
+}
+
+/* ===== 30 秒自动刷新 ===== */
+function startAutoRefresh(el, onRefresh){
+  let left = 30, lastUpdate = Date.now();
+  const render = () => {
+    el.innerHTML = `<span class="dot-live"></span>數據更新於 ${fmtTimeHM(lastUpdate)}<span class="count">${left}s 后自动刷新</span>`;
+  };
+  render();
+  return setInterval(()=>{
+    left--;
+    if (left<=0){ left=30; lastUpdate=Date.now(); onRefresh && onRefresh(lastUpdate); }
+    render();
+  }, 1000);
+}
+
+/* ===== 時間維度选择器（全部/近30天/近7天/自定義） ===== */
+function dimTimePicker(el, opts){
+  // opts: {dim, start, end, onApply(dim, startTs|null, endTs|null)}
+  let dim = opts.dim, open = false;
+  el.classList.add('dim-pick');
+  const label = () => {
+    if (dim==='自定義' && opts.start!=null && opts.end!=null)
+      return `${fmtRange(opts.start).slice(5,10)} ~ ${fmtRange(opts.end).slice(5,10)}`;
+    return dim;
+  };
+  const render = () => {
+    el.classList.toggle('open', open);
+    el.innerHTML = `
+      <span class="td-label">時間維度</span>
+      <span class="td-cur">${label()}</span>
+      <span class="td-caret">▾</span>
+      <div class="td-panel with-dt" onclick="event.stopPropagation()">
+        <div class="td-menu">
+          ${['全部','近30天','近7天','自定義'].map(d=>`<div class="td-opt ${d===dim?'on':''}" data-d="${d}">${d}${d===dim?'<span class="td-check">✓</span>':''}</div>`).join('')}
+          <div class="dt-inline" style="${dim==='自定義'?'':'display:none'}">
+            <div class="dt-row"><span>開始</span><input type="datetime-local" class="dp-s"></div>
+            <div class="dt-row"><span>結束</span><input type="datetime-local" class="dp-e"></div>
+            <div style="display:flex;justify-content:flex-end;gap:8px">
+              <button class="btn btn-sm dp-clear">清 空</button>
+              <button class="btn btn-primary btn-sm dp-ok">确 定</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    el.onclick = e => {
+      if (e.target.closest('.td-panel')) return;
+      e.stopPropagation();
+      open = !open;
+      document.querySelectorAll('.dim-pick.open').forEach(d => { if (d !== el) d.classList.remove('open'); });
+      el.classList.toggle('open', open);
+    };
+    el.querySelectorAll('.td-opt').forEach(o => o.onclick = () => {
+      dim = o.dataset.d;
+      if (dim === '自定義'){ open = true; }
+      else { open = false; opts.onApply(dim, null, null); }
+      render();
+    });
+    const sIn = el.querySelector('.dp-s'), eIn = el.querySelector('.dp-e');
+    if (sIn){ sIn.value = opts.start!=null?toLocalInput(opts.start):''; eIn.value = opts.end!=null?toLocalInput(opts.end):''; }
+    const ok = el.querySelector('.dp-ok');
+    if (ok) ok.onclick = () => {
+      const s = sIn.value ? new Date(sIn.value).getTime() : null;
+      const e2 = eIn.value ? new Date(eIn.value).getTime() : null;
+      if (!s || !e2){ toast('請選擇開始和結束時間', 'error'); return; }
+      if (s > e2){ toast('開始時間不能晚于結束時間', 'error'); return; }
+      open = false; opts.onApply('自定義', s, e2); render();
+    };
+    const clr = el.querySelector('.dp-clear');
+    if (clr) clr.onclick = () => { dim = '全部'; open = false; opts.onApply('全部', null, null); render(); };
+  };
+  render();
+}
+
+/* ===== 演示狀態切换 ===== */
+const DEMO_STATES = [
+  { k:'normal',  t:'正常數據' },
+  { k:'empty',   t:'无數據' },
+  { k:'no-wss',  t:'WSS 未接入' },
+  { k:'no-e2e',  t:'E2E 未接入' },
+  { k:'delay',   t:'數據延遲' },
+  { k:'timeout', t:'查詢超時' },
+];
+function demoSwitcher(current, onChange){
+  document.body.insertAdjacentHTML('beforeend', `
+    <div class="demo-fab" id="demo-fab">
+      <div class="fab-panel"><h4>空态与異常态演示</h4>
+        ${DEMO_STATES.map(s=>`<button class="opt ${s.k===current?'on':''}" data-k="${s.k}">${s.t}</button>`).join('')}
+      </div>
+      <button class="fab-btn">🎛 演示狀態</button>
+    </div>`);
+  const fab = document.getElementById('demo-fab');
+  fab.querySelector('.fab-btn').onclick = ()=> fab.classList.toggle('open');
+  fab.querySelectorAll('.opt').forEach(b => b.onclick = ()=>{
+    fab.querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); fab.classList.remove('open');
+    onChange(b.dataset.k);
+  });
+}
+
+</script>
+<script>
+/* ===== 模拟數據 ===== */
+function seededRandom(seed){ let s = seed; return () => { s = (s*9301+49297)%233280; return s/233280; }; }
+
+/* ---- 商戶（字段与线上商戶列表一致） ----
+   显示字段：过滤分类数/过滤事件数/APIKey/密鑰/IP白名單/狀態/创建時間
+   統計字段（api24h/succ/r5xx/wss/status）仅供「OpenAPI調用詳情」頁使用，不在列表展示 */
+const MERCHANTS = [
+  { id:80001, name:'12732',  contact:'hdajja', phone:'+112312686', email:'55666@163.com',   filterCat:0, filterEvt:17, apiKey:'eo52e91c77e08b41e087d5', secret:'8c34ea2f19bc4471c1d78', ip:'-', recon:true,  updatedAt:'2026-10-11 10:28:30', api24h:38412, succ:0.9987, r5xx:0.0004, wss:126, status:'ok' },
+  { id:80002, name:'55',     contact:'wwwwww', phone:'+11328828233', email:'322581@163.com', filterCat:0, filterEvt:4, apiKey:'570a9c31be22f4a85d7d9', secret:'89dd70e19ab4c22f11ed', ip:'192.168.0.5', recon:true, updatedAt:'2026-10-11 10:57:02', api24h:22108, succ:0.9951, r5xx:0.0012, wss:48, status:'ok' },
+  { id:80003, name:'视频的方法', contact:'ff', phone:'+113328587884', email:'342536@qq.com', filterCat:0, filterEvt:2, apiKey:'8868734fa22109c21917', secret:'6b76e1d0a9c84ee84fa', ip:'192.168.3.1', recon:true, updatedAt:'2026-10-11 01:52:35', api24h:15233, succ:0.9722, r5xx:0.0130, wss:230, status:'ok' },
+  { id:80004, name:'hhu',    contact:'eee', phone:'+1123546', email:'2584621@qq.com',  filterCat:0, filterEvt:1, apiKey:'3076be19f0a259851', secret:'cd9c2e4a1b73f17012', ip:'192.168.3.2 +1', recon:true, updatedAt:'2026-10-11 10:26:58', api24h:9860, succ:0.9518, r5xx:0.0621, wss:12, status:'bad' },
+  { id:80005, name:'呃啊色', contact:'-', phone:'-', email:'21212121998.com', filterCat:0, filterEvt:0, apiKey:'bdf1392c7ae416080a', secret:'fbff99d1e2c84b3bac2', ip:'-', recon:true, updatedAt:'2026-09-19 09:40:31', api24h:412, succ:0.9942, r5xx:0.0016, wss:2, status:'ok' },
+  { id:80006, name:'david-test', contact:'david', phone:'-', email:'david@outlook.com', filterCat:1, filterEvt:0, apiKey:'52c1f98ab43de87639', secret:'34n644c19be2f229438', ip:'-', recon:true, updatedAt:'2026-09-02 07:04:21', api24h:7412, succ:0.9990, r5xx:0.0002, wss:12, status:'ok' },
+  { id:80007, name:'kan02',  contact:'dsds', phone:'+112121212122', email:'kan102@qq.com', filterCat:1, filterEvt:48, apiKey:'7a5c6d19e4b2f69879', secret:'9e13b07a5c2de0757f', ip:'192.168.10.103', recon:true, updatedAt:'2026-08-19 09:54:16', api24h:36540, succ:0.9972, r5xx:0.0008, wss:210, status:'ok' },
+  { id:80008, name:'kan01',  contact:'dsds', phone:'+112121212122', email:'youxiao@qq.com', filterCat:0, filterEvt:1, apiKey:'d2895e4f17b3a73424', secret:'69030c1b8e42dc0a485', ip:'192.168.1.156', recon:true, updatedAt:'2026-08-19 09:10:56', api24h:9820, succ:0.9966, r5xx:0.0009, wss:64, status:'ok' },
+  { id:80009, name:'bubu',   contact:'-', phone:'-', email:'bubu01@qq.com', filterCat:0, filterEvt:8, apiKey:'265b8f0c31de64881', secret:'5d7d2a91e0b4c38e05', ip:'+20', recon:true, updatedAt:'2026-08-19 06:28:32', api24h:12600, succ:0.9938, r5xx:0.0018, wss:90, status:'ok' },
+  { id:80010, name:'bubu002', contact:'-', phone:'+6015222', email:'bubu002@qq.com', filterCat:0, filterEvt:0, apiKey:'17cc03a9be5d1b3f1', secret:'fb8ae2c74d19081846d', ip:'-', recon:true, updatedAt:'2026-08-19 05:48:11', api24h:4880, succ:0.9996, r5xx:0.0001, wss:8, status:'ok' },
+  { id:80011, name:'bubu',   contact:'-', phone:'+8618888886663', email:'bubu@qq.com', filterCat:0, filterEvt:0, apiKey:'7b049e12ca6b57036', secret:'33765f0a9d2c10402b', ip:'-', recon:true, updatedAt:'2026-08-19 05:47:24', api24h:3921, succ:0.9955, r5xx:0.0013, wss:19, status:'ok' },
+  { id:80012, name:'kan01',  contact:'dsds', phone:'+112121212122', email:'kan02@qq.com', filterCat:0, filterEvt:40, apiKey:'72715c8e309bdfe6ee6', secret:'46e7e92a1b6c4094ce', ip:'-', recon:true, updatedAt:'2026-08-19 05:45:30', api24h:28770, succ:0.9948, r5xx:0.0015, wss:150, status:'ok' },
+  { id:80013, name:'kan',    contact:'dsds', phone:'+112121212122', email:'kan7@qq.com', filterCat:0, filterEvt:0, apiKey:'b47c01e95a3d84d229', secret:'05055d7e2c1b9a6b7ef', ip:'-', recon:true, updatedAt:'2026-08-19 05:44:07', api24h:1954, succ:0.9992, r5xx:0.0002, wss:5, status:'ok' },
+  { id:80014, name:'mll02',  contact:'1111111', phone:'-', email:'dadas@qq.com', filterCat:0, filterEvt:0, apiKey:'2ec8904bd17ce8646d', secret:'32751a6e0f9d3be88de', ip:'-', recon:true, updatedAt:'2026-08-19 05:43:30', api24h:1432, succ:0.9930, r5xx:0.0015, wss:9, status:'ok' },
+  { id:80015, name:'mini002', contact:'-', phone:'-', email:'das@qq.com', filterCat:0, filterEvt:0, apiKey:'b14f1c70e39a85e50f8', secret:'e34072d9b1a6c4b81c8', ip:'-', recon:true, updatedAt:'2026-08-19 05:13:38', api24h:998, succ:0.9977, r5xx:0.0006, wss:3, status:'ok' },
+  { id:80016, name:'mini',   contact:'-', phone:'-', email:'mini@qq.com', filterCat:0, filterEvt:0, apiKey:'633e21d08a4c7fde1d8', secret:'43365b91e2d70119698', ip:'-', recon:true, updatedAt:'2026-08-19 03:41:27', api24h:766, succ:0.9846, r5xx:0.0052, wss:14, status:'ok' },
+  { id:80017, name:'jajan',  contact:'-', phone:'-', email:'jajan@qq.com', filterCat:0, filterEvt:0, apiKey:'57846b3d29ea0159699', secret:'465307ce1d8b42675a2', ip:'-', recon:true, updatedAt:'2026-08-03 03:38:38', api24h:512, succ:0.9961, r5xx:0.0010, wss:6, status:'ok' },
+  { id:80018, name:'test',   contact:'-', phone:'-', email:'merchant-80007@migration.inva', filterCat:2, filterEvt:3, apiKey:'e05ee91c74b0d28e510', secret:'2d4c3a81f6e7942c476c', ip:'-', recon:true, updatedAt:'2026-08-01 01:47:21', api24h:377, succ:0.9947, r5xx:0.0013, wss:4, status:'ok' },
+  { id:80019, name:'小山银行', contact:'小王', phone:'+1121212121212', email:'merchant-80005@migration.inva', filterCat:0, filterEvt:1, apiKey:'85e76d2c19fa30c8d87', secret:'8af913be7c04d2b2e7a', ip:'-', recon:true, updatedAt:'2026-08-01 03:54:07', api24h:204, succ:0.9995, r5xx:0.0001, wss:2, status:'ok' },
+  { id:80020, name:'商戶商戶', contact:'王', phone:'+1123456789', email:'merchant-80001@migration.inva', filterCat:2, filterEvt:2, apiKey:'603da91c75be8f7a67d', secret:'4fa912de7c30b87da0c', ip:'-', recon:true, updatedAt:'2026-08-01 03:03:24', api24h:158, succ:0.9988, r5xx:0.0003, wss:2, status:'ok' },
+];
+
+/* ---- 列表展示字段：狀態（啟用/停用）与创建時間 ----
+   创建時間由 updatedAt 回推得出，保证早于更新時間 */
+const DISABLED_MERCHANTS = [80005, 80014, 80017];
+function _pad2(n){ return String(n).padStart(2,'0'); }
+function _fmtDT(d){
+  return `${d.getFullYear()}-${_pad2(d.getMonth()+1)}-${_pad2(d.getDate())} ` +
+         `${_pad2(d.getHours())}:${_pad2(d.getMinutes())}:${_pad2(d.getSeconds())}`;
+}
+MERCHANTS.forEach(m=>{
+  m.enabled = !DISABLED_MERCHANTS.includes(m.id);
+  const t = new Date(String(m.updatedAt).replace(' ', 'T'));
+  t.setDate(t.getDate() - (5 + (m.id % 60)));
+  m.createdAt = _fmtDT(t);
+});
+
+/* ---- REST API 調用明细 ---- */
+const API_PATHS = [
+  ['GET','/v1/events'], ['GET','/v1/events/{event_id}'], ['GET','/v1/markets'],
+  ['GET','/v1/markets/{market_id}/quote'], ['POST','/v1/orders'], ['DELETE','/v1/orders/{order_id}'],
+  ['GET','/v1/orders'], ['GET','/v1/positions'], ['GET','/v1/accounts/balance'],
+  ['POST','/v1/webhooks'], ['GET','/v1/series'], ['PUT','/v1/orders/{order_id}'],
+  ['GET','/v1/trades'], ['GET','/v1/orderbook/{market_id}'],
+];
+const ERR_CODES = {
+  ok:['-'], client:['40001','40003','40400','42201'], limit:['42900'], server:['50000','50001','50200','50400'],
+};
+const GATEWAY_NODES = ['nginx-hk-01','nginx-hk-02','nginx-sg-01','nginx-sg-02'];
+const CALLERS = ['quant-bot-01 (103.86.12.7)','app-server-a (172.16.8.21)','risk-engine (172.16.8.33)','web-console (10.2.1.15)','trade-worker-3 (172.16.9.8)'];
+
+function genApiCalls(seed, count){
+  const rnd = seededRandom(seed);
+  const now = Date.now();
+  const rows = [];
+  for (let i=0;i<count;i++){
+    const [method, path] = API_PATHS[Math.floor(rnd()*API_PATHS.length)];
+    const roll = rnd();
+    let status, http, err;
+    if (roll < 0.9){ status='成功'; http=[200,200,200,201,204][Math.floor(rnd()*5)]; err='-'; }
+    else if (roll < 0.955){ status='失敗'; http=[400,401,403,404,422][Math.floor(rnd()*5)]; err=ERR_CODES.client[Math.floor(rnd()*4)]; }
+    else if (roll < 0.97){ status='失敗'; http=429; err='42900'; }
+    else if (roll < 0.988){ status='失敗'; http=[500,502][Math.floor(rnd()*2)]; err=ERR_CODES.server[Math.floor(rnd()*4)]; }
+    else { status='超时'; http=504; err='50400'; }
+    const duration = status==='超时' ? 5000+Math.floor(rnd()*4000) : 4+Math.floor(rnd()*rnd()*860);
+    const time = now - Math.floor(rnd()*7*24*3600*1000);
+    const rid = uuid()+'-'+(100000+Math.floor(rnd()*899999));
+    const ip = CALLERS[Math.floor(rnd()*CALLERS.length)];
+    rows.push({
+      requestId: rid, time, method, path, status, http, err, duration,
+      node: GATEWAY_NODES[Math.floor(rnd()*GATEWAY_NODES.length)], caller: ip,
+      rawLog: `${ip.match(/\(([^)]+)\)/)?.[1]||'10.0.0.1'} - - [${new Date(time).toISOString()}] "${method} ${path}${path.includes('{')?'':''} HTTP/1.1" ${http} ${200+Math.floor(rnd()*9000)} "-" "okhttp/4.12.0" request_id=${rid} upstream=${path.split('/')[2]||'core'}-svc rt=${(duration/1000).toFixed(3)}s node=${GATEWAY_NODES[Math.floor(rnd()*4)]}`,
+    });
+  }
+  rows.sort((a,b)=> b.time-a.time);
+  return rows;
+}
+
+/* ---- WSS 事件 ---- */
+const WSS_EVENTS = ['連接建立','訂閱','取消訂閱','廣播','心跳','斷連'];
+const WSS_CHANNELS = ['market.{id}.book','market.{id}.trades','event.{id}.ticker','user.orders','user.positions','series.crypto','series.sports'];
+const WSS_REASONS = ['-','客戶端主动關閉','心跳超時','網關重启','協定錯誤','連接數超限'];
+function genWssEvents(seed, count){
+  const rnd = seededRandom(seed);
+  const now = Date.now();
+  const rows = [];
+  for (let i=0;i<count;i++){
+    const evt = WSS_EVENTS[Math.floor(rnd()*WSS_EVENTS.length)];
+    let status, reason='-';
+    if (evt==='斷連'){
+      const kind = rnd();
+      if (kind < 0.5){ status = '断开'; reason = '客戶端主动關閉'; }
+      else if (kind < 0.8){ status = '超时'; reason = '心跳超時'; }
+      else { status = '断开'; reason = WSS_REASONS[3+Math.floor(rnd()*3)]; }
+    } else if (evt==='連接建立'){
+      status = rnd() < 0.25 ? '重连' : '在线';
+    } else if (evt==='心跳'){
+      status = rnd() < 0.06 ? '超时' : '在线';
+    } else {
+      status = '在线';
+    }
+    const upTs = now - Math.floor(rnd()*7*24*3600*1000);
+    const latency = evt==='廣播' ? 6+Math.floor(rnd()*rnd()*420) : (rnd()<0.5?null:2+Math.floor(rnd()*120));
+    rows.push({
+      connId: 'conn-'+uuid().slice(0,13), event: evt, time: upTs,
+      channel: WSS_CHANNELS[Math.floor(rnd()*WSS_CHANNELS.length)],
+      status, reason, latency,
+      upTs, downTs: latency==null?null:upTs+latency,
+    });
+  }
+  rows.sort((a,b)=> b.time-a.time);
+  return rows;
+}
+
+/* ---- P0 告警 ---- */
+const P0_RULES = [
+  { code:'R-REST-5XX-001', name:'REST 網關 5xx 爆炸', cond:'API 網關 1 分鐘内 5xx 響應占比 > 5%', impact:'下游量化/应用端調用 API 批量报错，分發瘫瘫' },
+  { code:'R-WSS-DROP-002', name:'WSS 廣播網關崩潰/斷連', cond:'1 分鐘内客戶端連接數驟降 > 50%', impact:'下游客戶端連接被批量切断' },
+  { code:'R-E2E-LAT-003', name:'全鏈路极速延遲 (E2E Latency)', cond:'核心源端到端延遲 > 5000ms（持续 1 分鐘）', impact:'上游時間戳到下游 WSS 收到時間全鏈路卡顿' },
+];
+function genAlarms(){
+  const rnd = seededRandom(88);
+  const now = Date.now();
+  const list = [];
+  const mk = (i, rule, status, agoMin, durMin, cur, th, scope) => {
+    const trig = now - agoMin*60000;
+    list.push({
+      id:`ALM${new Date(trig).toISOString().slice(0,10).replace(/-/g,'')}${String(i).padStart(3,'0')}`,
+      ruleCode: rule.code, ruleName: rule.name, level:'P0',
+      merchantId: scope.merchant || '-',
+      triggerTime: trig,
+      recoverTime: status==='已恢復' ? trig + durMin*60000 : null,
+      duration: status==='已恢復' ? durMin*60000 : (now - trig),
+      current: cur, threshold: th, scope, status,
+    });
+  };
+  mk(1, P0_RULES[0], '未處理', 18, 0, '7.42%', '5%',    { merchant:'80004', apis:['/v1/orders','/v1/markets/{id}/quote'], codes:['50000','50200'], nodes:['nginx-hk-02'], channels:['-'], callers:['quant-bot-01','trade-worker-3'] });
+  mk(2, P0_RULES[1], '未處理', 42, 0, '-63.2%', '50%',  { merchant:'-', apis:['-'], codes:['-'], nodes:['wss-gw-sg-01'], channels:['market.{id}.book','user.orders'], callers:['全部在线客戶端（约 1,842 个）'] });
+  mk(3, P0_RULES[2], '處理中', 75, 0, '6,312ms', '5000ms', { merchant:'80001', apis:['-'], codes:['-'], nodes:['wss-gw-hk-01'], channels:['market.{id}.trades'], callers:['app-server-a'] });
+  mk(4, P0_RULES[0], '處理中', 190, 0, '5.83%', '5%',   { merchant:'80003', apis:['/v1/events'], codes:['50400'], nodes:['nginx-sg-01'], channels:['-'], callers:['web-console'] });
+  mk(5, P0_RULES[2], '已恢復', 60*5, 14, '5,420ms', '5000ms', { merchant:'80006', apis:['-'], codes:['-'], nodes:['wss-gw-hk-02'], channels:['event.{id}.ticker'], callers:['risk-engine'] });
+  mk(6, P0_RULES[1], '已恢復', 60*9, 6,  '-58.7%', '50%', { merchant:'-', apis:['-'], codes:['-'], nodes:['wss-gw-sg-02'], channels:['series.crypto'], callers:['全部在线客戶端（约 966 个）'] });
+  mk(7, P0_RULES[0], '已恢復', 60*26, 22, '9.15%', '5%',  { merchant:'80002', apis:['/v1/orders','/v1/positions'], codes:['50001'], nodes:['nginx-hk-01'], channels:['-'], callers:['quant-bot-01'] });
+  mk(8, P0_RULES[2], '已恢復', 60*50, 31, '7,004ms', '5000ms', { merchant:'80005', apis:['-'], codes:['-'], nodes:['wss-gw-hk-01'], channels:['user.positions'], callers:['trade-worker-3'] });
+  return list;
+}
+
+/* ---- 概覽指標（按商戶派生） ---- */
+function overviewFor(m){
+  const rnd = seededRandom(m.id);
+  const labels = []; const vol = []; const rate5 = []; const conns = [];
+  for (let i=23;i>=0;i--){
+    const d = new Date(Date.now()-i*3600*1000);
+    labels.push(`${String(d.getHours()).padStart(2,'0')}时`);
+    vol.push(Math.round(m.api24h/24*(0.6+rnd()*0.9)));
+    rate5.push(+(rnd()*(m.r5xx*100*3)).toFixed(2));
+    conns.push(Math.max(0, Math.round(m.wss*(0.7+rnd()*0.6))));
+  }
+  return {
+    api: {
+      total: m.api24h, success: m.succ, r5xx: m.r5xx,
+      p95: 120+Math.floor(rnd()*380), p99: 380+Math.floor(rnd()*900),
+      r5xx1m: m.status==='bad' ? 0.062 : rnd()*0.02,
+      http: m.status,
+    },
+    wss: {
+      online: m.wss, changeRate: (rnd()*0.14-0.06),
+      drops: Math.floor(rnd()*40), broadcasts: Math.floor(m.api24h*0.8+rnd()*900),
+      p95: 60+Math.floor(rnd()*180), p99: 240+Math.floor(rnd()*600),
+      status: m.status==='bad' ? 'bad' : 'ok',
+    },
+    p0: { rest:'ok', wss:'ok', e2e: 320+Math.floor(rnd()*400), e2eP95: 900+Math.floor(rnd()*800), e2eP99: 1600+Math.floor(rnd()*1400) },
+    trend: { labels, vol, rate5, conns },
+  };
+}
+
+</script>
+<script>
+function mountIndex(){
+
+lineChart(document.getElementById('ch1'), {
+  labels:['10-27','10-28','10-29','10-30','10-31','11-1','11-2'],
+  yFmt: v => fmtNum(Math.round(v)),
+  series:[{ name:'新增事件', color:'#2e6bf0', area:true, data:[2598,8111,2574,1701,3919,2616,216] }],
+});
+lineChart(document.getElementById('ch2'), {
+  labels:['Crypto','Sports','Politics','Finance','Weather','Culture','Science','Business'],
+  yFmt: v => fmtNum(Math.round(v)),
+  series:[{ name:'事件数', color:'#5f9bff', area:true, data:[63119,51674,3144,2713,2323,612,591,302] }],
+});
+
+const tops = [
+  ['Fed Decision in October?', 20528763.904],
+  ['Trail Blazers vs. Lakers', 10034586.651],
+  ['LoL: Invictus Gaming vs LYON (BO3) - Worlds Group Stage', 8965115.146],
+  ['Nets vs. Celtics', 8099126.695],
+  ['LoL: LOS vs Team Secret Whales (BO3) - Worlds Group Stage', 8008970.664],
+  ['Cowboys vs. Eagles', 7532883.961],
+];
+document.getElementById('top-tbody').innerHTML = tops.map((t,i)=>`
+  <tr><td><b style="color:${i<3?'var(--warning)':'var(--text-3)'}">${i+1}</b></td>
+  <td>${t[0]}</td><td class="num" style="text-align:right">${fmtNum(Math.round(t[1]*1000)/1000)}</td></tr>`).join('');
+}
+
+function mountMerchant(){
+
+let state = { page:1, size:20, kw:'', email:'', status:'' };
+let revealAll = false;
+
+function maskKey(k){ return k ? k.slice(0,5)+' ···· '+k.slice(-5) : '-'; }
+
+function rowsHtml(list){
+  return list.map((m,i)=>`
+    <tr>
+      <td class="num">${(state.page-1)*state.size+i+1}</td>
+      <td>${m.name}</td>
+      <td>${m.contact}</td><td>${m.phone}</td><td>${m.email}</td>
+      <td class="num">${m.filterCat}</td><td class="num">${m.filterEvt}</td>
+      <td><span class="eye" onclick="toggleKey(this)" data-full="${m.apiKey}">👁</span><span class="key-txt">${maskKey(m.apiKey)}</span></td>
+      <td><span class="eye" onclick="toggleKey(this)" data-full="${m.secret}">👁</span><span class="key-txt">${maskKey(m.secret)}</span></td>
+      <td>${m.ip}</td>
+      <td>${m.enabled ? '<span class="tag tag-success"><i class="s-dot"></i>啟用</span>' : '<span class="tag tag-gray"><i class="s-dot"></i>停用</span>'}</td>
+      <td class="num" style="color:var(--text-2)">${m.createdAt}</td>
+      <td>
+        <a class="link" onclick="toast('演示原型未包含该功能')">权限设定</a>
+        <a class="link" style="margin-left:10px" onclick="toast('演示原型未包含该功能')">IP白名單</a>
+        ${moreDropdown([
+          { label:'OpenAPI調用詳情', onclick:`gotoDetail(${m.id})` },
+          { label:'更新密鑰', onclick:`toast('演示原型未包含该功能')` },
+          { label:'编辑', onclick:`toast('演示原型未包含该功能')` },
+          { label:'删除', onclick:`toast('演示原型未包含该功能')`, danger:true },
+        ])}
+      </td>
+    </tr>`).join('');
+}
+
+function render(){
+  const list = MERCHANTS.filter(m =>
+    (!state.kw || m.name.toLowerCase().includes(state.kw.toLowerCase())) &&
+    (!state.email || m.email.toLowerCase().includes(state.email.toLowerCase())) &&
+    (!state.status || String(m.enabled ? 1 : 0) === state.status));
+  const pageList = list.slice((state.page-1)*state.size, state.page*state.size);
+  document.getElementById('tbody').innerHTML = pageList.length ? rowsHtml(pageList) : `<tr><td colspan="13">${emptyState('暫無數據')}</td></tr>`;
+  renderPagination(document.getElementById('pager'), list.length, state.page, state.size, p=>{ state.page=p; render(); });
+}
+
+/* 单个 key 显示/隐藏 */
+window.toggleKey = function(el){
+  const txt = el.nextElementSibling;
+  const showing = txt.dataset.revealed === '1';
+  txt.textContent = showing ? maskKey(el.dataset.full) : el.dataset.full;
+  txt.dataset.revealed = showing ? '0' : '1';
+};
+window.toggleAllKeys = function(){
+  revealAll = !revealAll;
+  document.querySelectorAll('#tbody .eye').forEach(el=>{
+    const txt = el.nextElementSibling;
+    txt.textContent = revealAll ? el.dataset.full : maskKey(el.dataset.full);
+    txt.dataset.revealed = revealAll ? '1' : '0';
+  });
+};
+document.getElementById('btn-search').onclick = ()=>{ state.kw=document.getElementById('f-name').value.trim(); state.email=document.getElementById('f-email').value.trim(); state.status=document.getElementById('f-status').value; state.page=1; render(); };
+document.getElementById('btn-reset').onclick = ()=>{ document.getElementById('f-name').value=''; document.getElementById('f-email').value=''; document.getElementById('f-status').value=''; state={page:1,size:20,kw:'',email:'',status:''}; render(); };
+render();
+}
+
+function mountDetail(param){
+
+/* ---- 商戶上下文 ---- */
+const mid = param ? +param : 80001;
+const M = MERCHANTS.find(m => m.id === mid) || MERCHANTS[0];
+document.getElementById('h-name').textContent = M.name;
+document.getElementById('h-email').textContent = M.email;
+document.getElementById('h-contact').textContent = M.contact;
+document.getElementById('h-phone').textContent = M.phone;
+document.getElementById('h-ip').textContent = M.ip;
+
+const OV = overviewFor(M);
+const API_CALLS = genApiCalls(mid, 423);
+const WSS_EVENTS_LIST = genWssEvents(mid, 268);
+let demo = 'normal';
+
+startAutoRefresh(document.getElementById('refresh-meta'), () => toast('已刷新最新數據', 'success'));
+
+/* ============ 頁签 ============ */
+document.querySelectorAll('.bigtab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.bigtab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  renderTab(t.dataset.tab);
+});
+
+function renderTab(tab){
+  if (demo === 'empty')  { body().innerHTML = emptyState('暫無數據，请确认已接入 Nginx 访问日誌与 WSS 網關埋点'); return; }
+  if (demo === 'timeout'){ body().innerHTML = emptyState('查詢超時，请缩小時間範圍'); return; }
+  if (tab === 'overview') renderOverview();
+  else if (tab === 'api') renderApiTab();
+  else renderWssTab();
+}
+function body(){ return document.getElementById('tab-body'); }
+function delayBanner(){
+  return demo==='delay' ? `<div class="banner banner-warn" style="margin:14px 16px 0">⚠ 數據更新於 ${fmtTimeHM(Date.now()-9*60000)}，存在延遲，展示數據可能不是最新</div>` : '';
+}
+
+/* ============ 概覽 ============ */
+function statCard(label, value, unit, foot, status, help, fixed){
+  return `<div class="stat ${status==='ok'?'status-ok':status==='bad'?'status-bad':''}">
+    <div class="s-label">${label}${fixed?'<span class="fixed-badge">实时</span>':''}${help?`<span class="help" data-tip="${help}">?</span>`:''}</div>
+    <div class="s-value">${value}${unit?`<span class="unit">${unit}</span>`:''}</div>
+    ${foot?`<div class="s-foot">${foot}</div>`:''}
+  </div>`;
+}
+
+/* ---- 統計周期：REST / WSS 各自独立切换 ---- */
+const METRIC_DIMS = ['全部','近1小時','近24小時','近7天','近30天','自定義'];
+const DIM_HOURS  = { '近1小時':1, '近24小時':24, '近7天':168, '近30天':720 };
+/* 比率 / 分位数类指標不随窗口长度线性放大，用不同采样系数体现「换了窗口、换了样本集」 */
+const DIM_BIAS   = { '全部':1.9, '近1小時':0.65, '近24小時':1.0, '近7天':1.35, '近30天':1.8 };
+let apiDim = '近24小時', wssDim = '近24小時';
+let apiCustom = null, wssCustom = null;   // 各自保存 { s, e } 時間戳
+let customOpen = null;                    // 当前展开自定義面板的分组：'api' | 'wss' | null
+
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))>>>0; } return h; }
+function customOf(group){ return group==='api' ? apiCustom : wssCustom; }
+function pad2(n){ return String(n).padStart(2,'0'); }
+function customBias(f){ return Math.max(0.65, Math.min(1.8, Math.sqrt(Math.max(f, 1/1440)))); }
+
+function winOf(dim, group){
+  if (dim === '自定義'){
+    const c = customOf(group);
+    if (c && c.e > c.s){
+      const f = (c.e - c.s) / 86400e3;
+      return { s:c.s, e:c.e, f:Math.max(1/1440, f), bias:customBias(f) };
+    }
+    return winOf('近24小時', group);   // 未选時間段时兜底
+  }
+  if (dim === '全部') return { s:null, e:null, f:30, bias:DIM_BIAS['全部'] };   // 历史全量（按 30 天口径估算）
+  const h = DIM_HOURS[dim];
+  return { s:Date.now()-h*3600e3, e:Date.now(), f:h/24, bias:DIM_BIAS[dim] };
+}
+function metricBar(group, dim){
+  return `<div class="metric-bar">
+    <span class="metric-bar-label">時間</span>
+    <div class="metric-seg">${METRIC_DIMS.map(d=>
+      `<span class="ms-opt ${d===dim?'on':''} ${d==='自定義'?'ms-custom':''}" data-group="${group}" data-dim="${d}">${d}</span>`).join('')}</div>
+    <span class="metric-note">带 <span class="fixed-badge">实时</span> 的指標为当前快照，不随時間切换变化</span>
+    <div class="metric-custom ${customOpen===group?'open':''}" data-group="${group}">
+      <div class="cal-head">
+        <span class="cal-nav" data-n="-12">«</span>
+        <span class="cal-nav" data-n="-1">‹</span>
+        <span class="cal-title" style="flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--text)"></span>
+        <span class="cal-title2" style="flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--text)"></span>
+        <span class="cal-nav" data-n="1">›</span>
+        <span class="cal-nav" data-n="12">»</span>
+      </div>
+      <div class="cal-body"><div class="cal-month cal-m1"></div><div class="cal-month cal-m2"></div></div>
+      <div class="cal-foot"><span class="cal-hint"></span><span style="flex:1"></span><a class="link" data-act="clear">清 空</a></div>
+    </div>
+  </div>`;
+}
+
+/* ---- 自定義時間段：双月日历 ---- */
+let calBase = null, pickDraft = null;
+function dayFloor(ts){ const d = new Date(ts); d.setHours(0,0,0,0); return d.getTime(); }
+
+function renderCal(group){
+  const panel = document.querySelector(`.metric-custom[data-group="${group}"]`);
+  if (!panel) return;
+  if (calBase == null){
+    const c = customOf(group);
+    const d = c ? new Date(c.s) : new Date();
+    calBase = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+  }
+  const base = new Date(calBase), y = base.getFullYear(), m = base.getMonth();
+  const n = new Date(y, m+1, 1);
+  drawMonth(panel.querySelector('.cal-m1'), y, m, group);
+  drawMonth(panel.querySelector('.cal-m2'), n.getFullYear(), n.getMonth(), group);
+  panel.querySelector('.cal-title').textContent  = `${y}年${m+1}月`;
+  panel.querySelector('.cal-title2').textContent = `${n.getFullYear()}年${n.getMonth()+1}月`;
+  const c = customOf(group);
+  panel.querySelector('.cal-hint').textContent =
+    pickDraft != null ? `已选開始 ${pad2(new Date(pickDraft).getMonth()+1)}-${pad2(new Date(pickDraft).getDate())}，请点选結束日期`
+    : c ? `当前区间 ${fmtRange(c.s)} ~ ${fmtRange(c.e)}`
+    : '点选開始与結束日期（精确到天）';
+}
+function drawMonth(el, y, m, group){
+  const c = customOf(group);
+  const startDow = new Date(y, m, 1).getDay();
+  const days = new Date(y, m+1, 0).getDate();
+  let html = '<div class="cal-grid">';
+  ['日','一','二','三','四','五','六'].forEach(w => html += `<span class="cal-w">${w}</span>`);
+  for (let i=0;i<startDow;i++) html += '<span></span>';
+  for (let d=1; d<=days; d++){
+    const ts = new Date(y, m, d).getTime(), dayEnd = ts + 86399e3;
+    const inSel = c && ts >= dayFloor(c.s) && dayEnd <= c.e;
+    const edge  = (c && (ts === dayFloor(c.s) || ts === dayFloor(c.e))) || (pickDraft != null && ts === pickDraft);
+    html += `<span class="cal-d ${ts>Date.now()?'dis':''} ${inSel?'insel':''} ${edge?'edge':''}" data-ts="${ts}">${d}</span>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+  el.querySelectorAll('.cal-d:not(.dis)').forEach(x => x.onclick = ev => { ev.stopPropagation(); pickDay(+x.dataset.ts, group); });
+}
+function pickDay(ts, group){
+  ts = dayFloor(ts);
+  if (pickDraft == null){ pickDraft = ts; renderCal(group); return; }
+  const s = Math.min(pickDraft, ts), e = Math.max(pickDraft, ts) + 86399e3;
+  if (group === 'api'){ apiCustom = { s, e }; apiDim = '自定義'; }
+  else                { wssCustom = { s, e }; wssDim = '自定義'; }
+  pickDraft = null; customOpen = null;
+  renderOverview();
+}
+
+/* 口径说明：窗口类指標随統計周期变化；实时类指標固定取當前值 */
+const HELP_FIXED = {
+  r5xx1m: '固定口径｜始终統計「最近 1 分鐘」的 5xx 響應数 / 总響應数\n用于实时故障发现，自带固定短窗口，不随上方時間切换变化',
+  http:   '固定口径｜当前網關健康检查狀態（正常 / 異常）\n瞬时狀態，无時間窗口，不随上方時間切换变化',
+  online: '固定口径｜当前时刻维持的連接數快照\n瞬时值，不随上方時間窗口切换变化',
+  rate:   '固定口径｜当前 1 分鐘相比上一分鐘的連接數变化率\n自带固定对比窗口，不随上方時間切换变化',
+  sub:    '固定口径｜当前訂閱 / 廣播通道的健康狀態\n瞬时狀態，无時間窗口，不随上方時間切换变化',
+};
+
+/* 随時間变化的指標：按窗口长度缩放累计量，比率/分位数按窗口重新采样 */
+function apiMetrics(dim){
+  const w = winOf(dim, 'api');
+  const rnd = seededRandom(M.id*13 + hashStr('REST'+dim+(dim==='自定義'?w.s:'')));
+  const f = w.f, bias = w.bias;
+  return {
+    total:   Math.max(1, Math.round(M.api24h * f * (0.94+rnd()*0.12))),
+    success: Math.min(0.9999, 1 - (1-M.succ)*bias),
+    r5xx:    M.r5xx * bias,
+    p95:     Math.round(OV.api.p95 * bias * (0.92+rnd()*0.16)),
+    p99:     Math.round(OV.api.p99 * bias * (0.92+rnd()*0.16)),
+    r5xx1m:  OV.api.r5xx1m,
+    http:    OV.api.http
+  };
+}
+function wssMetrics(dim){
+  const w = winOf(dim, 'wss');
+  const rnd = seededRandom(M.id*29 + hashStr('WSS'+dim+(dim==='自定義'?w.s:'')));
+  const f = w.f, bias = w.bias;
+  return {
+    online:     OV.wss.online,
+    changeRate: OV.wss.changeRate,
+    drops:      Math.round(Math.max(1, OV.wss.drops) * f * (0.9+rnd()*0.2)),
+    broadcasts: Math.round(OV.wss.broadcasts * f * (0.9+rnd()*0.2)),
+    p95:        Math.round(OV.wss.p95 * bias * (0.92+rnd()*0.16)),
+    p99:        Math.round(OV.wss.p99 * bias * (0.92+rnd()*0.16)),
+    status:     OV.wss.status
+  };
+}
+
+function renderOverview(){
+  const noWss = demo==='no-wss';
+  const a = apiMetrics(apiDim), w = wssMetrics(wssDim);
+  body().innerHTML = delayBanner() + `
+  <div class="card-body">
+    <div class="section-title" style="margin-top:0">REST API 指標</div>
+    ${metricBar('api', apiDim)}
+    <div class="stat-grid">
+      ${statCard('調用量', fmtNum(a.total))}
+      ${statCard('成功率', fmtPct(a.success))}
+      ${statCard('5xx 占比', fmtPct(a.r5xx), '', '', a.r5xx>0.05?'bad':'')}
+      ${statCard('P95 耗時', a.p95, 'ms')}
+      ${statCard('P99 耗時', a.p99, 'ms')}
+      ${statCard('最近 1 分鐘 5xx 占比', fmtPct(a.r5xx1m), '', '', a.r5xx1m>0.05?'bad':'', HELP_FIXED.r5xx1m, true)}
+      ${statCard('HTTP 狀態', a.http==='ok'?'正常':'異常', '', '', a.http, HELP_FIXED.http, true)}
+    </div>
+    <div class="section-title">WSS 指標</div>
+    ${noWss ? '' : metricBar('wss', wssDim)}
+    ${noWss
+      ? emptyState('WSS 數據采集中，暂仅展示連接數') + `<div class="stat-grid">${statCard('当前在线連接數', fmtNum(w.online), '', '', '', HELP_FIXED.online, true)}</div>`
+      : `<div class="stat-grid">
+        ${statCard('当前在线連接數', fmtNum(w.online), '', '', '', HELP_FIXED.online, true)}
+        ${statCard('連接數变化率', (w.changeRate>=0?'+':'')+fmtPct(w.changeRate), '', '当前 1 分鐘相比上一分鐘', '', HELP_FIXED.rate, true)}
+        ${statCard('斷連数', fmtNum(w.drops), '', '異常断开連接數')}
+        ${statCard('廣播次数', fmtNum(w.broadcasts))}
+        ${statCard('消息延遲 P95', w.p95, 'ms')}
+        ${statCard('消息延遲 P99', w.p99, 'ms')}
+        ${statCard('訂閱狀態', w.status==='ok'?'正常':'異常', '', '', w.status, HELP_FIXED.sub, true)}
+      </div>`}
+  </div>`;
+  body().querySelectorAll('.ms-opt').forEach(b => b.onclick = () => {
+    const g = b.dataset.group, d = b.dataset.dim;
+    if (d === '自定義'){ customOpen = customOpen === g ? null : g; if (customOpen){ calBase = null; pickDraft = null; } }
+    else { if (g==='api') apiDim = d; else wssDim = d; customOpen = null; }
+    renderOverview();
+  });
+  body().querySelectorAll('.metric-custom.open').forEach(panel => {
+    const g = panel.dataset.group;
+    panel.querySelectorAll('.cal-nav').forEach(n => n.onclick = ev => {
+      ev.stopPropagation();
+      const b = new Date(calBase); b.setMonth(b.getMonth() + (+n.dataset.n));
+      calBase = b.getTime(); renderCal(g);
+    });
+    panel.querySelector('[data-act="clear"]').onclick = ev => {
+      ev.stopPropagation();
+      if (g==='api'){ apiCustom = null; apiDim = '近24小時'; }
+      else          { wssCustom = null; wssDim = '近24小時'; }
+      customOpen = null; renderOverview();
+    };
+    renderCal(g);
+  });
+}
+
+/* 点击面板外部關閉自定義日历 */
+document.addEventListener('click', e => {
+  if (customOpen && !e.target.closest('.metric-custom') && !e.target.closest('.ms-opt')){
+    customOpen = null; renderOverview();
+  }
+});
+
+/* ============ API 調用詳情 ============ */
+const apiTab = { page:1, size:20, start:Date.now()-24*3600e3, end:Date.now(), method:'', status:'', http:'', err:'', sortDesc:true };
+
+function renderApiTab(){
+  const httpOptions = [...new Set(API_CALLS.map(r=>r.http))].sort();
+  const errOptions = [...new Set(API_CALLS.map(r=>r.err))];
+  body().innerHTML = delayBanner() + `
+    <div class="filterbar">
+      <div class="f-item"><label>調用時間</label><div id="a-range"></div></div>
+      <div class="f-item"><label>API 方法</label>
+        <select class="select" id="a-method" style="min-width:110px"><option value="">全部</option><option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option></select></div>
+      <div class="f-item"><label>調用狀態</label>
+        <select class="select" id="a-status" style="min-width:110px"><option value="">全部</option><option>成功</option><option>失敗</option><option>超时</option></select></div>
+      <div class="f-item"><label>HTTP 狀態码</label>
+        <input class="input" id="a-http" list="dl-http" placeholder="下拉或模糊輸入" style="min-width:140px">
+        <datalist id="dl-http">${httpOptions.map(c=>`<option value="${c}">`).join('')}</datalist></div>
+      <div class="f-item"><label>錯誤碼</label>
+        <input class="input" id="a-err" list="dl-err" placeholder="下拉或模糊輸入" style="min-width:130px">
+        <datalist id="dl-err">${errOptions.map(c=>`<option value="${c}">`).join('')}</datalist></div>
+      <button class="btn" id="a-reset">重 置</button>
+      <button class="btn btn-primary" id="a-search">搜 寻</button>
+    </div>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr>
+        <th>請求 ID</th>
+        <th class="sort-th" id="a-sort">調用時間 <span class="arr">${apiTab.sortDesc?'↓':'↑'}</span></th>
+        <th>API 方法</th><th>接口路径</th><th>調用狀態</th><th>HTTP 狀態码</th>
+        <th>錯誤碼</th><th>請求耗時</th><th>網關节点</th><th>操作</th>
+      </tr></thead>
+      <tbody id="a-tbody"></tbody>
+    </table></div>
+    <div class="pagination" id="a-pager"></div>`;
+
+  dateRangePicker(document.getElementById('a-range'), {
+    start: apiTab.start, end: apiTab.end,
+    onApply: (s, e) => { apiTab.start = s; apiTab.end = e; apiTab.page = 1; renderApiRows(); }
+  });
+  document.getElementById('a-search').onclick = ()=>{
+    Object.assign(apiTab, {
+      method: gv('a-method'), status: gv('a-status'),
+      http: gv('a-http').trim(), err: gv('a-err').trim(), page: 1 });
+    renderApiRows();
+  };
+  document.getElementById('a-reset').onclick = ()=>{
+    Object.assign(apiTab, { page:1, start:Date.now()-24*3600e3, end:Date.now(), method:'', status:'', http:'', err:'' });
+    renderApiTab();
+  };
+  document.getElementById('a-sort').onclick = ()=>{ apiTab.sortDesc = !apiTab.sortDesc; renderApiTab(); };
+  renderApiRows();
+}
+function gv(id){ return document.getElementById(id).value; }
+
+function apiFiltered(){
+  let list = API_CALLS.filter(r =>
+    (apiTab.start==null || r.time >= apiTab.start) &&
+    (apiTab.end==null || r.time <= apiTab.end) &&
+    (!apiTab.method || r.method === apiTab.method) &&
+    (!apiTab.status || r.status === apiTab.status) &&
+    (!apiTab.http || String(r.http).includes(apiTab.http)) &&
+    (!apiTab.err || r.err.includes(apiTab.err)));
+  list.sort((a,b)=> apiTab.sortDesc ? b.time-a.time : a.time-b.time);
+  return list;
+}
+
+function statusTag(s){
+  return s==='成功' ? '<span class="tag tag-success">成功</span>'
+       : s==='超时' ? '<span class="tag tag-warning">超时</span>'
+       : '<span class="tag tag-danger">失敗</span>';
+}
+function httpCls(c){ return 'code-'+String(c)[0]+'xx'; }
+function methodTag(m){ return `<span class="method m-${m.toLowerCase()==='delete'?'del':m.toLowerCase()}">${m}</span>`; }
+
+function renderApiRows(){
+  const list = apiFiltered();
+  const page = list.slice((apiTab.page-1)*apiTab.size, apiTab.page*apiTab.size);
+  document.getElementById('a-tbody').innerHTML = page.length ? page.map(r=>`
+    <tr>
+      <td class="mono" style="color:var(--text-3)">${r.requestId.slice(0,18)}…</td>
+      <td class="num">${fmtTime(r.time)}</td>
+      <td>${methodTag(r.method)}</td>
+      <td class="mono">${r.path}</td>
+      <td>${statusTag(r.status)}</td>
+      <td class="num ${httpCls(r.http)}">${r.http}</td>
+      <td class="mono">${r.err}</td>
+      <td class="num">${fmtNum(r.duration)} ms</td>
+      <td class="mono" style="color:var(--text-3)">${r.node}</td>
+      <td><a class="link" onclick="apiDetail('${r.requestId}')">詳情</a></td>
+    </tr>`).join('') : `<tr><td colspan="10">${emptyState('暫無數據，请确认已接入 Nginx 访问日誌与 WSS 網關埋点')}</td></tr>`;
+  renderPagination(document.getElementById('a-pager'), list.length, apiTab.page, apiTab.size, p=>{ apiTab.page=p; renderApiRows(); });
+}
+
+window.apiDetail = function(rid){
+  const r = API_CALLS.find(x=>x.requestId===rid);
+  openDialog(`
+    <div class="kv">
+      <span class="k">請求 ID</span><span class="v mono">${r.requestId}</span>
+      <span class="k">調用時間</span><span class="v">${fmtTime(r.time)}</span>
+      <span class="k">API 方法</span><span class="v">${methodTag(r.method)}</span>
+      <span class="k">接口路径</span><span class="v mono">${r.path}</span>
+      <span class="k">調用狀態</span><span class="v">${statusTag(r.status)}</span>
+      <span class="k">HTTP 狀態码</span><span class="v ${httpCls(r.http)}">${r.http}</span>
+      <span class="k">錯誤碼</span><span class="v mono">${r.err}</span>
+      <span class="k">請求耗時</span><span class="v">${fmtNum(r.duration)} ms</span>
+      <span class="k">網關节点</span><span class="v mono">${r.node}</span>
+      <span class="k">調用方</span><span class="v">${r.caller}</span>
+    </div>
+    <div class="section-title">访问日誌（Nginx 原始日誌）</div>
+    <div class="log-block">${r.rawLog}</div>`, '', 'dialog-lg');
+};
+
+/* ============ WSS 調用詳情 ============ */
+const wssTab = { page:1, size:20, start:Date.now()-24*3600e3, end:Date.now(), event:'', status:'' };
+
+function renderWssTab(){
+  body().innerHTML = delayBanner() + `
+    <div class="filterbar">
+      <div class="f-item"><label>調用時間</label><div id="w-range"></div></div>
+      <div class="f-item"><label>事件类型</label>
+        <select class="select" id="w-event" style="min-width:130px"><option value="">全部</option>${WSS_EVENTS.map(e=>`<option>${e}</option>`).join('')}</select></div>
+      <div class="f-item"><label>連接狀態</label>
+        <select class="select" id="w-status" style="min-width:120px"><option value="">全部</option><option>在线</option><option>断开</option><option>重连</option><option>超时</option></select></div>
+      <button class="btn" id="w-reset">重 置</button>
+      <button class="btn btn-primary" id="w-search">搜 寻</button>
+    </div>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr>
+        <th>連接 ID</th><th>事件类型</th><th>調用時間</th><th>房间 / 频道</th>
+        <th>連接狀態</th><th>斷連原因</th><th>消息延遲</th><th>上游時間戳</th><th>下游時間戳</th><th>操作</th>
+      </tr></thead>
+      <tbody id="w-tbody"></tbody>
+    </table></div>
+    <div class="pagination" id="w-pager"></div>`;
+  dateRangePicker(document.getElementById('w-range'), {
+    start: wssTab.start, end: wssTab.end,
+    onApply: (s, e) => { wssTab.start = s; wssTab.end = e; wssTab.page = 1; renderWssRows(); }
+  });
+  document.getElementById('w-search').onclick = ()=>{
+    Object.assign(wssTab, { event:gv('w-event'), status:gv('w-status'), page:1 });
+    renderWssRows();
+  };
+  document.getElementById('w-reset').onclick = ()=>{ Object.assign(wssTab,{page:1,start:Date.now()-24*3600e3,end:Date.now(),event:'',status:''}); renderWssTab(); };
+  renderWssRows();
+}
+
+function connTag(s){
+  return s==='在线' ? '<span class="tag tag-success"><span class="s-dot"></span>在线</span>'
+       : s==='重连' ? '<span class="tag tag-warning"><span class="s-dot"></span>重连</span>'
+       : s==='超时' ? '<span class="tag tag-danger"><span class="s-dot"></span>超时</span>'
+       : '<span class="tag tag-gray">断开</span>';
+}
+
+function renderWssRows(){
+  const list = WSS_EVENTS_LIST.filter(r =>
+    (wssTab.start==null || r.time >= wssTab.start) &&
+    (wssTab.end==null || r.time <= wssTab.end) &&
+    (!wssTab.event || r.event === wssTab.event) &&
+    (!wssTab.status || r.status === wssTab.status));
+  const page = list.slice((wssTab.page-1)*wssTab.size, wssTab.page*wssTab.size);
+  document.getElementById('w-tbody').innerHTML = page.length ? page.map(r=>`
+    <tr>
+      <td class="mono" style="color:var(--text-3)">${r.connId}</td>
+      <td>${r.event==='斷連'?'<span style="color:var(--danger)">斷連</span>':r.event}</td>
+      <td class="num">${fmtTime(r.time)}</td>
+      <td class="mono">${r.channel}</td>
+      <td>${connTag(r.status)}</td>
+      <td>${r.reason==='-'?'-':`<span style="color:var(--warning)">${r.reason}</span>`}</td>
+      <td class="num">${r.latency==null?'-':fmtNum(r.latency)+' ms'}</td>
+      <td class="num" style="color:var(--text-2)">${r.upTs==null?'-':fmtTime(r.upTs)}</td>
+      <td class="num" style="color:var(--text-2)">${r.downTs==null?'-':fmtTime(r.downTs)}</td>
+      <td><a class="link" onclick="wssDetail('${r.connId}','${r.time}')">詳情</a></td>
+    </tr>`).join('') : `<tr><td colspan="10">${emptyState('暫無數據，请确认已接入 Nginx 访问日誌与 WSS 網關埋点')}</td></tr>`;
+  renderPagination(document.getElementById('w-pager'), list.length, wssTab.page, wssTab.size, p=>{ wssTab.page=p; renderWssRows(); });
+}
+
+window.wssDetail = function(cid, t){
+  const r = WSS_EVENTS_LIST.find(x=>x.connId===cid && String(x.time)===String(t));
+  openDialog(`
+    <div class="kv">
+      <span class="k">連接 ID</span><span class="v mono">${r.connId}</span>
+      <span class="k">事件类型</span><span class="v">${r.event}</span>
+      <span class="k">調用時間</span><span class="v">${fmtTime(r.time)}</span>
+      <span class="k">房间 / 频道</span><span class="v mono">${r.channel}</span>
+      <span class="k">連接狀態</span><span class="v">${connTag(r.status)}</span>
+      <span class="k">斷連原因</span><span class="v">${r.reason}</span>
+      <span class="k">消息延遲</span><span class="v">${r.latency==null?'-':fmtNum(r.latency)+' ms'}</span>
+      <span class="k">上游時間戳</span><span class="v mono">${r.downTs==null?'-':fmtTime(r.upTs)}</span>
+      <span class="k">下游時間戳</span><span class="v mono">${r.downTs==null?'-':fmtTime(r.downTs)}</span>
+    </div>`, '', 'dialog-lg');
+};
+
+/* ---- 演示狀態 ---- */
+demoSwitcher(demo, k => { demo = k; renderTab(document.querySelector('.bigtab.active').dataset.tab); });
+
+renderTab('overview');
+}
+
+function mountAlarm(){
+
+startAutoRefresh(document.getElementById('refresh-meta'), () => toast('已刷新最新數據', 'success'));
+
+const ALARMS = genAlarms();
+let state = { page:1, size:20, start:Date.now()-24*3600e3, end:Date.now(), rule:'', mid:'', status:'' };
+
+/* P0 狀態卡 */
+function renderP0Cards(){
+  const restBad  = ALARMS.some(a=>a.ruleCode==='R-REST-5XX-001' && a.status!=='已恢復');
+  const wssBad   = ALARMS.some(a=>a.ruleCode==='R-WSS-DROP-002' && a.status!=='已恢復');
+  const e2eVal   = 6312;
+  document.getElementById('p0-cards').innerHTML = `
+    <div class="stat ${restBad?'status-bad':'status-ok'}">
+      <div class="s-label">REST 網關狀態<span class="help" data-tip="監控指標：網關服务 5xx 爆炸｜觸發條件：API 網關 1 分鐘内 5xx 響應占比 > 5%｜業務影響：下游量化/应用端調用 API 批量报错，分發癱瘓">?</span></div>
+      <div class="s-value">${restBad?'異常':'正常'}</div></div>
+    <div class="stat ${wssBad?'status-bad':'status-ok'}">
+      <div class="s-label">WSS 網關狀態<span class="help" data-tip="監控指標：WSS 廣播網關崩潰/斷連｜觸發條件：1 分鐘内客戶端連接數驟降 > 50%｜業務影響：下游客戶端連接被批量切断">?</span></div>
+      <div class="s-value">${wssBad?'異常':'正常'}</div></div>
+    <div class="stat ${e2eVal>5000?'status-bad':'status-ok'}">
+      <div class="s-label">E2E 延遲<span class="help" data-tip="監控指標：全鏈路极速延遲（E2E Latency）｜觸發條件：核心源端到端延遲 > 5000ms 持续 1 分鐘｜業務影響：上游時間戳到下游 WSS 收到時間全鏈路卡顿">?</span></div>
+      <div class="s-value">${fmtNum(e2eVal)}<span class="unit">ms</span></div></div>
+    <div class="stat">
+      <div class="s-label">E2E P95<span class="help" data-tip="95% 消息延遲低于该值">?</span></div>
+      <div class="s-value">4,208<span class="unit">ms</span></div></div>
+    <div class="stat">
+      <div class="s-label">E2E P99<span class="help" data-tip="99% 消息延遲低于该值">?</span></div>
+      <div class="s-value">5,930<span class="unit">ms</span></div></div>`;
+}
+
+/* 告警狀態标签 */
+function alarmTag(s){
+  return s==='未處理' ? '<span class="tag tag-danger"><span class="s-dot"></span>未處理</span>'
+       : s==='處理中' ? '<span class="tag tag-warning"><span class="s-dot"></span>處理中</span>'
+       : '<span class="tag tag-success"><span class="s-dot"></span>已恢復</span>';
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function scopeSummary(a, plain){
+  const s = a.scope;
+  const groups = [];
+  const push = (label, arr, cap) => {
+    if (arr && arr[0] !== '-' && arr.length) {
+      const shown = arr.slice(0, cap).join('、');
+      const more = arr.length > cap ? ` 等 ${arr.length} 项` : '';
+      groups.push(plain
+        ? `${label}：${shown}${more}`
+        : `<b style="color:var(--text-3);font-weight:600;margin-right:2px">${label}：</b>${shown}${more}`);
+    }
+  };
+  push('接口', s.apis, 2);
+  push('錯誤碼', s.codes, 2);
+  push('網關节点', s.nodes, 2);
+  push('频道', s.channels, 2);
+  push('調用方', s.callers, 2);
+  return groups.length ? groups.join('；') : '-';
+}
+
+function render(){
+  const list = ALARMS.filter(a =>
+    (state.start==null || a.triggerTime >= state.start) &&
+    (state.end==null || a.triggerTime <= state.end) &&
+    (!state.rule || a.ruleName.includes(state.rule) || a.ruleCode.includes(state.rule)) &&
+    (!state.mid || String(a.merchantId).includes(state.mid)) &&
+    (!state.status || a.status === state.status));
+  const page = list.slice((state.page-1)*state.size, state.page*state.size);
+  document.getElementById('tbody').innerHTML = page.length ? page.map(a=>`
+    <tr>
+      <td class="mono">${a.id}</td>
+      <td class="mono" style="color:var(--text-3)">${a.ruleCode}</td>
+      <td>${a.ruleName}</td>
+      <td><span class="tag tag-danger">${a.level}</span></td>
+      <td>${a.merchantId}</td>
+      <td class="num">${fmtTime(a.triggerTime)}</td>
+      <td class="num">${a.recoverTime ? fmtTime(a.recoverTime) : '-'}</td>
+      <td class="num">${fmtDur(a.duration)}</td>
+      <td class="num" style="color:var(--danger);font-weight:600">${a.current}</td>
+      <td class="num">${a.threshold}</td>
+      <td class="col-scope"><div class="scope-ellipsis" data-full="${esc(scopeSummary(a, true))}">${scopeSummary(a, false)}</div></td>
+      <td>${alarmTag(a.status)}</td>
+      <td>
+        ${a.status==='未處理' ? `<a class="link" onclick="handleAlarm('${a.id}')">處理異常</a>` : ''}
+        <a class="link" style="${a.status==='未處理'?'margin-left:8px':''}" onclick="alarmDetail('${a.id}')">詳情</a>
+      </td>
+    </tr>`).join('') : `<tr><td colspan="13">${emptyState('暂无告警事件')}</td></tr>`;
+  renderPagination(document.getElementById('pager'), list.length, state.page, state.size, p=>{ state.page=p; render(); });
+}
+
+window.handleAlarm = function(id){
+  openDialog(`确认将告警 <b class="mono">${id}</b> 标记为「處理中」？<br>
+    <span style="color:var(--text-3);font-size:12.5px">操作后狀態由「未處理」变更为「處理中」；故障恢復后系统将自动判断并更新为「已恢復」。</span>`,
+    `<button class="btn" onclick="closeAllLayers()">取 消</button>
+     <button class="btn btn-primary" onclick="doHandle('${id}')">确 定</button>`);
+};
+window.doHandle = function(id){
+  const a = ALARMS.find(x=>x.id===id);
+  a.status = '處理中';
+  closeAllLayers(); renderP0Cards(); render();
+  toast('已标记为處理中', 'success');
+};
+
+window.alarmDetail = function(id){
+  const a = ALARMS.find(x=>x.id===id);
+  const s = a.scope;
+  const chips = arr => arr && arr[0]!=='-' ? arr.map(x=>`<span class="tag tag-gray" style="margin:0 4px 4px 0">${x}</span>`).join('') : '-';
+  openDialog(`
+    <div style="font-size:15px;font-weight:600;color:var(--text-1);margin-bottom:14px">告警詳情</div>
+    <div class="kv">
+      <span class="k">告警 ID</span><span class="v mono">${a.id}</span>
+      <span class="k">規則編號</span><span class="v mono">${a.ruleCode}</span>
+      <span class="k">規則名稱</span><span class="v">${a.ruleName}</span>
+      <span class="k">告警級別</span><span class="v"><span class="tag tag-danger">${a.level}</span></span>
+      <span class="k">商戶 ID</span><span class="v">${a.merchantId}</span>
+      <span class="k">觸發時間</span><span class="v">${fmtTime(a.triggerTime)}</span>
+      <span class="k">恢復時間</span><span class="v">${a.recoverTime?fmtTime(a.recoverTime):'-'}</span>
+      <span class="k">持續時長</span><span class="v">${fmtDur(a.duration)}</span>
+      <span class="k">當前值 / 閾值</span><span class="v"><b style="color:var(--danger)">${a.current}</b> / ${a.threshold}</span>
+      <span class="k">告警狀態</span><span class="v">${alarmTag(a.status)}</span>
+    </div>
+    <div class="section-title">影響範圍</div>
+    <div class="kv">
+      <span class="k">接口</span><span class="v">${chips(s.apis)}</span>
+      <span class="k">錯誤碼</span><span class="v">${chips(s.codes)}</span>
+      <span class="k">網關节点</span><span class="v">${chips(s.nodes)}</span>
+      <span class="k">频道</span><span class="v">${chips(s.channels)}</span>
+      <span class="k">調用方</span><span class="v">${chips(s.callers)}</span>
+    </div>
+    <div class="section-title">觸發條件</div>
+    <p style="font-size:12.5px;color:var(--text-2);line-height:1.8">${P0_RULES.find(r=>r.code===a.ruleCode).cond}<br>${P0_RULES.find(r=>r.code===a.ruleCode).impact}</p>`,
+    '', 'dialog-lg');
+};
+
+/* 規則名稱模糊輸入选项 */
+document.getElementById('dl-rule').innerHTML = P0_RULES.map(r=>`<option value="${r.name}">`).join('');
+
+function initRangePicker(){
+  dateRangePicker(document.getElementById('f-range'), {
+    start: state.start, end: state.end,
+    onApply: (s, e) => { state.start = s; state.end = e; state.page = 1; render(); }
+  });
+}
+document.getElementById('btn-search').onclick = ()=>{
+  Object.assign(state, { rule:gv('f-rule').trim(), mid:gv('f-mid').trim(), status:gv('f-status'), page:1 });
+  render();
+};
+document.getElementById('btn-reset').onclick = ()=>{
+  Object.assign(state, { page:1, start:Date.now()-24*3600e3, end:Date.now(), rule:'', mid:'', status:'' });
+  initRangePicker();
+  document.getElementById('f-rule').value='';
+  document.getElementById('f-mid').value=''; document.getElementById('f-status').value='';
+  render();
+};
+function gv(id){ return document.getElementById(id).value; }
+
+/* 影響範圍：单行省略，悬浮显示完整内容（fixed 浮层，避免被表格横向滚动裁剪） */
+if (!window.__scopeTipInit) (function(){
+  let tip = null, cur = null; window.__scopeTipInit = true;
+  const hide = () => { if (tip) { tip.remove(); tip = null; } cur = null; };
+  const place = (x, y) => {
+    if (!tip) return;
+    const pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+    let left = x + pad, top = y + pad;
+    if (left + w > window.innerWidth - 8) left = x - w - pad;
+    if (top + h > window.innerHeight - 8) top = y - h - pad;
+    tip.style.left = Math.max(8, left) + 'px';
+    tip.style.top = Math.max(8, top) + 'px';
+  };
+  document.addEventListener('mouseover', e => {
+    const el = e.target.closest && e.target.closest('.scope-ellipsis');
+    if (!el || el === cur) return;
+    // 仅当内容被截断时才提示
+    if (el.scrollWidth <= el.clientWidth) { hide(); return; }
+    const full = el.getAttribute('data-full');
+    if (!full) return;
+    cur = el;
+    tip = document.createElement('div');
+    tip.className = 'scope-tip';
+    tip.textContent = full;
+    document.body.appendChild(tip);
+    place(e.clientX, e.clientY);
+  });
+  document.addEventListener('mousemove', e => { if (tip) place(e.clientX, e.clientY); });
+  document.addEventListener('mouseout', e => {
+    const el = e.target.closest && e.target.closest('.scope-ellipsis');
+    if (el && !el.contains(e.relatedTarget)) hide();
+  });
+  window.addEventListener('scroll', hide, true);
+})();
+
+renderP0Cards();
+initRangePicker();
+render();
+}
+
+</script>
+<script>
+/* ===== 子頁啟動殼（取代單頁版的側欄/頁籤外框） ===== */
+const _timers = new Set();
+const _origSAR = startAutoRefresh;
+startAutoRefresh = function(el, cb){ const id = _origSAR(el, cb); _timers.add(id); return id; };
+function clearTimers(){ _timers.forEach(clearInterval); _timers.clear(); }
+const MOUNTS = { detail: mountDetail, alarm: mountAlarm };
+function switchView(v, param){
+  if(!MOUNTS[v]) return;
+  clearTimers();
+  closeAllLayers();
+  const c = document.getElementById('content');
+  c.innerHTML = '';
+  c.innerHTML = document.getElementById('tpl-' + v).innerHTML;
+  MOUNTS[v](param);
+}
+document.getElementById('mask').addEventListener('click', closeAllLayers);
+document.addEventListener('click', e => {
+  document.querySelectorAll('.dropdown.open').forEach(d => { if(!d.contains(e.target)) d.classList.remove('open'); });
+  document.querySelectorAll('.drp.open').forEach(d => { if(!d.contains(e.target)) d.classList.remove('open'); });
+  document.querySelectorAll('.trend-dim.open').forEach(d => { if(!d.contains(e.target)) d.classList.remove('open'); });
+});
+const _qs = new URLSearchParams(location.search);
+switchView('detail', _qs.get('id') || 80001);
+if('detail' === 'detail' && _qs.get('name')){
+  const _h = document.getElementById('h-name');
+  if(_h) _h.textContent = _qs.get('name');
+}
+</script>
+</body>
+</html>

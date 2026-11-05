@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 管理面
-  原型版本：V1.1.2 ｜ 入口：index.html
+  原型版本：V1.2.0 ｜ 入口：index.html
   配色沿用原站 192.168.10.51:7080；字體按產品基線規範
 -->
 <html lang="zh-CN">
@@ -9,9 +9,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>管理面 · 數據中台管理系統 V1.1.2</title>
+<title>管理面 · 數據中台管理系統 V1.2.0</title>
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.1.2">
+<link rel="stylesheet" href="assets/app.css?v=1.2.0">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -24,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 管理面</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.1.2</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.2.0</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -40,7 +41,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.1.2"></script>
+<script src="assets/core.js?v=1.2.0"></script>
 <script>
 /* ==================================================================
    數據中台管理系統 · 交互原型
@@ -61,7 +62,8 @@ const MENU=[
   {key:'system',label:'系統設置',icon:'gear',children:[
     {label:'用戶管理',path:'/system/user'},
     {label:'角色管理',path:'/system/role'},
-    {label:'操作日誌',path:'/system/operation'}
+    {label:'操作日誌',path:'/system/operation'},
+    {label:'API推送異常',path:'/system/api-alarm',isNew:true}
   ]},
   {key:'auth',label:'登錄與認證',icon:'shield',children:[
     {label:'登錄頁',path:'/login'}
@@ -73,7 +75,9 @@ const ROUTE_TITLE={
   '/merchant/merchant/index':'商戶列表','/system/user':'用戶管理','/system/role':'角色管理',
   '/system/operation':'操作日誌','/system/role/create':'新增角色',
   '/merchant/merchant/detail':'商戶權限設定','/event/review/detail':'事件審核詳情',
-  '/login':'登錄頁'
+  '/login':'登錄頁',
+  '/system/api-alarm':'API推送異常',
+  '/merchant/api-detail':'OpenAPI調用詳情'
 };
 
 /* ---------- 資料 ---------- */
@@ -323,6 +327,7 @@ const state={
   navOpen:{event:true,merchant:false,system:false,auth:false},
   drawer:false, coefTab:'global', reviewTab:'basic', merchantTab:'type', specSection:'version',
   topRange:'24h', mfaBound:false, eventCat:null, trendRange:'7',
+  apiDetailId:80001, apiDetailName:'', moreName:'',
   /* 開關狀態：key 形如 'ev:8016024137:push'，避免重繪後狀態丟失 */
   sw:{}
 };
@@ -401,7 +406,7 @@ function renderAdmin(){
     const open=state.navOpen[m.key]?' open':'';
     const isActive=m.children.some(function(c){return c.path===state.route;});
     const subs=m.children.map(function(c){
-      return '<div class="nav-item'+(state.route===c.path?' active':'')+'" onclick="go(\''+c.path+'\')"><span class="nl">'+c.label+'</span></div>';
+      return '<div class="nav-item'+(state.route===c.path?' active':'')+'" onclick="go(\''+c.path+'\')"><span class="nl">'+c.label+'</span>'+(c.isNew?'<span class="nav-new">NEW</span>':'')+'</div>';
     }).join('');
     return '<div class="nav-group"><div class="nav-item'+(isActive?' active':'')+open+'" onclick="toggleNav(\''+m.key+'\')">'+
       '<span class="ni">'+icon(m.icon,16)+'</span><span class="nl">'+m.label+'</span>'+
@@ -435,7 +440,9 @@ const PAGES={
   '/merchant/merchant/index':pageMerchant,'/system/user':pageUser,'/system/role':pageRole,
   '/system/operation':pageOperation,'/system/role/create':pageRoleCreate,
   '/merchant/merchant/detail':pageMerchantDetail,'/event/review/detail':pageReviewDetail,
-  '/login':pageLogin
+  '/login':pageLogin,
+  '/system/api-alarm':pageApiAlarm,
+  '/merchant/api-detail':pageApiDetail
 };
 function renderRoute(){return (PAGES[state.route]||pageDashboard)();}
 function go(path){
@@ -1677,10 +1684,31 @@ function openIpWhitelist(name){
     foot:'<button class="btn btn-primary" onclick="closeModal()">完成</button>'
   }));
 }
+/* ----- API 調用監控：商戶詳情子頁 + 系統設置告警子頁 ----- */
+function openApiDetail(){
+  var name=state.moreName||MERCHANTS[0][0];
+  var i=MERCHANTS.findIndex(function(m){return m[0]===name;});
+  state.apiDetailId=80001+Math.max(0,i);
+  state.apiDetailName=name;
+  go('/merchant/api-detail');
+}
+function pageApiDetail(){
+  var name=state.apiDetailName||MERCHANTS[0][0];
+  return '<div class="embed-wrap">'+
+    '<div class="embed-bar"><span class="embed-title">'+esc(name)+' · OpenAPI 調用詳情</span>'+
+    '<span class="embed-tip">商戶列表 → 更多 → OpenAPI 調用詳情</span></div>'+
+    '<iframe class="embed-frame" src="api-detail.html?id='+state.apiDetailId+'&amp;name='+encodeURIComponent(name)+'" title="OpenAPI 調用詳情"></iframe></div>';
+}
+function pageApiAlarm(){
+  return '<div class="embed-wrap">'+
+    '<iframe class="embed-frame" src="api-alarm.html" title="API 推送異常"></iframe></div>';
+}
 function openMerchantMore(name){
+  state.moreName=name;
   openModal(modalShell({
     title:'更多操作 · '+name,size:'narrow',
     body:'<div style="display:flex;flex-direction:column;gap:2px">'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();openApiDetail()">OpenAPI 調用詳情</button>'+
       '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：編輯商戶\')">編輯商戶</button>'+
       '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'API Key 已重新生成\')">重新生成 API Key</button>'+
       '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px;color:#f53f3f" onclick="closeModal();confirmDelete(\'商戶\')">刪除商戶</button></div>',
@@ -2246,7 +2274,12 @@ function showVersion(){
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 內容變更</div>'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 功能新增</div>'+
+      '合併 API 調用監控兩項功能：商戶列表「更多」新增 OpenAPI 調用詳情（概覽 / API / WSS 三頁籤），'+
+      '系統設置新增 API 推送異常（P0 指標卡 / 告警列表 / 告警詳情與處理流轉）。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.1.2</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 內容變更</div>'+
       '規範頁 1.1 升版規則改為按位遞增：功能變更中間位 +1、尾數歸零，內容變更尾數 +1；'+
       '新增協作場景的版本衝突處理順序，5.1 衝突規則同步改寫。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.1.1</span>'+
