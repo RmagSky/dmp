@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 管理面
-  原型版本：V1.0.0 ｜ 入口：index.html
+  原型版本：V1.1.0 ｜ 入口：index.html
   配色沿用原站 192.168.10.51:7080；字體按產品基線規範
 -->
 <html lang="zh-CN">
@@ -9,9 +9,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>管理面 · 數據中台管理系統 V1.0.0</title>
+<title>管理面 · 數據中台管理系統 V1.1.0</title>
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.0.0">
+<link rel="stylesheet" href="assets/app.css?v=1.1.0">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -24,7 +24,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 管理面</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.0.0</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.1.0</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -40,7 +40,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.0.0"></script>
+<script src="assets/core.js?v=1.1.0"></script>
 <script>
 /* ==================================================================
    數據中台管理系統 · 交互原型
@@ -2245,9 +2245,14 @@ function showVersion(){
       '<div class="ver-card"><div class="k">框架參考</div><div class="v">'+BASE_REF+'</div></div></div>'+
       '<div style="border-top:1px solid #eef1f6;padding-top:14px">'+
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
-      '<div style="display:flex;gap:12px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 首次發布</div>'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 功能新增</div>'+
+      '產品基線新增「團隊協作」分組與團隊更新上傳流程，規範頁補入倉庫入口、五步流程、'+
+      '衝突處理規則、提交信息格式、上傳前檢查清單與禁止事項。</div></div>'+
+      '<div style="display:flex;gap:12px"><span class="vnum" style="align-self:flex-start">V1.0.0</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-04 · 首次發布</div>'+
       '依原站前端還原管理面 9 個業務頁面與 7 類彈窗；外框改為產品基線結構，新增「產品基線 · 規範」文檔頁；'+
       '字體按基線規範統一為 Outfit + 系統中文字體，配色沿用原站藍色體系。</div></div></div>',
     foot:'<button class="btn btn-primary" onclick="closeModal()">關閉</button>'

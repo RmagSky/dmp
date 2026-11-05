@@ -55,3 +55,16 @@
 .icon-cell{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border:1px solid var(--border-light);border-radius:8px;background:#fcfdff}
 .icon-cell .nm{font-size:var(--fs-tag);color:var(--text-help)}
 .icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(94px,1fr));gap:10px}
+
+/* 流程步驟 */
+.flow{display:flex;flex-direction:column}
+.flow-step{display:flex;gap:14px;padding:16px 0;border-bottom:1px dashed var(--border-light)}
+.flow-step:first-child{padding-top:0}
+.flow-step:last-child{border-bottom:0;padding-bottom:0}
+.flow-step .no{flex:0 0 26px;height:26px;border-radius:50%;background:var(--primary-light);color:var(--primary);font-weight:600;font-size:var(--fs-help);display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.flow-step .bd{flex:1;min-width:0}
+.flow-step .tt{font-weight:600;font-size:var(--fs-table);margin-bottom:5px;color:var(--text)}
+.flow-step .ds{font-size:var(--fs-help);color:var(--text-help);line-height:1.75;margin-bottom:10px}
+.cmd{font-family:ui-monospace,"SFMono-Regular",Consolas,Menlo,monospace;font-size:var(--fs-help);line-height:1.95;background:#f7f9fc;border:1px solid var(--border-light);border-radius:8px;padding:12px 15px;margin:0;overflow-x:auto;white-space:pre;color:var(--text-sub)}
+.cmd .c{color:var(--text-disabled)}
+.cmd .k{color:var(--primary)}

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 產品基線規範
-  原型版本：V1.0.0 ｜ 入口：index.html
+  原型版本：V1.1.0 ｜ 入口：index.html
   框架參考：中台商户 SaaS 投注交易平台 · 交互原型 V1.5.5
 -->
 <html lang="zh-CN">
@@ -9,10 +9,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>產品基線 · 數據中台管理系統 V1.0.0</title>
+<title>產品基線 · 數據中台管理系統 V1.1.0</title>
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.0.0">
-<link rel="stylesheet" href="assets/rule.css?v=1.0.0">
+<link rel="stylesheet" href="assets/app.css?v=1.1.0">
+<link rel="stylesheet" href="assets/rule.css?v=1.1.0">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -25,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 產品基線</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.0.0</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.1.0</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -41,7 +41,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.0.0"></script>
+<script src="assets/core.js?v=1.1.0"></script>
 <script>
 
 /* ==================================================================
@@ -70,6 +70,9 @@ const SPEC_NAV=[
     {id:'type',n:'4.2',label:'字體 / 字號'},
     {id:'icon',n:'4.3',label:'圖標'},
     {id:'comp',n:'4.4',label:'常用組件'}
+  ]},
+  {group:'團隊協作',items:[
+    {id:'team',n:'5.1',label:'團隊更新與上傳流程'}
   ]}
 ];
 const REQ_LIST=[
@@ -165,11 +168,13 @@ function specContent(){
   if(s==='type')return specType();
   if(s==='icon')return specIcon();
   if(s==='comp')return specComp();
+  if(s==='team')return specTeam();
   return specVersion();
 }
 
 function specVersion(){
   const changes=[
+    ['V1.1.0','2026-11-05','功能新增','新增「團隊協作」分組，補入團隊更新與上傳流程：倉庫與入口、五步流程（拉取上游 / 檢查新提交 / 合併 / 衝突修正 / 上傳更新）、衝突處理規則、提交信息格式、上傳前檢查清單、禁止事項。'],
     ['V1.0.0','2026-11-04','首次發布','依原站（192.168.10.51:7080）前端還原管理面 9 個業務頁面：事件總覽、事件列表、事件分類、事件複核、投注類係數調控、商戶列表、用戶管理、角色管理、操作日誌。覆蓋 7 類彈窗與 3 個跳轉頁。外框改為產品基線結構，新增本規範文檔頁，含基線總覽、全局規範、公共說明、組件與規範四部分。字體按基線統一為 Outfit + 系統中文字體，配色沿用原站藍色體系。']
   ];
   return '<div class="spec-crumb">產品基線 / 基線總覽 / 原型版本信息</div>'+
@@ -570,6 +575,103 @@ function specComp(){
 }
 
 
+function specTeam(){
+  const repo='https://github.com/RmagSky/dmp';
+  const site='https://rmagsky.github.io/dmp/';
+  return '<div class="spec-crumb">產品基線 / 團隊協作 / 團隊更新與上傳流程</div>'+
+    '<h1 class="spec-h1">團隊更新與上傳流程</h1>'+
+    '<p class="spec-lead">原型以 Git 倉庫為唯一事實來源，所有人直接在主線 main 上工作。每次動手前先拉取上游，上傳前先合併並驗證，五步按順序執行，不跳步。</p>'+
+
+    '<div class="spec-block"><h3>一、倉庫與入口</h3>'+
+      '<table class="spec-table"><thead><tr><th style="width:132px">項</th><th>內容</th></tr></thead><tbody>'+
+      '<tr><td>倉庫</td><td><span class="mono-code">'+repo+'</span></td></tr>'+
+      '<tr><td>線上入口</td><td><span class="mono-code">'+site+'</span></td></tr>'+
+      '<tr><td>主線分支</td><td><span class="mono-code">main</span>，唯一長期分支，不開個人分支</td></tr>'+
+      '<tr><td>入口文件</td><td><span class="mono-code">index.html</span> 框架頁 ｜ <span class="mono-code">dmp.html</span> 管理面 ｜ <span class="mono-code">rule.html</span> 產品基線</td></tr>'+
+      '<tr><td>共用資源</td><td><span class="mono-code">assets/app.css</span>、<span class="mono-code">assets/core.js</span> 被三個頁面共用，改動影響全部頁面</td></tr>'+
+      '<tr><td>發布方式</td><td>推送到 main 後 GitHub Pages 自動重建，約 1 分鐘生效</td></tr>'+
+      '</tbody></table></div>'+
+
+    '<div class="spec-block"><h3>二、五步流程</h3>'+
+      '<p class="sub">本地工作目錄即倉庫根目錄，以下指令在根目錄執行。</p>'+
+      '<div class="flow">'+
+
+      '<div class="flow-step"><div class="no">1</div><div class="bd">'+
+        '<div class="tt">拉取上游</div>'+
+        '<div class="ds">動手改文件之前先取遠端最新提交。本地有未提交改動時，先提交或暫存，再拉取。</div>'+
+        '<pre class="cmd"><span class="c"># 取遠端並以 rebase 方式併入本地提交</span>\ngit pull --rebase origin main</pre>'+
+      '</div></div>'+
+
+      '<div class="flow-step"><div class="no">2</div><div class="bd">'+
+        '<div class="tt">檢查新提交</div>'+
+        '<div class="ds">確認上游改動了哪些文件、是否與自己本次要改的部分重疊。重疊的部分先讀懂對方的改法，再決定自己的改法。</div>'+
+        '<pre class="cmd"><span class="c"># 本地落後的提交</span>\ngit log --oneline HEAD..origin/main\n\n<span class="c"># 上游改了哪些文件</span>\ngit diff --stat HEAD origin/main\n\n<span class="c"># 逐行查看具體改動</span>\ngit diff HEAD origin/main -- dmp.html</pre>'+
+      '</div></div>'+
+
+      '<div class="flow-step"><div class="no">3</div><div class="bd">'+
+        '<div class="tt">合併</div>'+
+        '<div class="ds">把上游提交併入本地工作分支，使本地包含雙方改動。第 1 步已用 <span class="mono-code">--rebase</span> 時，此步只確認結果；直接合併時執行下面的指令。</div>'+
+        '<pre class="cmd"><span class="c"># 合併上游，保留雙方歷史</span>\ngit merge origin/main\n\n<span class="c"># 確認合併後本地與上游的差異，只剩自己的改動</span>\ngit status\ngit log --oneline -8</pre>'+
+      '</div></div>'+
+
+      '<div class="flow-step"><div class="no">4</div><div class="bd">'+
+        '<div class="tt">確認衝突並修正</div>'+
+        '<div class="ds">合併或 rebase 出現衝突時，Git 在文件內標記衝突區段，並把文件標為未合併。逐個文件修正後標記解決，再繼續。修正按下方「衝突處理規則」執行，不整段取一邊。</div>'+
+        '<pre class="cmd"><span class="c"># 查看衝突文件</span>\ngit status\n\n<span class="c"># 修正後標記為已解決</span>\ngit add dmp.html assets/app.css\n\n<span class="c"># rebase 過程中繼續；merge 過程中改為 git commit</span>\ngit rebase --continue</pre>'+
+        '<div class="spec-note red" style="margin-top:12px"><span class="i">'+icon('warn',15)+'</span><span>衝突標記 <span class="mono-code">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span> / <span class="mono-code">=======</span> / <span class="mono-code">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span> 必須全部清除。殘留標記會讓整頁腳本失效，頁面白屏。</span></div>'+
+      '</div></div>'+
+
+      '<div class="flow-step"><div class="no">5</div><div class="bd">'+
+        '<div class="tt">上傳更新</div>'+
+        '<div class="ds">本地驗證通過後推送到主線。推送前先按「上傳前檢查清單」自查，推送後確認 Pages 重建成功。</div>'+
+        '<pre class="cmd"><span class="c"># 暫存本次改動並提交，提交信息按本頁第四節格式</span>\ngit add -A\ngit commit -m "feat(event-list): 分類頁籤改為由分類樹派生"\n\n<span class="c"># 上傳到主線</span>\ngit push origin main\n\n<span class="c"># 確認本地與遠端一致</span>\ngit status</pre>'+
+      '</div></div>'+
+
+      '</div></div>'+
+
+    '<div class="spec-block"><h3>三、衝突處理規則</h3>'+
+      '<p class="sub">同一處被兩人改動時按此判定保留哪一側，逐段判斷，不整文件取捨。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:180px">衝突位置</th><th>處理方式</th></tr></thead><tbody>'+
+      '<tr><td>頁面 HTML 結構</td><td>雙方新增的功能都保留，按 4.x 組件規範重排位置與樣式，不刪任一方的功能</td></tr>'+
+      '<tr><td>CSS 變數區</td><td>配色取上游（配色以源站為準）；字號、間距、圓角取上游（字體按基線規範）</td></tr>'+
+      '<tr><td>SPEC_NAV / REQ_LIST 等數組</td><td>雙方新增項全部保留，按編號順序排列，編號重複時順延並同步改引用處</td></tr>'+
+      '<tr><td>版本號串 V1.x.x</td><td>不在衝突階段手動合併，統一在提交前按 1.1 升版規則改一處，再全局核對</td></tr>'+
+      '<tr><td>mock 數據</td><td>保留上游數據集，自己的演示數據另存備份，不覆蓋上游已有條目</td></tr>'+
+      '</tbody></table>'+
+      '<div class="spec-note"><span class="i">'+icon('warn',15)+'</span><span>拿不準保留哪一側時，先問改動方，不自行刪除他人提交。合併後的頁面必須本地打開驗證，不以「看起來沒錯」作為通過標準。</span></div></div>'+
+
+    '<div class="spec-block"><h3>四、提交信息格式</h3>'+
+      '<p class="sub">一行摘要說明改動內容，類型用英文前綴，範圍寫頁面或模塊。</p>'+
+      '<pre class="cmd"><span class="c"># 格式：類型(範圍): 摘要</span>\nfeat(event-list): 分類頁籤改為由分類樹派生\nfix(rule): 修正國家過濾彈窗在多選時的計數\nstyle(dmp): 統一表格數值列使用 tabular-nums\ndocs(readme): 補充線上入口與交互清單\nchore: 添加 .nojekyll 禁用 Jekyll 構建</pre>'+
+      '<table class="spec-table" style="margin-top:14px"><thead><tr><th style="width:110px">類型</th><th>適用改動</th></tr></thead><tbody>'+
+      '<tr><td><span class="mono-code">feat</span></td><td>新增頁面、功能單元、章節、彈窗</td></tr>'+
+      '<tr><td><span class="mono-code">fix</span></td><td>修正錯誤：交互失效、樣式錯位、數據錯算</td></tr>'+
+      '<tr><td><span class="mono-code">style</span></td><td>字號、配色、間距、位置等視覺調整</td></tr>'+
+      '<tr><td><span class="mono-code">docs</span></td><td>README、規範文檔文字</td></tr>'+
+      '<tr><td><span class="mono-code">chore</span></td><td>構建、配置、依賴、忽略文件</td></tr>'+
+      '</tbody></table></div>'+
+
+    '<div class="spec-block"><h3>五、上傳前檢查清單</h3>'+
+      '<p class="sub">五項全部通過再推送，任一項不通過則不上傳。</p>'+
+      '<table class="spec-table"><thead><tr><th style="width:52px">序</th><th style="width:220px">檢查項</th><th>通過標準</th></tr></thead><tbody>'+
+      '<tr><td class="num">1</td><td>三個頁面可打開</td><td><span class="mono-code">index.html</span>、<span class="mono-code">dmp.html</span>、<span class="mono-code">rule.html</span> 本地打開無控制台報錯，管理面各頁可切換</td></tr>'+
+      '<tr><td class="num">2</td><td>版本號一致</td><td>三處展示位、<span class="mono-code">core.js</span> 的 <span class="mono-code">VERSION</span>、1.1 記錄表首行三者相同</td></tr>'+
+      '<tr><td class="num">3</td><td>靜態資源版本串</td><td>改動過 <span class="mono-code">assets/*</span> 時同步更新 <span class="mono-code">?v=</span> 串，避免瀏覽器用舊緩存</td></tr>'+
+      '<tr><td class="num">4</td><td>無臨時文件</td><td>不含 <span class="mono-code">node_modules</span>、截圖、備份文件、編輯器配置</td></tr>'+
+      '<tr><td class="num">5</td><td>改動範圍可控</td><td><span class="mono-code">git status</span> 列出的文件都是本次有意修改的</td></tr>'+
+      '</tbody></table>'+
+      '<div class="spec-note blue"><span class="i">'+icon('info',15)+'</span><span>推送後打開線上入口確認：頁面可加載、字體正常（<span class="mono-code">_fonts/</span> 未 404）、改動處生效。Pages 重建期間訪問可能仍為舊版本，等重建完成再判斷。</span></div></div>'+
+
+    '<div class="spec-block"><h3>六、禁止事項</h3>'+
+      '<table class="spec-table"><thead><tr><th style="width:200px">禁止操作</th><th>原因與替代做法</th></tr></thead><tbody>'+
+      '<tr><td>強制推送</td><td><span class="mono-code">git push --force</span> 會覆蓋他人提交。改用 <span class="mono-code">--force-with-lease</span>，且僅限自己剛推送且無人基於其工作的分支</td></tr>'+
+      '<tr><td>改寫歷史提交</td><td>已推送的提交不改寫、不 squash。需撤銷時用新提交反向修改</td></tr>'+
+      '<tr><td>直接改主線共享文件不拉取</td><td><span class="mono-code">app.css</span>、<span class="mono-code">core.js</span> 被三頁共用，改前必拉取，改後必驗證三頁</td></tr>'+
+      '<tr><td>把 mock 數據當真實接口</td><td>原型不含後端，接口路徑僅作示意，不對接真實環境</td></tr>'+
+      '</tbody></table></div>';
+}
+
+
 /* 規範頁外框 */
 function renderShell(){
   document.getElementById('proto-main').innerHTML=renderSpec();
@@ -586,9 +688,14 @@ function showVersion(){
       '<div class="ver-card"><div class="k">框架參考</div><div class="v">'+BASE_REF+'</div></div></div>'+
       '<div style="border-top:1px solid #eef1f6;padding-top:14px">'+
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
-      '<div style="display:flex;gap:12px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 首次發布</div>'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 功能新增</div>'+
+      '規範頁新增「團隊協作」分組與團隊更新上傳流程：倉庫與入口、五步流程、衝突處理規則、'+
+      '提交信息格式、上傳前檢查清單、禁止事項。</div></div>'+
+      '<div style="display:flex;gap:12px"><span class="vnum" style="align-self:flex-start">V1.0.0</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-04 · 首次發布</div>'+
       '依原站前端還原管理面業務頁面與彈窗；外框改為產品基線結構，本頁為規範文檔；'+
       '字體按基線規範統一為 Outfit + 系統中文字體，配色沿用原站藍色體系。</div></div></div>',
     foot:'<button class="btn btn-primary" onclick="closeModal()">關閉</button>'
