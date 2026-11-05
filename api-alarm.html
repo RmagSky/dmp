@@ -5,46 +5,47 @@
 
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>API 推送異常 · 數據中台管理系統</title>
+<script>
+/* 被 dmp.html 以 iframe 載入時收起自身外框，避免雙層側欄與頂欄 */
+if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
+</script>
 <style>
-/* ===== 數據中台 原型樣式（貼合線上 Element Plus 風格） ===== */
-:root{
-  --primary:#2e6bf0; --primary-hover:#4a82f5; --primary-light:#eaf1fe;
-  --bg:#f3f6fb; --card:#ffffff; --border:#e6ebf3; --border-dark:#d9e1ec;
-  --text:#1f2d3d; --text-2:#5e6d82; --text-3:#8a97ab;
-  --success:#16a34a; --success-bg:#e8f8ee;
-  --danger:#e5484d; --danger-bg:#feecec;
-  --warning:#d97706; --warning-bg:#fef3e2;
-  --info:#0891b2; --info-bg:#e6f7fb;
-  --sidebar-w:208px; --topbar-h:56px; --tabs-h:40px;
-  --radius:8px;
-  --shadow:0 1px 3px rgba(31,45,61,.06),0 4px 16px rgba(31,45,61,.05);
-}
+/* ===== 數據中台 原型樣式：變數對齊 assets/app.css 基線（統一在下方 :root 定義） ===== */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans CJK TC",sans-serif;
-  font-size:13px;color:var(--text);background:var(--bg)}
+body{font-family:Outfit,"Noto Sans SC","Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-size:var(--fs-table);color:var(--text);background:var(--bg)}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
 a{color:var(--primary);text-decoration:none;cursor:pointer}
 a:hover{color:var(--primary-hover)}
+
+/* ===== 嵌入管理面 iframe 時：收起自身外框，避免與管理面形成雙層界面 ===== */
+html.is-embedded .sidebar,
+html.is-embedded .topbar,
+html.is-embedded .pagetabs{display:none}
+html.is-embedded .layout{grid-template-columns:1fr;height:100%}
+html.is-embedded body{background:transparent}
+html.is-embedded .content{padding:16px}
 
 /* ===== 佈局 ===== */
 .layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;height:100vh;overflow:hidden}
 .sidebar{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
-.logo{display:flex;align-items:center;gap:8px;padding:16px 18px;font-size:17px;font-weight:700;color:var(--primary);letter-spacing:.5px}
-.logo .logo-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2e6bf0,#5f9bff);
-  display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
+.logo{display:flex;align-items:center;gap:8px;padding:16px 18px;font-size:var(--fs-page);font-weight:700;color:var(--primary);letter-spacing:.5px}
+.logo .logo-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2f6bf6,#7ba3ff);
+  display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:var(--fs-table);font-weight:800}
 .menu{padding:4px 10px 20px}
 .menu-item,.menu-group-title{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:6px;
-  color:var(--text-2);cursor:pointer;font-size:13.5px;user-select:none;position:relative}
+  color:var(--text-2);cursor:pointer;font-size:var(--fs-body);user-select:none;position:relative}
 .menu-item:hover,.menu-group-title:hover{background:#f4f7fd;color:var(--text)}
 .menu-item.active{color:var(--primary);background:var(--primary-light);font-weight:600}
 .menu-item .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.55;margin-left:2px}
 .menu-sub{padding-left:14px}
-.menu-sub .menu-item{padding:8px 12px 8px 31px;font-size:13px}
+.menu-sub .menu-item{padding:8px 12px 8px 31px;font-size:var(--fs-table)}
 .menu-sub .menu-item.active::before{content:"";position:absolute;left:18px;top:50%;transform:translateY(-50%);
   width:4px;height:4px;border-radius:50%;background:var(--primary)}
 .menu-item .icon,.menu-group-title .icon{width:16px;text-align:center;flex:none}
-.caret{margin-left:auto;font-size:10px;color:var(--text-3);transition:transform .2s}
-.badge-new{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:9px;font-weight:600;transform:scale(.92)}
+.caret{margin-left:auto;font-size:var(--fs-tag);color:var(--text-3);transition:transform .2s}
+.badge-new{margin-left:auto;background:var(--danger);color:#fff;font-size:var(--fs-tag);padding:1px 6px;border-radius:9px;font-weight:600;transform:scale(.92)}
 
 .main{display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .topbar{height:var(--topbar-h);background:#fff;border-bottom:1px solid var(--border);
@@ -52,106 +53,157 @@ a:hover{color:var(--primary-hover)}
 .topbar .clock{color:var(--text-2);font-variant-numeric:tabular-nums}
 .topbar .user{display:flex;align-items:center;gap:6px;color:var(--text);cursor:pointer}
 .topbar .avatar{width:24px;height:24px;border-radius:50%;background:var(--primary-light);color:var(--primary);
-  display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  display:inline-flex;align-items:center;justify-content:center;font-size:var(--fs-help);font-weight:700}
 .pagetabs{height:var(--tabs-h);background:#eef2f8;display:flex;align-items:flex-end;gap:6px;padding:6px 12px 0;flex:none}
-.pagetab{background:#dde5f0;color:var(--text-2);padding:7px 16px;border-radius:8px 8px 0 0;font-size:12.5px;cursor:default}
+.pagetab{background:#dde5f0;color:var(--text-2);padding:7px 16px;border-radius:8px 8px 0 0;font-size:var(--fs-table);cursor:default}
 .pagetab.active{background:#fff;color:var(--primary);font-weight:600}
 .pagetab .x{margin-left:8px;color:var(--text-3);font-size:11px}
 .content{flex:1;overflow:auto;padding:16px 18px 40px}
 
 /* ===== 卡片 ===== */
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card{background:var(--card);border-radius:10px;box-shadow:var(--shadow);padding:18px 20px}
 .card + .card{margin-top:14px}
-.card-head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border)}
+.card-head{display:flex;align-items:center;gap:10px;padding:0 0 12px}
 .card-head .bar{width:4px;height:15px;border-radius:2px;background:var(--primary)}
-.card-head h3{font-size:14px;font-weight:600}
-.card-head .extra{margin-left:auto;color:var(--text-3);font-size:12px;display:flex;gap:14px;align-items:center}
-.card-body{padding:16px}
+.card-head h3{font-size:var(--fs-block);font-weight:600}
+.card-head .extra{margin-left:auto;color:var(--text-3);font-size:var(--fs-help);display:flex;gap:14px;align-items:center}
+.card-body{padding:0}
+/* 卡片内标题行：与 dmp 原生页 .card > h2.page-title 一致 */
+.card-title-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.card-title-row .head-right{margin-left:auto}
+/* 卡片底部状态条：刷新时间等元信息 */
+.card-foot{display:flex;align-items:center;justify-content:flex-end;gap:8px;
+  margin-top:12px;padding-top:11px;border-top:1px solid var(--border-light)}
+/* 无边框的筛选项（日期范围等自绘控件用） */
+.filters{display:flex;flex-wrap:wrap;gap:10px;row-gap:10px;align-items:center;margin:0 0 14px}
+/* 表格基础样式：与 dmp 原生页一致 */
+table{width:100%;border-collapse:collapse;font-size:var(--fs-table)}
+thead th{background:#f7f9fc;color:var(--text-sub);font-weight:500;text-align:left;
+  padding:11px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap}
+tbody td{padding:12px;border-bottom:1px solid #f4f6fa;color:var(--text-sub);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#fafcff}
+td.name{color:var(--text);font-weight:500}
+/* 分頁器：與基線 assets/app.css 一致 */
+.pager{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:14px 2px 2px;
+  color:var(--text-sub);font-size:var(--fs-table);flex-wrap:wrap}
+.pager .total{margin-right:auto}
+.pg{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 6px;
+  border-radius:5px;color:var(--text-sub);cursor:pointer;border:1px solid transparent;
+  font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;font-size:var(--fs-table);transition:.14s}
+.pg:hover{background:#f2f5fa}
+.pg.active{border-color:var(--primary);color:var(--primary);font-weight:600}
+.pg.disabled{color:var(--text-disabled);cursor:not-allowed}
+.pg.disabled:hover{background:none}
+.pager select{height:28px;border:1px solid var(--border);border-radius:5px;padding:0 4px;
+  background:#fff;font-size:var(--fs-tag);color:var(--text-sub);cursor:pointer}
+.pager .jump{display:flex;align-items:center;gap:5px}
+.pager .jump input{width:44px;height:28px;border:1px solid var(--border);border-radius:5px;
+  text-align:center;font-size:var(--fs-tag);color:var(--text);outline:none}
+.pager .jump input:focus{border-color:var(--primary)}
+
+.f-item-plain{height:34px;border:0;background:transparent;gap:8px}
+/* 含日期範圍的篩選項：放開溢出，否則下拉面板會被裁掉 */
+.f-item:has(.drp){overflow:visible}
+.f-label-plain{color:var(--text-sub);white-space:nowrap;font-size:var(--fs-table)}
 
 /* ===== 篩選欄 ===== */
-.filterbar{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:flex-end;padding:14px 16px}
-.f-item{display:flex;align-items:center;gap:8px}
-.f-item label{color:var(--text-2);white-space:nowrap;font-size:12.5px}
-.input,.select{height:32px;border:1px solid var(--border-dark);border-radius:6px;padding:0 10px;font-size:12.5px;
+.f-item{display:flex;align-items:center;flex:0 0 auto;height:34px;border:1px solid var(--border);
+  border-radius:6px;background:#fff;overflow:hidden;transition:.14s}
+.f-item:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(47,107,246,.09)}
+.f-label{flex:none;padding:0 10px;color:var(--text-sub);background:#fafbfd;height:100%;
+  display:flex;align-items:center;border-right:1px solid var(--border-light);
+  white-space:nowrap;font-size:var(--fs-table)}
+.f-input{height:100%;border:0;padding:0 10px;min-width:104px;background:transparent;font-size:var(--fs-table)}
+.f-select{height:100%;border:0;padding:0 26px 0 10px;background:transparent;font-size:var(--fs-table);cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2386909c' stroke-width='2.4'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;min-width:88px}
+.input,.select{height:34px;border:1px solid var(--border);border-radius:6px;padding:0 10px;font-size:var(--fs-table);
   color:var(--text);background:#fff;outline:none;min-width:170px;transition:border-color .15s}
 .input:focus,.select:focus{border-color:var(--primary)}
-.input::placeholder{color:#aab4c4}
+.input::placeholder{color:var(--text-disabled)}
 select.select{cursor:pointer}
-.btn{height:32px;padding:0 16px;border-radius:6px;border:1px solid var(--border-dark);background:#fff;
-  color:var(--text-2);font-size:12.5px;cursor:pointer;transition:all .15s}
-.btn:hover{border-color:var(--primary);color:var(--primary)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:34px;padding:0 15px;
+  border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--text-2);
+  font-size:var(--fs-table);cursor:pointer;transition:.16s;white-space:nowrap}
+.btn:hover{border-color:#c3cee0;color:var(--primary)}
 .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
 .btn-primary:hover{background:var(--primary-hover);color:#fff}
 .btn-danger{background:var(--danger);border-color:var(--danger);color:#fff}
-.btn-sm{height:26px;padding:0 10px;font-size:12px}
+.btn-sm{height:26px;padding:0 10px;font-size:var(--fs-help)}
 .btn[disabled]{opacity:.45;cursor:not-allowed;pointer-events:none}
 
 /* ===== 表格 ===== */
-.tbl-wrap{overflow-x:auto}
-table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
-.tbl thead th{background:#f7f9fc;color:var(--text-2);font-weight:600;text-align:left;
-  padding:11px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
-.tbl tbody td{padding:11px 12px;border-bottom:1px solid #f0f3f9;white-space:nowrap;color:var(--text)}
-.tbl tbody tr:hover{background:#f7faff}
-.tbl .num{font-variant-numeric:tabular-nums}
-.tbl .link{color:var(--primary);cursor:pointer}
-.tbl .link:hover{text-decoration:underline}
 .sort-th{cursor:pointer;user-select:none}
-.sort-th .arr{font-size:10px;color:var(--text-3);margin-left:4px}
-.mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:12px}
-.cell-sub{color:var(--text-3);font-size:11.5px;margin-top:2px}
+.sort-th .arr{font-size:var(--fs-tag);color:var(--text-3);margin-left:4px}
+.mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:var(--fs-help)}
+.cell-sub{color:var(--text-3);font-size:var(--fs-help);margin-top:2px}
 
 /* ===== 標籤 / 狀態 ===== */
-.tag{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:4px;font-size:12px;line-height:18px;border:1px solid transparent}
+.tag{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:4px;
+  font-size:var(--fs-tag);font-weight:500;line-height:1;white-space:nowrap}
 .tag .s-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
-.tag-success{background:var(--success-bg);color:var(--success)}
-.tag-danger{background:var(--danger-bg);color:var(--danger)}
-.tag-warning{background:var(--warning-bg);color:var(--warning)}
-.tag-info{background:var(--info-bg);color:var(--info)}
-.tag-gray{background:#f0f2f5;color:var(--text-2)}
-.col-scope{font-size:12.5px;color:var(--text-2)}
+.tag-success{background:#e8f8ec;color:#12923c}
+.tag-danger{background:#fdecec;color:#d33}
+.tag-warning{background:#fff3e8;color:#c25e00}
+.tag-info{background:var(--primary-light);color:var(--primary)}
+.tag-gray{background:#f2f5fa;color:var(--text-help)}
+.col-scope{font-size:var(--fs-table);color:var(--text-2)}
 .scope-ellipsis{display:block;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.scope-tip{position:fixed;z-index:9999;max-width:480px;background:#1f2733;color:#fff;font-size:12.5px;line-height:1.75;padding:9px 11px;border-radius:7px;box-shadow:0 8px 24px rgba(15,23,42,.28);pointer-events:none;white-space:normal;word-break:break-word}
+.scope-tip{position:fixed;z-index:9999;max-width:480px;background:#1f2733;color:#fff;font-size:var(--fs-table);line-height:1.75;padding:9px 11px;border-radius:7px;box-shadow:0 8px 24px rgba(15,23,42,.28);pointer-events:none;white-space:normal;word-break:break-word}
 .tag-blue{background:var(--primary-light);color:var(--primary)}
-.method{font-weight:700;font-size:11.5px;padding:1px 7px;border-radius:4px}
+.method{font-weight:700;font-size:var(--fs-help);padding:1px 7px;border-radius:4px}
 .m-get{background:#e8f8ee;color:var(--success)} .m-post{background:var(--primary-light);color:var(--primary)}
 .m-put{background:var(--warning-bg);color:var(--warning)} .m-del{background:var(--danger-bg);color:var(--danger)}
 .code-2xx{color:var(--success)} .code-3xx{color:var(--info)} .code-4xx{color:var(--warning)} .code-5xx{color:var(--danger);font-weight:600}
 
 /* ===== 指標卡 ===== */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px}
 .stat{border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;background:#fff;position:relative;transition:box-shadow .15s}
 .stat:hover{box-shadow:var(--shadow)}
-.stat .s-label{color:var(--text-2);font-size:12px;display:flex;align-items:center;gap:5px}
-.stat .s-value{font-size:24px;font-weight:700;margin-top:8px;font-variant-numeric:tabular-nums;line-height:1.15}
-.stat .s-value .unit{font-size:12px;color:var(--text-3);font-weight:400;margin-left:3px}
-.stat .s-foot{margin-top:7px;font-size:11.5px;color:var(--text-3)}
+.stat .s-label{color:var(--text-2);font-size:var(--fs-help);display:flex;align-items:center;gap:5px}
+.stat .s-value{font-size:24px;font-weight:600;margin-top:8px;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;line-height:1.15}
+.stat .s-value .unit{font-size:var(--fs-help);color:var(--text-3);font-weight:400;margin-left:3px}
+.stat .s-foot{margin-top:7px;font-size:var(--fs-help);color:var(--text-3)}
 .stat .s-foot .up{color:var(--danger)} .stat .s-foot .down{color:var(--success)}
 .stat.status-ok .s-value{color:var(--success)} .stat.status-bad .s-value{color:var(--danger)}
+/* ===== 指標列表（P0 監控狀態） ===== */
+/* 橫排指標卡：一列 5 項，指標名在上、數值在下 */
+.m-list{display:grid;grid-template-columns:repeat(5,1fr);gap:0;
+  border:1px solid var(--border-light);border-radius:8px;overflow:hidden;background:#fff}
+.m-row{padding:14px 18px;border-right:1px solid #f4f6fa;transition:background .14s;min-width:0}
+.m-row:last-child{border-right:0}
+.m-row:hover{background:#fafcff}
+.m-name{display:flex;align-items:center;gap:6px;color:var(--text-sub);font-size:var(--fs-table);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-val{margin-top:9px;font-size:var(--fs-stat);font-weight:600;color:var(--text);
+  font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;white-space:nowrap;line-height:1.15}
+.m-val .unit{font-size:var(--fs-help);font-weight:400;color:var(--text-help);margin-left:3px}
+.m-val.val-ok{color:var(--success)}
+.m-val.val-bad{color:var(--danger)}
+/* 5 項橫排優先：容器夠寬時始終一列 5 項，僅在極窄時降級 */
+@media (max-width:900px){.m-list{grid-template-columns:repeat(3,1fr)}
+  .m-row{border-right:1px solid #f4f6fa;border-bottom:1px solid #f4f6fa}
+  .m-row:nth-child(3n){border-right:0}
+  .m-row:nth-last-child(-n+2){border-bottom:0}}
+@media (max-width:560px){.m-list{grid-template-columns:repeat(2,1fr)}
+  .m-row:nth-child(2n){border-right:0}}
+
 .help{width:14px;height:14px;border-radius:50%;border:1px solid var(--text-3);color:var(--text-3);
-  display:inline-flex;align-items:center;justify-content:center;font-size:10px;cursor:help;position:relative;flex:none}
+  display:inline-flex;align-items:center;justify-content:center;font-size:var(--fs-tag);cursor:help;position:relative;flex:none}
 .help:hover{border-color:var(--primary);color:var(--primary)}
 .help:hover::after{content:attr(data-tip);position:absolute;left:-8px;bottom:calc(100% + 7px);
-  background:#1f2d3d;color:#fff;font-size:12px;font-weight:400;line-height:1.75;padding:9px 12px;border-radius:6px;
+  background:#1d2129;color:#fff;font-size:var(--fs-help);font-weight:400;line-height:1.75;padding:9px 12px;border-radius:6px;
   width:290px;max-width:70vw;white-space:pre-line;text-align:left;z-index:90;box-shadow:0 8px 24px rgba(0,0,0,.22)}
 .help:hover::before{content:"";position:absolute;left:2px;bottom:calc(100% + 1px);
-  border:6px solid transparent;border-top-color:#1f2d3d;z-index:90}
+  border:6px solid transparent;border-top-color:#1d2129;z-index:90}
 
 /* ===== 頁簽（詳情頁大頁簽） ===== */
 .bigtabs{display:flex;gap:4px;border-bottom:1px solid var(--border);background:#fff;padding:0 16px;border-radius:var(--radius) var(--radius) 0 0}
-.bigtab{padding:13px 20px;cursor:pointer;color:var(--text-2);font-size:13.5px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.bigtab{padding:13px 20px;cursor:pointer;color:var(--text-2);font-size:var(--fs-body);border-bottom:2px solid transparent;margin-bottom:-1px}
 .bigtab:hover{color:var(--primary)}
 .bigtab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
 
 /* ===== 分頁 ===== */
-.pagination{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding:13px 16px;color:var(--text-2);font-size:12.5px;flex-wrap:wrap}
-.pagination .total{margin-right:auto}
-.pg-btn{min-width:28px;height:28px;border:1px solid var(--border-dark);border-radius:5px;background:#fff;color:var(--text-2);
-  cursor:pointer;padding:0 8px;font-size:12.5px}
-.pg-btn:hover{border-color:var(--primary);color:var(--primary)}
-.pg-btn.cur{background:var(--primary);border-color:var(--primary);color:#fff}
-.pg-btn[disabled]{opacity:.4;cursor:not-allowed}
-.pg-jump .input{min-width:0;width:48px;height:28px;text-align:center}
 
 /* ===== 抽屜 / 彈窗 ===== */
 .mask{position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -160,57 +212,57 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
   transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column;box-shadow:-6px 0 24px rgba(0,0,0,.12)}
 .drawer.show{transform:none}
 .drawer-head{display:flex;align-items:center;padding:15px 20px;border-bottom:1px solid var(--border)}
-.drawer-head h3{font-size:15px}
+.drawer-head h3{font-size:var(--fs-block)}
 .drawer-head .close{margin-left:auto;cursor:pointer;color:var(--text-3);font-size:18px;line-height:1;padding:2px 6px;border-radius:4px}
 .drawer-head .close:hover{background:#f0f2f5;color:var(--text)}
 .drawer-body{flex:1;overflow:auto;padding:18px 20px}
-.kv{display:grid;grid-template-columns:110px 1fr;gap:10px 16px;font-size:12.5px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:10px 16px;font-size:var(--fs-table)}
 .kv .k{color:var(--text-3)}
 .kv .v{color:var(--text);word-break:break-all}
 .log-block{margin-top:16px;background:#0f172a;color:#c9d6e8;border-radius:8px;padding:14px 16px;
-  font-family:Consolas,monospace;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-all}
-.section-title{font-size:13px;font-weight:600;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+  font-family:Consolas,monospace;font-size:var(--fs-help);line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.section-title{font-size:var(--fs-table);font-weight:600;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
 .section-title::before{content:"";width:3px;height:12px;background:var(--primary);border-radius:2px}
 
 .dialog{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);background:#fff;border-radius:10px;
   z-index:102;width:420px;max-width:92vw;opacity:0;pointer-events:none;transition:all .18s;box-shadow:0 12px 40px rgba(0,0,0,.18)}
 .dialog.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
-.dialog-body{padding:24px 22px 12px;font-size:13.5px;line-height:1.7}
+.dialog-body{padding:24px 22px 12px;font-size:var(--fs-body);line-height:1.7}
 .dialog-foot{display:flex;justify-content:flex-end;gap:10px;padding:12px 18px 18px}
 .dialog-x{position:absolute;top:10px;right:12px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;
-  color:var(--text-3);font-size:15px;line-height:1;border-radius:6px;cursor:pointer;z-index:2;user-select:none;transition:background .15s,color .15s}
+  color:var(--text-3);font-size:var(--fs-block);line-height:1;border-radius:6px;cursor:pointer;z-index:2;user-select:none;transition:background .15s,color .15s}
 .dialog-x:hover{background:#f0f2f5;color:var(--text)}
 .dialog-bare .dialog-body{padding-bottom:22px}
 
 /* ===== 空態 ===== */
 .empty{padding:56px 20px;text-align:center;color:var(--text-3)}
 .empty .e-icon{font-size:40px;opacity:.5;margin-bottom:12px}
-.empty .e-text{font-size:13px}
+.empty .e-text{font-size:var(--fs-table)}
 
 /* ===== 提示條 / 刷新 ===== */
-.banner{display:flex;align-items:center;gap:9px;border-radius:8px;padding:10px 14px;font-size:12.5px;margin-bottom:14px}
+.banner{display:flex;align-items:center;gap:9px;border-radius:8px;padding:10px 14px;font-size:var(--fs-table);margin-bottom:14px}
 .banner-warn{background:var(--warning-bg);color:var(--warning);border:1px solid #f5ddb3}
 .banner-info{background:var(--info-bg);color:var(--info);border:1px solid #b9e6f0}
-.refresh-meta{display:flex;align-items:center;gap:10px;color:var(--text-3);font-size:12px}
+.refresh-meta{display:flex;align-items:center;gap:10px;color:var(--text-3);font-size:var(--fs-help)}
 .refresh-meta .dot-live{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px rgba(22,163,74,.15)}
 .refresh-meta .count{font-variant-numeric:tabular-nums;color:var(--text-2)}
 
 /* ===== 吐司 ===== */
 .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-8px);background:#fff;border:1px solid var(--border);
-  box-shadow:var(--shadow);border-radius:8px;padding:10px 18px;z-index:300;font-size:13px;opacity:0;transition:all .2s;pointer-events:none}
+  box-shadow:var(--shadow);border-radius:8px;padding:10px 18px;z-index:300;font-size:var(--fs-table);opacity:0;transition:all .2s;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.success{border-color:#b7ebc6;color:var(--success)}
 .toast.error{border-color:#f5c2c4;color:var(--danger)}
 
 /* ===== 演示控制 ===== */
 .demo-fab{position:fixed;right:18px;bottom:18px;z-index:200}
-.demo-fab .fab-btn{background:#1f2d3d;color:#fff;border:none;border-radius:20px;padding:8px 16px;cursor:pointer;font-size:12.5px;box-shadow:var(--shadow)}
+.demo-fab .fab-btn{background:#1d2129;color:#fff;border:none;border-radius:20px;padding:8px 16px;cursor:pointer;font-size:var(--fs-table);box-shadow:var(--shadow)}
 .demo-fab .fab-panel{position:absolute;right:0;bottom:42px;width:230px;background:#fff;border:1px solid var(--border);
   border-radius:10px;box-shadow:var(--shadow);padding:12px;display:none}
 .demo-fab.open .fab-panel{display:block}
-.fab-panel h4{font-size:12.5px;margin-bottom:8px;color:var(--text-2)}
+.fab-panel h4{font-size:var(--fs-table);margin-bottom:8px;color:var(--text-2)}
 .fab-panel .opt{display:block;width:100%;text-align:left;border:1px solid var(--border);background:#fff;border-radius:6px;
-  padding:6px 10px;margin-bottom:6px;cursor:pointer;font-size:12px;color:var(--text)}
+  padding:6px 10px;margin-bottom:6px;cursor:pointer;font-size:var(--fs-help);color:var(--text)}
 .fab-panel .opt.on{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
 
 /* ===== 下拉（更多） ===== */
@@ -218,15 +270,15 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .dropdown-menu{position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--border);border-radius:8px;
   box-shadow:var(--shadow);min-width:140px;padding:6px;display:none;z-index:50}
 .dropdown.open .dropdown-menu{display:block}
-.dropdown-menu .dd-item{padding:8px 14px;border-radius:6px;font-size:12.5px;color:var(--text);cursor:pointer;white-space:nowrap}
+.dropdown-menu .dd-item{padding:8px 14px;border-radius:6px;font-size:var(--fs-table);color:var(--text);cursor:pointer;white-space:nowrap}
 .dropdown-menu .dd-item:hover{background:var(--primary-light);color:var(--primary)}
 .dropdown-menu .dd-item.danger{color:var(--danger)}
 .dropdown-menu .dd-item.danger:hover{background:var(--danger-bg)}
 
 /* ===== 頭部資訊條（詳情頁） ===== */
 .page-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.page-head h2{font-size:17px}
-.page-head .back{display:inline-flex;align-items:center;gap:5px;color:var(--text-2);cursor:pointer;font-size:13px}
+.page-head h2{font-size:var(--fs-page)}
+.page-head .back{display:inline-flex;align-items:center;gap:5px;color:var(--text-2);cursor:pointer;font-size:var(--fs-table)}
 .page-head .back:hover{color:var(--primary)}
 .head-tags{display:flex;gap:8px;align-items:center}
 .head-right{margin-left:auto}
@@ -234,7 +286,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 /* ===== 圖表容器 ===== */
 .chart{width:100%;height:230px}
 .chart-lg{height:260px}
-.chart-legend{display:flex;gap:16px;font-size:12px;color:var(--text-2);margin-bottom:6px}
+.chart-legend{display:flex;gap:16px;font-size:var(--fs-help);color:var(--text-2);margin-bottom:6px}
 .chart-legend .lg{display:inline-flex;align-items:center;gap:6px}
 .chart-legend .lg i{width:10px;height:10px;border-radius:2px;display:inline-block}
 
@@ -244,8 +296,8 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 
 /* ===== 商戶詳情頭部（與線上商戶明細一致） ===== */
 .mh-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 24px;margin-top:16px}
-.mh-label{color:var(--text-3);font-size:12px}
-.mh-value{font-size:13px;margin-top:5px;color:var(--text);word-break:break-all}
+.mh-label{color:var(--text-3);font-size:var(--fs-help)}
+.mh-value{font-size:var(--fs-table);margin-top:5px;color:var(--text);word-break:break-all}
 .mh-name{font-size:16px;font-weight:700;line-height:1.3}
 
 /* ===== 大号中间弹窗 ===== */
@@ -253,51 +305,52 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .dialog-body{max-height:72vh;overflow:auto}
 
 /* ===== 日期時間範圍选择器 ===== */
-.drp{position:relative;display:inline-flex;align-items:center;gap:10px;height:32px;border:1px solid var(--border-dark);
-  border-radius:6px;background:#fff;padding:0 10px;cursor:pointer;min-width:270px;transition:border-color .15s;user-select:none}
-.drp:hover,.drp.open{border-color:var(--primary)}
-.drp .drp-val{font-size:12.5px;color:var(--text);white-space:nowrap}
-.drp .drp-val.placeholder{color:#aab4c4}
-.drp .drp-icon{color:var(--text-3);margin-left:auto;font-size:13px}
+/* 日期範圍：嵌在 .f-item 內，自身不再畫邊框，避免框中框 */
+.drp{position:relative;display:inline-flex;align-items:center;gap:8px;height:100%;
+  background:transparent;padding:0 9px;cursor:pointer;min-width:172px;user-select:none}
+.drp .drp-val{font-size:var(--fs-help);color:var(--text);white-space:nowrap;
+  font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+.drp .drp-val.placeholder{color:var(--text-disabled)}
+.drp .drp-icon{display:inline-flex;align-items:center;color:var(--text-3);margin-left:auto;flex:none}
 .drp-panel{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--border);border-radius:8px;
   box-shadow:var(--shadow);padding:14px;width:360px;z-index:60;display:none;cursor:default}
 .drp.open .drp-panel{display:block}
 .drp-panel .presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.drp-panel .preset{border:1px solid var(--border);border-radius:5px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--text-2)}
+.drp-panel .preset{border:1px solid var(--border);border-radius:5px;padding:4px 10px;font-size:var(--fs-help);cursor:pointer;color:var(--text-2)}
 .drp-panel .preset:hover{border-color:var(--primary);color:var(--primary)}
-.drp-panel .dt-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:12px;color:var(--text-2);white-space:nowrap}
-.drp-panel .dt-row input{flex:1;min-width:0;height:30px;border:1px solid var(--border-dark);border-radius:6px;padding:0 8px;font-size:12px;color:var(--text)}
+.drp-panel .dt-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:var(--fs-help);color:var(--text-2);white-space:nowrap}
+.drp-panel .dt-row input{flex:1;min-width:0;height:30px;border:1px solid var(--border-dark);border-radius:6px;padding:0 8px;font-size:var(--fs-help);color:var(--text)}
 
 /* ===== 調用趨勢：時間維度选择器 + 自定義日历 ===== */
 .trend-bar{display:flex;align-items:center;gap:14px;margin-bottom:8px}
 .chip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:14px;
-  background:#fff;border:1px solid var(--border-dark);font-size:12px;color:var(--text-2);cursor:pointer}
+  background:#fff;border:1px solid var(--border-dark);font-size:var(--fs-help);color:var(--text-2);cursor:pointer}
 .chip:hover{border-color:var(--primary);color:var(--primary)}
 .trend-dim{position:relative;display:inline-flex;align-items:center;gap:8px;height:32px;border:1px solid var(--border-dark);
   border-radius:6px;background:#fff;padding:0 12px;cursor:pointer;user-select:none;transition:border-color .15s}
 .trend-dim:hover,.trend-dim.open{border-color:var(--primary)}
-.td-label{color:var(--text-2);font-size:12.5px}
-.td-cur{font-size:12.5px;color:var(--text);white-space:nowrap}
-.td-caret{color:var(--text-3);font-size:10px}
+.td-label{color:var(--text-2);font-size:var(--fs-table)}
+.td-cur{font-size:var(--fs-table);color:var(--text);white-space:nowrap}
+.td-caret{color:var(--text-3);font-size:var(--fs-tag)}
 .td-panel{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--border);border-radius:8px;
   box-shadow:var(--shadow);z-index:70;display:none;cursor:default}
 .trend-dim.open .td-panel{display:flex}
 .td-menu{padding:8px;min-width:118px}
 .td-panel.with-cal .td-menu{border-right:1px solid var(--border)}
-.td-opt{padding:8px 14px;border-radius:6px;font-size:12.5px;color:var(--text);cursor:pointer;display:flex;
+.td-opt{padding:8px 14px;border-radius:6px;font-size:var(--fs-table);color:var(--text);cursor:pointer;display:flex;
   justify-content:space-between;gap:10px;white-space:nowrap;align-items:center}
 .td-opt:hover{background:var(--primary-light)}
 .td-opt.on{color:var(--primary);font-weight:600}
 .td-check{margin-left:auto}
 .td-cal{padding:12px;width:600px}
 .cal-head{display:flex;align-items:center;margin-bottom:8px}
-.cal-nav{cursor:pointer;color:var(--text-2);padding:2px 10px;border-radius:4px;font-size:15px}
+.cal-nav{cursor:pointer;color:var(--text-2);padding:2px 10px;border-radius:4px;font-size:var(--fs-block)}
 .cal-nav:hover{background:#f0f2f5;color:var(--text)}
 .cal-body{display:flex;gap:18px}
 .cal-month{flex:1}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
-.cal-w{color:var(--text-3);font-size:11.5px;padding:4px 0}
-.cal-d{font-size:12px;padding:5px 0;border-radius:6px;cursor:pointer;color:var(--text)}
+.cal-w{color:var(--text-3);font-size:var(--fs-help);padding:4px 0}
+.cal-d{font-size:var(--fs-help);padding:5px 0;border-radius:6px;cursor:pointer;color:var(--text)}
 .cal-d:hover{background:var(--primary-light)}
 .cal-d.dis{color:#c6cedb;pointer-events:none}
 .cal-d.insel{background:var(--primary-light)}
@@ -317,16 +370,16 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 
 /* ===== 指標卡時間切换（REST / WSS 各自独立） ===== */
 .metric-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}
-.metric-bar-label{font-size:12px;color:var(--text-2)}
+.metric-bar-label{font-size:var(--fs-help);color:var(--text-2)}
 .metric-seg{display:inline-flex;border:1px solid var(--border-dark);border-radius:6px;overflow:hidden;background:#fff}
-.metric-seg .ms-opt{padding:6px 13px;font-size:12px;color:var(--text-2);cursor:pointer;
+.metric-seg .ms-opt{padding:6px 13px;font-size:var(--fs-help);color:var(--text-2);cursor:pointer;
   border-right:1px solid var(--border-dark);user-select:none;white-space:nowrap;transition:background .15s,color .15s}
 .metric-seg .ms-opt:last-child{border-right:none}
 .metric-seg .ms-opt:hover{background:var(--primary-light);color:var(--primary)}
 .metric-seg .ms-opt.on{background:var(--primary);color:#fff;font-weight:600}
-.metric-note{font-size:11.5px;color:var(--text-3)}
+.metric-note{font-size:var(--fs-help);color:var(--text-3)}
 .fixed-badge{display:inline-flex;align-items:center;height:16px;padding:0 5px;border-radius:3px;
-  background:#f0f2f5;color:var(--text-3);font-size:10px;font-weight:500;line-height:1;letter-spacing:.2px}
+  background:#f0f2f5;color:var(--text-3);font-size:var(--fs-tag);font-weight:500;line-height:1;letter-spacing:.2px}
 .metric-seg .ms-custom{border-left:1px solid var(--border-dark)}
 .metric-bar{position:relative}
 .metric-custom{display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:70;
@@ -336,11 +389,11 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .metric-custom .cal-body{display:flex;gap:22px}
 .metric-custom .cal-month{width:252px}
 .metric-custom .cal-head{display:flex;align-items:center;margin-bottom:8px}
-.cal-nav{cursor:pointer;color:var(--text-2);padding:2px 8px;border-radius:4px;font-size:14px;user-select:none}
+.cal-nav{cursor:pointer;color:var(--text-2);padding:2px 8px;border-radius:4px;font-size:var(--fs-body);user-select:none}
 .cal-nav:hover{background:#f0f2f5;color:var(--text)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}
-.cal-w{color:var(--text-3);font-size:11.5px;padding:5px 0}
-.cal-d{font-size:12px;padding:6px 0;border-radius:5px;cursor:pointer;color:var(--text)}
+.cal-w{color:var(--text-3);font-size:var(--fs-help);padding:5px 0}
+.cal-d{font-size:var(--fs-help);padding:6px 0;border-radius:5px;cursor:pointer;color:var(--text)}
 .cal-d:hover{background:var(--primary-light)}
 .cal-d.dis{color:#c6cedb;pointer-events:none}
 .cal-d.insel{background:var(--primary-light)}
@@ -348,13 +401,13 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .cal-d.today{color:var(--primary);font-weight:600}
 .cal-d.edge.today{color:#fff}
 .cal-foot{display:flex;align-items:center;margin-top:10px;padding-top:9px;border-top:1px solid var(--border)}
-.cal-hint{font-size:12px;color:var(--text-3)}
+.cal-hint{font-size:var(--fs-help);color:var(--text-3)}
 
 </style>
 <style>
-.eye{cursor:pointer;opacity:.6;margin-right:4px;font-size:12px}
+.eye{cursor:pointer;opacity:.6;margin-right:4px;font-size:var(--fs-help)}
 .eye:hover{opacity:1}
-.key-txt{font-family:Consolas,monospace;font-size:11.5px;color:var(--text-2)}
+.key-txt{font-family:Consolas,monospace;font-size:var(--fs-help);color:var(--text-2)}
 .pagetab{cursor:pointer}
 </style>
 <style>
@@ -362,52 +415,48 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 :root{
   --primary:#2F6BF6; --primary-hover:#1F5AE8; --primary-light:#EAF1FF;
   --bg:#EAF1F9; --card:#FFFFFF; --border:#E5E8EF; --border-dark:#C9CDD4;
-  --text:#1D2129; --text-2:#4E5969; --text-3:#86909C;
+  --border-light:#EEF1F6;
+  --text:#1D2129; --text-2:#4E5969; --text-3:#86909C; --text-disabled:#C9CDD4;
   --success:#00B42A; --success-bg:#E8F8EC;
   --danger:#F53F3F; --danger-bg:#FEECEC;
   --warning:#FF7D00; --warning-bg:#FFF3E2;
   --info:#2F6BF6; --info-bg:#E6F7FB;
+  --fs-stat:24px; --fs-page:18px; --fs-block:16px;
+  --fs-body:14px; --fs-table:13px; --fs-help:12px; --fs-tag:11px;
   --radius:8px;
-  --shadow:0 1px 3px rgba(31,45,61,.06),0 4px 16px rgba(31,45,61,.05);
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 6px 18px rgba(16,24,40,.045);
 }
 body{
   font-family:Outfit,"Noto Sans SC","Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微軟雅黑",Arial,sans-serif;
   background:var(--bg);
 }
-.num,.s-value,.mh-value,.key-txt,.tbl .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+.num,.s-value,.mh-value,.key-txt{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
 /* 作為 iframe 子頁載入：收起外層留白，由管理面統一提供導航與頁籤 */
-.content{padding:18px 20px 48px;min-height:100vh}
+.content{padding:16px;min-height:100%}
 </style>
 </head>
 <body>
 <template id="tpl-alarm">
-  <div class="page-head">
-    <h2>API 推送異常</h2>
-    <span class="tag tag-danger">P0 级故障</span>
-    <div class="head-right refresh-meta" id="refresh-meta"></div>
-  </div>
-
   <div class="card">
     <div class="card-head"><span class="bar"></span><h3>P0 監控狀態（平台级）</h3>
-      <div class="extra">1 分鐘滑动窗口，1 分鐘内发现</div></div>
-    <div class="card-body">
-      <div class="stat-grid" id="p0-cards"></div>
-    </div>
+      <div class="extra refresh-meta" id="refresh-meta"></div></div>
+    <div class="m-list" id="p0-cards"></div>
   </div>
 
   <div class="card">
-    <div class="filterbar">
-      <div class="f-item"><label>觸發時間</label><div id="f-range"></div></div>
-      <div class="f-item"><label>規則名稱</label>
-        <input class="input" id="f-rule" list="dl-rule" placeholder="下拉或模糊輸入">
+    <div class="filters">
+      <div class="f-item"><span class="f-label">觸發時間</span><div id="f-range"></div></div>
+      <div class="f-item"><span class="f-label">規則名稱</span>
+        <input class="f-input" id="f-rule" list="dl-rule" placeholder="下拉或模糊輸入">
         <datalist id="dl-rule"></datalist></div>
-      <div class="f-item"><label>商戶 ID</label><input class="input" id="f-mid" placeholder="輸入商戶 ID" style="min-width:120px"></div>
-      <div class="f-item"><label>告警狀態</label>
-        <select class="select" id="f-status" style="min-width:120px"><option value="">全部</option><option>未處理</option><option>處理中</option><option>已恢復</option></select></div>
-      <button class="btn" id="btn-reset">重 置</button>
+      <div class="f-item"><span class="f-label">商戶 ID</span>
+        <input class="f-input" id="f-mid" placeholder="輸入商戶 ID" style="min-width:110px"></div>
+      <div class="f-item"><span class="f-label">告警狀態</span>
+        <select class="f-select" id="f-status" style="min-width:110px"><option value="">全部</option><option>未處理</option><option>處理中</option><option>已恢復</option></select></div>
+      <button class="btn btn-ghost" id="btn-reset">重 置</button>
       <button class="btn btn-primary" id="btn-search">搜 寻</button>
     </div>
-    <div class="tbl-wrap"><table class="tbl">
+    <div class="table-wrap"><table style="min-width:1240px">
       <thead><tr>
         <th>告警 ID</th><th>規則編號</th><th>規則名稱</th><th>告警級別</th><th>商戶 ID</th>
         <th>觸發時間</th><th>恢復時間</th><th>持續時長</th><th>當前值</th><th>閾值</th>
@@ -415,7 +464,7 @@ body{
       </tr></thead>
       <tbody id="tbody"></tbody>
     </table></div>
-    <div class="pagination" id="pager"></div>
+    <div class="pager" id="pager"></div>
   </div>
 </template>
 <div class="content" id="content"></div>
@@ -551,13 +600,13 @@ function renderPagination(el, total, page, pageSize, onPage){
   else nums = [1,'…',page-1,page,page+1,'…',pages];
   el.innerHTML = `
     <span class="total">合共 ${fmtNum(total)} 條</span>
-    <button class="pg-btn" ${page<=1?'disabled':''} data-p="${page-1}">‹</button>
-    ${nums.map(n => n==='…' ? `<button class="pg-btn" disabled>…</button>` :
-      `<button class="pg-btn ${n===page?'cur':''}" data-p="${n}">${n}</button>`).join('')}
-    <button class="pg-btn" ${page>=pages?'disabled':''} data-p="${page+1}">›</button>
-    <select class="select" style="min-width:0;height:28px"><option>${pageSize} 條 / 頁</option></select>
-    <span class="pg-jump">前往 <input class="input" id="pg-jump-in" /> 頁</span>`;
-  el.querySelectorAll('.pg-btn[data-p]').forEach(b => b.onclick = () => onPage(+b.dataset.p));
+    <span class="pg ${page<=1?'disabled':''}" data-p="${page-1}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    ${nums.map(n => n==='…' ? `<span class="pg disabled">…</span>` :
+      `<span class="pg ${n===page?'active':''}" data-p="${n}">${n}</span>`).join('')}
+    <span class="pg ${page>=pages?'disabled':''}" data-p="${page+1}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <select><option>${pageSize} 條 / 頁</option></select>
+    <span class="jump">前往 <input id="pg-jump-in" /> 頁</span>`;
+  el.querySelectorAll('.pg[data-p]').forEach(b => b.onclick = () => onPage(+b.dataset.p));
   const ji = el.querySelector('#pg-jump-in');
   ji.onkeydown = e => { if (e.key==='Enter'){ const p = Math.min(pages, Math.max(1, +ji.value||1)); onPage(p); } };
 }
@@ -584,7 +633,7 @@ function dateRangePicker(el, opts){
     el.querySelector('.drp-val').classList.toggle('placeholder', st==null||en==null);
   };
   el.innerHTML = `
-    <span class="drp-val"></span><span class="drp-icon">📅</span>
+    <span class="drp-val"></span><span class="drp-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
     <div class="drp-panel" onclick="event.stopPropagation()">
       <div class="dt-row"><span>開始</span><input type="datetime-local" class="drp-s"><span>結束</span><input type="datetime-local" class="drp-e"></div>
       <div style="display:flex;justify-content:flex-end;gap:8px">
@@ -630,11 +679,11 @@ function lineChart(el, opts){
     const gy = P.t + (H-P.t-P.b)*g/4;
     const gv = max*(1-g/4);
     svg += `<line x1="${P.l}" y1="${gy}" x2="${W-P.r}" y2="${gy}" stroke="#eef2f8"/>`;
-    svg += `<text x="${P.l-8}" y="${gy+4}" text-anchor="end" font-size="10" fill="#8a97ab">${opts.yFmt?opts.yFmt(gv):Math.round(gv)}</text>`;
+    svg += `<text x="${P.l-8}" y="${gy+4}" text-anchor="end" font-size="10" fill="#86909c">${opts.yFmt?opts.yFmt(gv):Math.round(gv)}</text>`;
   }
   opts.labels.forEach((lb,i)=>{
     if (n<=8 || i%Math.ceil(n/8)===0)
-      svg += `<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="10" fill="#8a97ab">${lb}</text>`;
+      svg += `<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="10" fill="#86909c">${lb}</text>`;
   });
   opts.series.forEach(s=>{
     const pts = s.data.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
@@ -946,12 +995,12 @@ function mountIndex(){
 lineChart(document.getElementById('ch1'), {
   labels:['10-27','10-28','10-29','10-30','10-31','11-1','11-2'],
   yFmt: v => fmtNum(Math.round(v)),
-  series:[{ name:'新增事件', color:'#2e6bf0', area:true, data:[2598,8111,2574,1701,3919,2616,216] }],
+  series:[{ name:'新增事件', color:'#2f6bf6', area:true, data:[2598,8111,2574,1701,3919,2616,216] }],
 });
 lineChart(document.getElementById('ch2'), {
   labels:['Crypto','Sports','Politics','Finance','Weather','Culture','Science','Business'],
   yFmt: v => fmtNum(Math.round(v)),
-  series:[{ name:'事件数', color:'#5f9bff', area:true, data:[63119,51674,3144,2713,2323,612,591,302] }],
+  series:[{ name:'事件数', color:'#7ba3ff', area:true, data:[63119,51674,3144,2713,2323,612,591,302] }],
 });
 
 const tops = [
@@ -1068,10 +1117,9 @@ function delayBanner(){
 
 /* ============ 概覽 ============ */
 function statCard(label, value, unit, foot, status, help, fixed){
-  return `<div class="stat ${status==='ok'?'status-ok':status==='bad'?'status-bad':''}">
-    <div class="s-label">${label}${fixed?'<span class="fixed-badge">实时</span>':''}${help?`<span class="help" data-tip="${help}">?</span>`:''}</div>
-    <div class="s-value">${value}${unit?`<span class="unit">${unit}</span>`:''}</div>
-    ${foot?`<div class="s-foot">${foot}</div>`:''}
+  return `<div class="m-row">
+    <div class="m-name">${label}${fixed?'<span class="fixed-badge">实时</span>':''}${help?`<span class="help" data-tip="${help}">?</span>`:''}</div>
+    <div class="m-val ${status==='ok'?'val-ok':status==='bad'?'val-bad':''}">${value}${unit?`<span class="unit">${unit}</span>`:''}</div>
   </div>`;
 }
 
@@ -1112,8 +1160,8 @@ function metricBar(group, dim){
       <div class="cal-head">
         <span class="cal-nav" data-n="-12">«</span>
         <span class="cal-nav" data-n="-1">‹</span>
-        <span class="cal-title" style="flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--text)"></span>
-        <span class="cal-title2" style="flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--text)"></span>
+        <span class="cal-title" style="flex:1;text-align:center;font-size:var(--fs-table);font-weight:600;color:var(--text)"></span>
+        <span class="cal-title2" style="flex:1;text-align:center;font-size:var(--fs-table);font-weight:600;color:var(--text)"></span>
         <span class="cal-nav" data-n="1">›</span>
         <span class="cal-nav" data-n="12">»</span>
       </div>
@@ -1220,7 +1268,7 @@ function renderOverview(){
   <div class="card-body">
     <div class="section-title" style="margin-top:0">REST API 指標</div>
     ${metricBar('api', apiDim)}
-    <div class="stat-grid">
+    <div class="m-list">
       ${statCard('調用量', fmtNum(a.total))}
       ${statCard('成功率', fmtPct(a.success))}
       ${statCard('5xx 占比', fmtPct(a.r5xx), '', '', a.r5xx>0.05?'bad':'')}
@@ -1232,8 +1280,8 @@ function renderOverview(){
     <div class="section-title">WSS 指標</div>
     ${noWss ? '' : metricBar('wss', wssDim)}
     ${noWss
-      ? emptyState('WSS 數據采集中，暂仅展示連接數') + `<div class="stat-grid">${statCard('当前在线連接數', fmtNum(w.online), '', '', '', HELP_FIXED.online, true)}</div>`
-      : `<div class="stat-grid">
+      ? emptyState('WSS 數據采集中，暂仅展示連接數') + `<div class="m-list">${statCard('当前在线連接數', fmtNum(w.online), '', '', '', HELP_FIXED.online, true)}</div>`
+      : `<div class="m-list">
         ${statCard('当前在线連接數', fmtNum(w.online), '', '', '', HELP_FIXED.online, true)}
         ${statCard('連接數变化率', (w.changeRate>=0?'+':'')+fmtPct(w.changeRate), '', '当前 1 分鐘相比上一分鐘', '', HELP_FIXED.rate, true)}
         ${statCard('斷連数', fmtNum(w.drops), '', '異常断开連接數')}
@@ -1280,22 +1328,22 @@ function renderApiTab(){
   const httpOptions = [...new Set(API_CALLS.map(r=>r.http))].sort();
   const errOptions = [...new Set(API_CALLS.map(r=>r.err))];
   body().innerHTML = delayBanner() + `
-    <div class="filterbar">
-      <div class="f-item"><label>調用時間</label><div id="a-range"></div></div>
-      <div class="f-item"><label>API 方法</label>
-        <select class="select" id="a-method" style="min-width:110px"><option value="">全部</option><option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option></select></div>
-      <div class="f-item"><label>調用狀態</label>
-        <select class="select" id="a-status" style="min-width:110px"><option value="">全部</option><option>成功</option><option>失敗</option><option>超时</option></select></div>
-      <div class="f-item"><label>HTTP 狀態码</label>
-        <input class="input" id="a-http" list="dl-http" placeholder="下拉或模糊輸入" style="min-width:140px">
+    <div class="filters">
+      <div class="f-item f-item-plain"><span class="f-label-plain">調用時間</span><div id="a-range"></div></div>
+      <div class="f-item"><span class="f-label">API 方法</span>
+        <select class="f-select" id="a-method" style="min-width:110px"><option value="">全部</option><option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option></select></div>
+      <div class="f-item"><span class="f-label">調用狀態</span>
+        <select class="f-select" id="a-status" style="min-width:110px"><option value="">全部</option><option>成功</option><option>失敗</option><option>超时</option></select></div>
+      <div class="f-item"><span class="f-label">HTTP 狀態码</span>
+        <input class="f-input" id="a-http" list="dl-http" placeholder="下拉或模糊輸入" style="min-width:140px">
         <datalist id="dl-http">${httpOptions.map(c=>`<option value="${c}">`).join('')}</datalist></div>
-      <div class="f-item"><label>錯誤碼</label>
-        <input class="input" id="a-err" list="dl-err" placeholder="下拉或模糊輸入" style="min-width:130px">
+      <div class="f-item"><span class="f-label">錯誤碼</span>
+        <input class="f-input" id="a-err" list="dl-err" placeholder="下拉或模糊輸入" style="min-width:130px">
         <datalist id="dl-err">${errOptions.map(c=>`<option value="${c}">`).join('')}</datalist></div>
-      <button class="btn" id="a-reset">重 置</button>
+      <button class="btn btn-ghost" id="a-reset">重 置</button>
       <button class="btn btn-primary" id="a-search">搜 寻</button>
     </div>
-    <div class="tbl-wrap"><table class="tbl">
+    <div class="table-wrap"><table style="min-width:1100px">
       <thead><tr>
         <th>請求 ID</th>
         <th class="sort-th" id="a-sort">調用時間 <span class="arr">${apiTab.sortDesc?'↓':'↑'}</span></th>
@@ -1304,7 +1352,7 @@ function renderApiTab(){
       </tr></thead>
       <tbody id="a-tbody"></tbody>
     </table></div>
-    <div class="pagination" id="a-pager"></div>`;
+    <div class="pager" id="a-pager"></div>`;
 
   dateRangePicker(document.getElementById('a-range'), {
     start: apiTab.start, end: apiTab.end,
@@ -1388,23 +1436,23 @@ const wssTab = { page:1, size:20, start:Date.now()-24*3600e3, end:Date.now(), ev
 
 function renderWssTab(){
   body().innerHTML = delayBanner() + `
-    <div class="filterbar">
-      <div class="f-item"><label>調用時間</label><div id="w-range"></div></div>
-      <div class="f-item"><label>事件类型</label>
-        <select class="select" id="w-event" style="min-width:130px"><option value="">全部</option>${WSS_EVENTS.map(e=>`<option>${e}</option>`).join('')}</select></div>
-      <div class="f-item"><label>連接狀態</label>
-        <select class="select" id="w-status" style="min-width:120px"><option value="">全部</option><option>在线</option><option>断开</option><option>重连</option><option>超时</option></select></div>
-      <button class="btn" id="w-reset">重 置</button>
+    <div class="filters">
+      <div class="f-item f-item-plain"><span class="f-label-plain">調用時間</span><div id="w-range"></div></div>
+      <div class="f-item"><span class="f-label">事件类型</span>
+        <select class="f-select" id="w-event" style="min-width:130px"><option value="">全部</option>${WSS_EVENTS.map(e=>`<option>${e}</option>`).join('')}</select></div>
+      <div class="f-item"><span class="f-label">連接狀態</span>
+        <select class="f-select" id="w-status" style="min-width:120px"><option value="">全部</option><option>在线</option><option>断开</option><option>重连</option><option>超时</option></select></div>
+      <button class="btn btn-ghost" id="w-reset">重 置</button>
       <button class="btn btn-primary" id="w-search">搜 寻</button>
     </div>
-    <div class="tbl-wrap"><table class="tbl">
+    <div class="table-wrap"><table style="min-width:1100px">
       <thead><tr>
         <th>連接 ID</th><th>事件类型</th><th>調用時間</th><th>房间 / 频道</th>
         <th>連接狀態</th><th>斷連原因</th><th>消息延遲</th><th>上游時間戳</th><th>下游時間戳</th><th>操作</th>
       </tr></thead>
       <tbody id="w-tbody"></tbody>
     </table></div>
-    <div class="pagination" id="w-pager"></div>`;
+    <div class="pager" id="w-pager"></div>`;
   dateRangePicker(document.getElementById('w-range'), {
     start: wssTab.start, end: wssTab.end,
     onApply: (s, e) => { wssTab.start = s; wssTab.end = e; wssTab.page = 1; renderWssRows(); }
@@ -1481,22 +1529,23 @@ function renderP0Cards(){
   const restBad  = ALARMS.some(a=>a.ruleCode==='R-REST-5XX-001' && a.status!=='已恢復');
   const wssBad   = ALARMS.some(a=>a.ruleCode==='R-WSS-DROP-002' && a.status!=='已恢復');
   const e2eVal   = 6312;
-  document.getElementById('p0-cards').innerHTML = `
-    <div class="stat ${restBad?'status-bad':'status-ok'}">
-      <div class="s-label">REST 網關狀態<span class="help" data-tip="監控指標：網關服务 5xx 爆炸｜觸發條件：API 網關 1 分鐘内 5xx 響應占比 > 5%｜業務影響：下游量化/应用端調用 API 批量报错，分發癱瘓">?</span></div>
-      <div class="s-value">${restBad?'異常':'正常'}</div></div>
-    <div class="stat ${wssBad?'status-bad':'status-ok'}">
-      <div class="s-label">WSS 網關狀態<span class="help" data-tip="監控指標：WSS 廣播網關崩潰/斷連｜觸發條件：1 分鐘内客戶端連接數驟降 > 50%｜業務影響：下游客戶端連接被批量切断">?</span></div>
-      <div class="s-value">${wssBad?'異常':'正常'}</div></div>
-    <div class="stat ${e2eVal>5000?'status-bad':'status-ok'}">
-      <div class="s-label">E2E 延遲<span class="help" data-tip="監控指標：全鏈路极速延遲（E2E Latency）｜觸發條件：核心源端到端延遲 > 5000ms 持续 1 分鐘｜業務影響：上游時間戳到下游 WSS 收到時間全鏈路卡顿">?</span></div>
-      <div class="s-value">${fmtNum(e2eVal)}<span class="unit">ms</span></div></div>
-    <div class="stat">
-      <div class="s-label">E2E P95<span class="help" data-tip="95% 消息延遲低于该值">?</span></div>
-      <div class="s-value">4,208<span class="unit">ms</span></div></div>
-    <div class="stat">
-      <div class="s-label">E2E P99<span class="help" data-tip="99% 消息延遲低于该值">?</span></div>
-      <div class="s-value">5,930<span class="unit">ms</span></div></div>`;
+  const rows = [
+    { name:'REST 網關狀態', val: restBad?'異常':'正常', state: restBad?'bad':'ok',
+      tip:'監控指標：網關服务 5xx 爆炸｜觸發條件：API 網關 1 分鐘内 5xx 響應占比 > 5%｜業務影響：下游量化/应用端調用 API 批量报错，分發癱瘓' },
+    { name:'WSS 網關狀態', val: wssBad?'異常':'正常', state: wssBad?'bad':'ok',
+      tip:'監控指標：WSS 廣播網關崩潰/斷連｜觸發條件：1 分鐘内客戶端連接數驟降 > 50%｜業務影響：下游客戶端連接被批量切断' },
+    { name:'E2E 延遲', val: fmtNum(e2eVal), unit:'ms', state: e2eVal>5000?'bad':'ok',
+      tip:'監控指標：全鏈路极速延遲（E2E Latency）｜觸發條件：核心源端到端延遲 > 5000ms 持续 1 分鐘｜業務影響：上游時間戳到下游 WSS 收到時間全鏈路卡顿' },
+    { name:'E2E P95', val:'4,208', unit:'ms', state:'',
+      tip:'95% 消息延遲低于该值' },
+    { name:'E2E P99', val:'5,930', unit:'ms', state:'',
+      tip:'99% 消息延遲低于该值' }
+  ];
+  document.getElementById('p0-cards').innerHTML = rows.map(r=>`
+    <div class="m-row">
+      <div class="m-name">${r.name}<span class="help" data-tip="${r.tip}">?</span></div>
+      <div class="m-val ${r.state==='ok'?'val-ok':r.state==='bad'?'val-bad':''}">${r.val}${r.unit?`<span class="unit">${r.unit}</span>`:''}</div>
+    </div>`).join('');
 }
 
 /* 告警狀態标签 */
@@ -1560,7 +1609,7 @@ function render(){
 
 window.handleAlarm = function(id){
   openDialog(`确认将告警 <b class="mono">${id}</b> 标记为「處理中」？<br>
-    <span style="color:var(--text-3);font-size:12.5px">操作后狀態由「未處理」变更为「處理中」；故障恢復后系统将自动判断并更新为「已恢復」。</span>`,
+    <span style="color:var(--text-3);font-size:var(--fs-table)">操作后狀態由「未處理」变更为「處理中」；故障恢復后系统将自动判断并更新为「已恢復」。</span>`,
     `<button class="btn" onclick="closeAllLayers()">取 消</button>
      <button class="btn btn-primary" onclick="doHandle('${id}')">确 定</button>`);
 };
@@ -1576,7 +1625,7 @@ window.alarmDetail = function(id){
   const s = a.scope;
   const chips = arr => arr && arr[0]!=='-' ? arr.map(x=>`<span class="tag tag-gray" style="margin:0 4px 4px 0">${x}</span>`).join('') : '-';
   openDialog(`
-    <div style="font-size:15px;font-weight:600;color:var(--text-1);margin-bottom:14px">告警詳情</div>
+    <div style="font-size:var(--fs-block);font-weight:600;color:var(--text-1);margin-bottom:14px">告警詳情</div>
     <div class="kv">
       <span class="k">告警 ID</span><span class="v mono">${a.id}</span>
       <span class="k">規則編號</span><span class="v mono">${a.ruleCode}</span>
@@ -1598,7 +1647,7 @@ window.alarmDetail = function(id){
       <span class="k">調用方</span><span class="v">${chips(s.callers)}</span>
     </div>
     <div class="section-title">觸發條件</div>
-    <p style="font-size:12.5px;color:var(--text-2);line-height:1.8">${P0_RULES.find(r=>r.code===a.ruleCode).cond}<br>${P0_RULES.find(r=>r.code===a.ruleCode).impact}</p>`,
+    <p style="font-size:var(--fs-table);color:var(--text-2);line-height:1.8">${P0_RULES.find(r=>r.code===a.ruleCode).cond}<br>${P0_RULES.find(r=>r.code===a.ruleCode).impact}</p>`,
     '', 'dialog-lg');
 };
 

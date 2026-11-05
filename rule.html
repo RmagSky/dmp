@@ -11,8 +11,8 @@
 <title>產品基線 · 數據中台管理系統 V1.2.1</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.2.1">
-<link rel="stylesheet" href="assets/rule.css?v=1.2.1">
+<link rel="stylesheet" href="assets/app.css?v=1.2.7">
+<link rel="stylesheet" href="assets/rule.css?v=1.2.7">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -41,7 +41,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.2.1"></script>
+<script src="assets/core.js?v=1.2.7"></script>
 <script>
 
 /* ==================================================================
@@ -174,7 +174,7 @@ function specContent(){
 
 function specVersion(){
   const changes=[
-    ['V1.2.1','2026-11-05','內容變更','事件總覽「類型分布」改為按容器實際寬度繪製，消除固定 viewBox 等比縮放造成的兩側留白；並排卡片改為頂部對齊，來源分布不再被右欄撐高。'],
+    ['V1.2.1','2026-11-05','內容變更','事件總覽圖表按容器寬度自適應繪製，並排卡片等高、來源分布條形垂直居中；商戶列表「更多」改為下拉菜單；側欄 NEW 徽標縮小、折疊態一級菜單改為浮出二級列表；api-alarm.html、api-detail.html 按基線規範重做（變數層、卡片、表格、標籤、按鈕、輸入框、指標卡、嵌入態背景與佈局），頁面結構對齊管理面原生頁；OpenAPI 調用詳情頁標題合併為「OpenAPI 調用詳情（商戶：xxx）」；分頁器箭頭改為左右方向並統一兩個子頁；篩選欄改為不壓縮、超出換行並留行間隙，日期範圍控件內嵌化；同步修正 1.1 升版規則示例。'],
     ['V1.2.0','2026-11-05','功能新增','合併「API 調用監控」兩項功能：商戶列表更多選單新增 OpenAPI 調用詳情（概覽 / API 調用詳情 / WSS 調用詳情），系統設置新增 API 推送異常（P0 監控指標卡 / 告警列表 / 告警詳情與處理流轉）。新增 api-detail.html、api-alarm.html 兩個嵌入子頁，頁面清單、菜單分組與覆蓋數同步更新。'],
     ['V1.1.2','2026-11-05','內容變更','1.1 升版規則改為按位遞增：功能變更中間位 +1、尾數歸零，內容變更尾數 +1；新增「協作場景的版本衝突」三條處理順序；5.1 衝突處理規則同步改寫版本號與變更記錄的處理方式。'],
     ['V1.1.1','2026-11-05','內容變更','5.1 倉庫與入口補緩存策略：Cloudflare 每次回源，GitHub Pages 的 HTML 被瀏覽器與 CDN 各緩存 10 分鐘；新增驗證說明，區分構建延遲與緩存未過期；上傳前檢查清單第 2 項擴展為版本號與變更記錄同查。'],
@@ -198,7 +198,7 @@ function specVersion(){
     '<div class="spec-block"><h3>版本升版規則</h3><p class="sub">團隊協作時按此規則判斷是否升版，以及改哪一位數字。</p>'+
       '<table class="spec-table"><thead><tr><th style="width:132px">變更類型</th><th style="width:150px">版本號變動</th><th>判定標準</th></tr></thead><tbody>'+
       '<tr><td>功能變更</td><td><span class="pri pri-p0">中間位 +1</span></td><td>增刪合併功能單元、頁面、章節；V1.1.3 → V1.2.0，尾數歸零</td></tr>'+
-      '<tr><td>內容變更</td><td><span class="pri pri-p0">尾數 +1</span></td><td>規則口徑、計算邏輯、術語定義、字段集合、校驗條件、補充說明；V1.2.0 → V1.2.1</td></tr>'+
+      '<tr><td>內容變更</td><td><span class="pri pri-p0">尾數 +1</span></td><td>規則口徑、計算邏輯、術語定義、字段集合、校驗條件、補充說明、佈局調整；V1.2.9 → V1.2.10</td></tr>'+
       '<tr><td>文案措辭</td><td><span class="pri pri-p2">不升版</span></td><td>措辭調整、錯別字、品牌標識</td></tr>'+
       '<tr><td>視覺微調</td><td><span class="pri pri-p2">不升版</span></td><td>字號、配色、元素位置</td></tr>'+
       '</tbody></table>'+
@@ -718,8 +718,8 @@ function showVersion(){
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
       '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 內容變更</div>'+
-      '事件總覽「類型分布」改為按容器實際寬度繪製，消除兩側留白；'+
-      '並排卡片改為頂部對齊。</div></div>'+
+      '事件總覽圖表自適應、卡片等高；商戶列表「更多」改下拉；側欄 NEW 徽標縮小、折疊態改浮出二級列表；'+
+      'api-alarm.html、api-detail.html 按基線規範重做並對齊原生頁；分頁器箭頭改左右並統一兩個子頁；篩選欄換行留間隙、日期控件內嵌化。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.2.0</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
       '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 功能新增</div>'+

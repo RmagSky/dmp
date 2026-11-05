@@ -12,7 +12,7 @@
 <title>管理面 · 數據中台管理系統 V1.2.1</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.2.1">
+<link rel="stylesheet" href="assets/app.css?v=1.2.7">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -41,7 +41,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.2.1"></script>
+<script src="assets/core.js?v=1.2.7"></script>
 <script>
 /* ==================================================================
    數據中台管理系統 · 交互原型
@@ -424,7 +424,7 @@ function renderAdmin(){
     const subs=m.children.map(function(c){
       return '<div class="nav-item'+(state.route===c.path?' active':'')+'" onclick="go(\''+c.path+'\')"><span class="nl">'+c.label+'</span>'+(c.isNew?'<span class="nav-new">NEW</span>':'')+'</div>';
     }).join('');
-    return '<div class="nav-group"><div class="nav-item'+(isActive?' active':'')+open+'" onclick="toggleNav(\''+m.key+'\')">'+
+    return '<div class="nav-group"><div class="nav-item'+(isActive?' active':'')+open+'" onclick="onNavGroup(\''+m.key+'\',\''+m.children[0].path+'\',this)" title="'+m.label+'">'+
       '<span class="ni">'+icon(m.icon,16)+'</span><span class="nl">'+m.label+'</span>'+
       '<span class="caret">'+icon('chevron',13)+'</span></div>'+
       '<div class="nav-sub'+open+'">'+subs+'</div></div>';
@@ -478,6 +478,12 @@ function closeTab(e,path){
   renderShell();
 }
 function toggleNav(k){state.navOpen[k]=!state.navOpen[k];renderShell();}
+/* 折疊態（窄屏，側欄 64px）下子菜單不可見，改為向右浮出二級列表；
+   展開態維持原有的展開 / 收起行為 */
+function onNavGroup(k,firstPath,el){
+  if(window.innerWidth<=1240){ openNavFlyout(k,el); return; }
+  toggleNav(k);
+}
 function toggleDrawer(v){state.drawer=v;renderShell();}
 function tickClock(){
   const el=document.getElementById('clock');
@@ -512,7 +518,7 @@ function pageDashboard(){
   const srcMax=Math.max.apply(null,d.sources.map(function(s){return s.v;}));
   const srcHtml=d.sources.map(function(s,i){
     const color=i===0?'linear-gradient(90deg,#a8c8ff,#2f6bf6)':'linear-gradient(90deg,#d8c6ff,#8b5cf6)';
-    return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'+
+    return '<div class="src-bar-row">'+
       '<span style="width:78px;color:#4e5969;font-size:12px">'+s.name+'</span>'+
       '<div style="flex:1;height:11px;background:#f4f7fc;border-radius:6px;overflow:hidden">'+
       '<div style="width:'+((s.v/srcMax)*100)+'%;height:100%;background:'+color+';border-radius:6px"></div></div>'+
@@ -524,7 +530,6 @@ function pageDashboard(){
     return '<div class="top-row"><span class="rank '+(i<3?'r'+(i+1):'')+'">'+(i+1)+'</span>'+
       '<span class="top-name">'+t.n+'</span><span class="top-val">'+t.v+'</span></div>';
   }).join('');
-  const topSum=topSrc.reduce(function(a,b){return a+Number(b.v.replace(/,/g,''));},0);
   return '<div class="stat-grid">'+statsHtml+'</div>'+
   '<div class="grid-2">'+
     '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>新增趨勢</div>'+
@@ -537,11 +542,11 @@ function pageDashboard(){
       '<div class="legend" style="justify-content:flex-end"><i style="background:#5b8cff"></i>事件數</div>'+
       '<div class="chart-area" id="area-chart"></div></section></div>'+
   '<div class="grid-2">'+
-    '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>來源分布</div>'+
+    '<section class="panel panel-col"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>來源分布</div>'+
       '<div class="right"><select class="f-select" style="border:1px solid #e5e8ef;border-radius:6px;height:28px"><option>全部事件</option><option>polymarket</option><option>predict.fun</option></select></div></div>'+
       '<div class="legend" style="justify-content:flex-end;margin-bottom:10px"><i style="background:#5b8cff"></i>polymarket&nbsp;&nbsp;<i style="background:#a78bfa"></i>predict.fun</div>'+
-      '<div style="padding:6px 0 0">'+srcHtml+'</div>'+
-      '<div class="num" style="display:flex;justify-content:space-between;color:#c9cdd4;font-size:10.5px;padding-left:88px;margin-top:2px">'+
+      '<div class="src-bars">'+srcHtml+'</div>'+
+      '<div class="num" style="display:flex;justify-content:space-between;color:#c9cdd4;font-size:10.5px;padding-left:88px;margin-top:2px;flex:none">'+
       '<span>0</span><span>20,000</span><span>40,000</span><span>60,000</span><span>80,000</span><span>100,000</span><span>120,000</span><span>140,000</span></div></section>'+
     '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>上游交易量 TOP10</div>'+
       '<div class="right">'+
@@ -549,12 +554,7 @@ function pageDashboard(){
         '<button class="'+(isTotal?'':'active')+'" onclick="setTopRange(\'24h\')">24h 交易量</button>'+
         '<button class="'+(isTotal?'active':'')+'" onclick="setTopRange(\'total\')">總交易量</button>'+
       '</div></div></div>'+
-      '<div style="display:flex;align-items:center;gap:6px;margin:0 6px 8px;color:#86909c;font-size:11.5px">'+
-        '<span>'+(isTotal?'全週期累計':'近 24 小時')+'</span>'+
-        '<span style="color:#c9cdd4">·</span>'+
-        '<span>TOP8 合計 <b class="num" style="color:#4e5969;font-weight:600">$'+topSum.toLocaleString()+'</b></span>'+
-      '</div>'+
-      '<div style="display:grid;grid-template-columns:34px 1fr 132px;gap:10px;padding:0 6px 6px;color:#86909c;font-size:11px">'+
+      '<div style="display:grid;grid-template-columns:34px 1fr 132px;gap:10px;padding:10px 6px 6px;color:#86909c;font-size:11px">'+
       '<span style="text-align:center">排名</span><span>事件名稱</span><span style="text-align:right">交易量 ($)</span></div>'+
       '<div class="top-list">'+topHtml+'</div></section></div>';
 }
@@ -1484,9 +1484,9 @@ function pageCoefficient(){
       '<p class="hero-desc">高優先級設定將覆蓋低優先級設定</p>'+
       '<div class="tier-flow">'+
       '<div class="tier"><div class="tier-ico">'+icon('globe',20)+'</div><div class="tier-name">1 全域調控</div><div class="tier-tag">低優先級</div><div class="tier-desc">適用於全部商戶與事件</div></div>'+
-      '<span class="tier-arrow">'+icon('chevron',16)+'</span>'+
+      '<span class="tier-arrow">'+icon('chevronRight',16)+'</span>'+
       '<div class="tier"><div class="tier-ico">'+icon('shop',20)+'</div><div class="tier-name">2 按商戶調控</div><div class="tier-tag">中優先級</div><div class="tier-desc">僅影響指定商戶</div></div>'+
-      '<span class="tier-arrow">'+icon('chevron',16)+'</span>'+
+      '<span class="tier-arrow">'+icon('chevronRight',16)+'</span>'+
       '<div class="tier"><div class="tier-ico">'+icon('layers',20)+'</div><div class="tier-name">3 按事件調控</div><div class="tier-tag">高優先級</div><div class="tier-desc">僅影響指定事件</div></div>'+
       '</div></div></div>'+
       '<div class="card" style="margin-top:14px"><div class="card-head"><div class="card-title">全域係數設定</div>'+
@@ -1663,7 +1663,7 @@ function pageMerchant(){
       '<td>'+(m[8]==='–'?'<span class="muted">–</span>':'<span class="chip chip-line">'+m[8]+'</span>')+'</td>'+
       '<td class="actions"><span class="btn-text" onclick="openMerchantPerm(\''+esc(m[0])+'\')">權限設定</span>'+
       '<span class="btn-text" onclick="openIpWhitelist(\''+esc(m[0])+'\')">IP白名單</span>'+
-      '<span class="btn-text" onclick="openMerchantMore(\''+esc(m[0])+'\')">更多</span></td></tr>';
+      '<span class="btn-text" onclick="openMerchantMore(\''+esc(m[0])+'\',this)">更多</span></td></tr>';
   }).join('');
   return '<div class="card"><div class="filters">'+
     '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="輸入商戶名稱" style="min-width:190px" /></div>'+
@@ -1724,27 +1724,29 @@ function openApiDetail(){
   go('/merchant/api-detail');
 }
 function pageApiDetail(){
+  /* 標題由子頁自行渲染為「OpenAPI 調用詳情（商戶：xxx）」，此處不再重複說明條 */
   var name=state.apiDetailName||MERCHANTS[0][0];
-  return '<div class="embed-wrap">'+
-    '<div class="embed-bar"><span class="embed-title">'+esc(name)+' · OpenAPI 調用詳情</span>'+
-    '<span class="embed-tip">商戶列表 → 更多 → OpenAPI 調用詳情</span></div>'+
+  return '<div class="embed-plain">'+
     '<iframe class="embed-frame" src="api-detail.html?id='+state.apiDetailId+'&amp;name='+encodeURIComponent(name)+'" title="OpenAPI 調用詳情"></iframe></div>';
 }
 function pageApiAlarm(){
-  return '<div class="embed-wrap">'+
+  /* 無頂部說明條，用單列容器避免 .embed-wrap 的 gap 產生多餘空隙 */
+  return '<div class="embed-plain">'+
     '<iframe class="embed-frame" src="api-alarm.html" title="API 推送異常"></iframe></div>';
 }
-function openMerchantMore(name){
+function openMerchantMore(name,el){
   state.moreName=name;
-  openModal(modalShell({
-    title:'更多操作 · '+name,size:'narrow',
-    body:'<div style="display:flex;flex-direction:column;gap:2px">'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();openApiDetail()">OpenAPI 調用詳情</button>'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：編輯商戶\')">編輯商戶</button>'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'API Key 已重新生成\')">重新生成 API Key</button>'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px;color:#f53f3f" onclick="closeModal();confirmDelete(\'商戶\')">刪除商戶</button></div>',
-    foot:false
-  }));
+  openPopover(
+    '<button class="popover-item" onclick="closePopover();openApiDetail()">'+
+      '<span class="pi">'+icon('doc',15)+'</span><span class="pl">OpenAPI 調用詳情</span></button>'+
+    '<button class="popover-item" onclick="closePopover();toast(\'原型示意：編輯商戶\')">'+
+      '<span class="pi">'+icon('gear',15)+'</span><span class="pl">編輯商戶</span></button>'+
+    '<button class="popover-item" onclick="closePopover();toast(\'API Key 已重新生成\')">'+
+      '<span class="pi">'+icon('refresh',15)+'</span><span class="pl">重新生成 API Key</span></button>'+
+    '<div class="popover-sep"></div>'+
+    '<button class="popover-item" style="color:#f53f3f" onclick="closePopover();confirmDelete(\'商戶\')">'+
+      '<span class="pi" style="color:#f53f3f">'+icon('close',15)+'</span><span class="pl">刪除商戶</span></button>',
+    el);
 }
 
 /* ==================================================================
@@ -2143,6 +2145,38 @@ function closePopover(){
 }
 
 /* ==================================================================
+   側欄折疊態：分組浮出面板
+   折疊後子菜單不可見，改為點一級菜單時向右浮出二級列表
+   ================================================================== */
+function openNavFlyout(key,anchor){
+  const m=MENU.filter(function(x){return x.key===key;})[0];
+  if(!m||!m.children)return;
+  const items=m.children.map(function(c){
+    const act=state.route===c.path?' active':'';
+    return '<button class="popover-item'+act+'" onclick="closePopover();go(\''+c.path+'\')">'+
+      '<span class="pl">'+c.label+(c.isNew?'<span class="nav-new" style="margin-left:6px">NEW</span>':'')+'</span>'+
+      (act?'<span class="pr">'+icon('chevronRight',15)+'</span>':'')+'</button>';
+  }).join('');
+  closePopover();
+  const mask=document.createElement('div');
+  mask.className='popover-mask';
+  mask.onclick=closePopover;
+  const box=document.createElement('div');
+  box.className='popover nav-flyout';
+  box.innerHTML='<div class="nav-flyout-head">'+m.label+'</div>'+items;
+  document.body.appendChild(mask);
+  document.body.appendChild(box);
+  const r=anchor.getBoundingClientRect();
+  box.style.left=(r.right+6)+'px';
+  /* 底部溢出時上移，保證整塊可見 */
+  const h=box.offsetHeight||200;
+  let top=r.top;
+  if(top+h>window.innerHeight-12)top=Math.max(12,window.innerHeight-12-h);
+  box.style.top=top+'px';
+  popoverEl={mask:mask,box:box};
+}
+
+/* ==================================================================
    Google 驗證（MFA）綁定 / 解綁
    對齊原站 /profile/mfa/setup 與 /profile/mfa/confirm：
    返回 challengeToken + otpauthUri，5 分鐘內需提交 6 位驗證碼
@@ -2306,8 +2340,8 @@ function showVersion(){
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
       '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 內容變更</div>'+
-      '事件總覽「類型分布」改為按容器實際寬度繪製，消除兩側留白；'+
-      '並排卡片改為頂部對齊。</div></div>'+
+      '事件總覽圖表自適應、卡片等高；商戶列表「更多」改下拉；側欄 NEW 徽標縮小、折疊態改浮出二級列表；'+
+      'api-alarm.html、api-detail.html 按基線規範重做並對齊原生頁；分頁器箭頭改左右並統一兩個子頁；篩選欄換行留間隙、日期控件內嵌化。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.2.0</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
       '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 功能新增</div>'+

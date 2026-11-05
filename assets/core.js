@@ -42,7 +42,8 @@ const ICONS={
   refresh:'<path d="M4 4v5h5M20 20v-5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.6 14a8 8 0 0013.4 3M19.4 10A8 8 0 006 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   moon:'<path d="M20.5 14.3A8.5 8.5 0 019.7 3.5a8.5 8.5 0 1010.8 10.8z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
   google:'<path d="M21 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.1a4.4 4.4 0 01-1.9 2.9v2.4h3.1c1.8-1.7 2.7-4.1 2.7-7.1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 21.5c2.4 0 4.4-.8 5.9-2.2l-3.1-2.4c-.8.6-1.9.9-2.8.9-2.2 0-4-1.5-4.7-3.5H4.1v2.5A9.5 9.5 0 0012 21.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.3 14.3a5.7 5.7 0 010-4.6V7.2H4.1a9.5 9.5 0 000 9.6l3.2-2.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 6.3c1.3 0 2.5.5 3.4 1.3l2.7-2.7A9.5 9.5 0 004.1 7.2l3.2 2.5c.7-2 2.5-3.4 4.7-3.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
-  chevronRight:'<path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+  chevronRight:'<path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  chevronLeft:'<path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
 };
 function icon(n,s){return '<svg width="'+(s||16)+'" height="'+(s||16)+'" viewBox="0 0 24 24" fill="none" aria-hidden="true">'+(ICONS[n]||'')+'</svg>';}
 
@@ -97,9 +98,9 @@ function pager(total,page){
   });
   nums+='<span class="pg disabled">…</span><span class="pg" onclick="toast(\'原型示意：末頁\',\'info\')">'+total+'</span>';
   return '<div class="pager"><span class="total">合共 '+total+' 條</span>'+
-    '<span class="pg disabled">'+icon('chevron',12)+'</span>'+nums+
-    '<span class="pg">'+icon('chevron',12)+'</span>'+
+    '<span class="pg disabled">'+icon('chevronLeft',12)+'</span>'+nums+
+    '<span class="pg">'+icon('chevronRight',12)+'</span>'+
     '<select><option>20 條 / 頁</option><option>50 條 / 頁</option><option>100 條 / 頁</option></select>'+
-    '<span class="jump">前往 <input value="1" /></span></div>';
+    '<span class="jump">前往 <input value="1" /> 頁</span></div>';
 }
 
