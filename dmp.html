@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 管理面
-  原型版本：V1.2.1 ｜ 入口：index.html
+  原型版本：V1.3.0 ｜ 入口：index.html
   配色沿用原站 192.168.10.51:7080；字體按產品基線規範
 -->
 <html lang="zh-CN">
@@ -9,7 +9,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>管理面 · 數據中台管理系統 V1.2.1</title>
+<title>管理面 · 數據中台管理系統 V1.3.0</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
 <link rel="stylesheet" href="assets/app.css?v=1.2.7">
@@ -25,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 管理面</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.2.1</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.3.0</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -41,7 +41,67 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.2.7"></script>
+<style>
+:root{
+  --card:#fff; --border:#e5e6eb; --border-light:#f2f3f5;
+  --text:#1d2129; --text-sub:#4e5969; --text-help:#86909c;
+  --warning:#ff7d00; --danger:#f53f3f;
+  --fs-tag:12px; --fs-help:12px; --fs-body:13px; --fs-table:13px;
+}
+/* 事件歸檔專屬：色值全部取自 :root 變量；字號只用產品基線七檔 */
+.ar-tag{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:4px;
+  border:1px solid var(--danger);background:var(--card);color:var(--danger);
+  font-size:var(--fs-tag);font-weight:500;white-space:nowrap;vertical-align:middle;margin-left:8px;cursor:help}
+.ar-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.ar-stat{background:var(--card);border:1px solid var(--border-light);border-radius:8px;padding:14px 16px}
+.ar-stat .k{color:var(--text-help);font-size:var(--fs-help);margin-bottom:6px}
+.ar-stat .v{font-size:var(--fs-stat);font-weight:600;font-variant-numeric:tabular-nums}
+.ar-cd{min-width:150px}
+.ar-cd-t{font-size:var(--fs-help);color:var(--text-sub);margin-bottom:5px}
+.ar-cd-bar{height:5px;border-radius:3px;background:var(--border-light);overflow:hidden}
+.ar-cd-fill{height:100%;background:var(--primary);border-radius:3px}
+.ar-cd-fill.soon{background:var(--warning)}
+.ar-cd-fill.over{background:var(--danger)}
+.ar-form-row{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+  padding:14px 0;border-bottom:1px solid var(--border-light)}
+.ar-form-row:last-child{border-bottom:0}
+.ar-form-label{font-size:var(--fs-body);font-weight:600;margin-bottom:4px}
+.ar-form-desc{font-size:var(--fs-help);color:var(--text-sub);line-height:1.7;max-width:520px}
+.ar-form-ctrl{min-width:230px;text-align:right;font-size:var(--fs-table)}
+.ar-check{display:flex;align-items:center;gap:6px;font-size:var(--fs-table);margin:5px 0;text-align:left}
+.ar-flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ar-flow-node{border:1px solid var(--border);border-radius:8px;padding:8px 14px;
+  font-size:var(--fs-table);background:var(--card);text-align:center;min-width:96px}
+.ar-flow-node small{display:block;font-size:var(--fs-tag);color:var(--text-help);font-weight:400}
+.ar-flow-arw{color:var(--text-help);font-size:var(--fs-help);text-align:center}
+.ar-conf{border:1px solid var(--danger);border-radius:8px;padding:13px 15px;margin-bottom:10px;background:var(--card)}
+.ar-conf .t{font-size:var(--fs-body);font-weight:600;margin-bottom:5px;display:flex;gap:8px;align-items:center}
+.ar-conf .idx{width:20px;height:20px;border-radius:50%;background:var(--danger);color:var(--card);
+  display:inline-flex;align-items:center;justify-content:center;font-size:var(--fs-tag);flex:0 0 auto}
+.ar-conf .d{font-size:var(--fs-help);color:var(--text-sub);line-height:1.8}
+.ar-pager .pg{cursor:pointer}
+.ar-empty{padding:28px;text-align:center;color:var(--text-help);font-size:var(--fs-help);line-height:1.9}
+.ar-alert{border-left:3px solid var(--primary);background:var(--primary-light);padding:10px 14px;
+  border-radius:0 6px 6px 0;font-size:var(--fs-help);color:var(--text-sub);line-height:1.8;margin-top:10px}
+.ar-alert.warn{border-left-color:var(--warning);background:var(--card);border:1px solid var(--border)}
+/* 事件列表 · 批量歸檔（來源：event-archive-prototype.html 頁面 1） */
+.ev-bulkbar{display:none;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border-light);background:var(--card);font-size:var(--fs-help);color:var(--text-sub)}
+.ev-bulkbar.show{display:flex}
+.ev-bulkbar b{color:var(--primary);font-weight:600}
+.ev-mma-list{list-style:none;margin:12px 0 0;padding:8px 10px;max-height:216px;overflow-y:auto;border:1px solid var(--border-light);border-radius:8px}
+.ev-mma-list li{margin:6px 0}
+.ev-mma-item{display:flex;align-items:flex-start;gap:9px;cursor:pointer;padding:5px 9px;border:1px solid var(--border-light);border-radius:6px;font-size:var(--fs-help);background:var(--card)}
+.ev-mma-item:hover{border-color:var(--primary)}
+.ev-mma-item input{margin-top:3px;flex-shrink:0;accent-color:var(--primary);cursor:pointer}
+.ev-mma-item .t{flex:1;min-width:0;word-break:break-all;line-height:1.7;color:var(--text-sub)}
+.ev-mma-item .t b{font-weight:500;color:var(--text)}
+.ev-mma-item.off{opacity:.5;background:transparent}
+.ev-mma-item.off .t b{text-decoration:line-through}
+.ev-mma-empty{display:none;margin-top:8px;padding:8px 10px;border-radius:6px;background:var(--border-light);color:var(--text-help);font-size:var(--fs-help)}
+.ev-op-archive{color:var(--danger)}
+.ev-row-check:disabled{cursor:not-allowed;opacity:.45}
+</style>
+<script src="assets/core.js?v=1.3.0"></script>
 <script>
 /* ==================================================================
    數據中台管理系統 · 交互原型
@@ -54,7 +114,8 @@ const MENU=[
     {label:'事件列表',path:'/event/list'},
     {label:'事件分類',path:'/event/category'},
     {label:'事件複核',path:'/event/review'},
-    {label:'投注類係數調控',path:'/event/betting-coefficient'}
+    {label:'投注類係數調控',path:'/event/betting-coefficient'},
+    {label:'事件歸檔',path:'/event/archive'}
   ]},
   {key:'merchant',label:'商戶管理',icon:'shop',children:[
     {label:'商戶列表',path:'/merchant/merchant/index'}
@@ -72,6 +133,7 @@ const MENU=[
 const ROUTE_TITLE={
   '/index':'事件總覽','/event/list':'事件列表','/event/category':'事件分類',
   '/event/review':'事件複核','/event/betting-coefficient':'投注類係數調控',
+  '/event/archive':'事件歸檔',
   '/merchant/merchant/index':'商戶列表','/system/user':'用戶管理','/system/role':'角色管理',
   '/system/operation':'操作日誌','/system/role/create':'新增角色',
   '/merchant/merchant/detail':'商戶權限設定','/event/review/detail':'事件審核詳情',
@@ -458,7 +520,8 @@ const PAGES={
   '/merchant/merchant/detail':pageMerchantDetail,'/event/review/detail':pageReviewDetail,
   '/login':pageLogin,
   '/system/api-alarm':pageApiAlarm,
-  '/merchant/api-detail':pageApiDetail
+  '/merchant/api-detail':pageApiDetail,
+  '/event/archive':pageArchive
 };
 function renderRoute(){return (PAGES[state.route]||pageDashboard)();}
 function go(path){
@@ -609,11 +672,16 @@ function pageEventList(){
     return '<button class="cat-tab'+(t===curCat?' active':'')+'" onclick="setEventCat(\''+t+'\')">'+t+'</button>';
   }).join('');
   /* 按當前分類篩選；分類下無事件時顯示空態 */
-  const list=EVENTS.filter(function(r){ return r[8]===curCat; });
+  /* 已歸檔事件不進入活躍列表；歸檔為邏輯標記，不改變事件三態 */
+  const list=evListRows();
   const rows=list.map(function(r){
     const tags=r[7].map(function(t){return '<span class="chip">'+t+'</span>';}).join(' ');
     const catChip=r[9]?'<span class="chip chip-blue" style="margin-left:6px">'+r[9]+'</span>':'';
-    return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></td>'+
+    /* 歸檔准入：僅「已結束」事件可歸檔，與歸檔工作台及產品基線口徑一致 */
+    const can=evCanArchive(r[0]);
+    return '<tr><td style="width:36px"><input type="checkbox" class="ev-row-check" data-ev-id="'+r[0]+'"'+
+      (can?(EVARC.sel[r[0]]?' checked':'')+' onchange="evToggleRow(\''+r[0]+'\',this.checked)"':' disabled title="僅已結束事件可歸檔"')+
+      ' style="accent-color:var(--primary)" /></td>'+
       '<td class="num" style="color:#86909c">'+r[0]+'</td>'+
       '<td class="name"><div class="cell-clip" title="'+esc(r[1])+'">'+esc(r[1])+'</div></td>'+
       '<td><div style="width:34px;height:24px;border-radius:3px;background:linear-gradient(135deg,#eef4ff,#dbe8ff);display:flex;align-items:center;justify-content:center;color:#9db8e8">'+icon('file',13)+'</div></td>'+
@@ -622,7 +690,9 @@ function pageEventList(){
       '<td><span class="chip chip-line">'+r[6]+'</span></td><td>'+tags+'</td>'+
       '<td class="actions"><span class="btn-text" onclick="openCountryFilter(\''+esc(r[1])+'\',\'event\')">國家過濾</span>'+
       '<span class="btn-text" onclick="openEventEdit(\''+r[0]+'\')">編輯</span>'+
-      '<span class="btn-text" onclick="openEventDetail(\''+r[0]+'\')">詳情</span></td></tr>';
+      '<span class="btn-text" onclick="openEventDetail(\''+r[0]+'\')">詳情</span>'+
+      (can?'<span class="btn-text ev-op-archive" onclick="evOpenArchive([\''+r[0]+'\'])">歸檔</span>':
+           '<span class="btn-text muted" title="僅已結束事件可歸檔">歸檔</span>')+'</td></tr>';
   }).join('');
   const bodyHtml=rows||'<tr><td colspan="10"><div class="empty-state">'+
       icon('file',26)+'<p>「'+esc(curCat)+'」分類下暫無事件</p></div></td></tr>';
@@ -650,12 +720,19 @@ function pageEventList(){
     '<div style="margin-left:auto;display:flex;gap:6px">'+
     '<button class="btn btn-ghost" style="width:34px;padding:0" onclick="toast(\'原型示意：列表檢視\',\'info\')">'+icon('list',15)+'</button>'+
     '<button class="btn btn-ghost" style="width:34px;padding:0" onclick="toast(\'原型示意：欄位設定\',\'info\')">'+icon('grid',15)+'</button></div></div>'+
+    '<div class="ev-bulkbar'+(evSelIds().length?' show':'')+'" id="ev-bulkbar">'+
+      '<span>已選 <b id="ev-sel-count">'+evSelIds().length+'</b> 條</span>'+
+      '<button class="btn btn-ghost" onclick="evClearSel()">取消選取</button>'+
+      '<span style="flex:1"></span>'+
+      '<button class="btn btn-primary" id="ev-batch-btn" onclick="evOpenArchive()"'+(evSelIds().length?'':' disabled')+'>批量歸檔</button></div>'+
     '<div class="table-wrap"><table><thead><tr>'+
-    '<th style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></th>'+
+    '<th style="width:36px"><input type="checkbox" id="ev-check-all" style="accent-color:var(--primary)"'+
+      (list.some(function(r){return evCanArchive(r[0]);})?'':' disabled title="僅已結束事件可歸檔"')+
+      ' onchange="evToggleAll(this.checked)" /></th>'+
     '<th>事件 ID</th><th>名稱</th><th>封面</th><th>二級分類</th><th>事件狀態</th><th>推送狀態</th><th>數據來源</th><th>關聯標籤</th><th>操作</th>'+
     '</tr></thead><tbody>'+bodyHtml+'</tbody></table></div>'+pager(Math.max(list.length,1),1)+'</div>';
 }
-function setEventCat(c){
+function setEventCat(c){ EVARC.sel={};
   state.eventCat=c;
   renderShell();
   const s=document.getElementById('cat-strip');
@@ -2339,7 +2416,11 @@ function showVersion(){
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 內容變更</div>'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 功能新增</div>'+
+      '合併本地歸檔特性：事件列表新增批量歸檔交互（勾選/全選/可取消二次確認），新增事件歸檔頁（歸檔統計/決策點/歸檔池/分頁），僅已結束事件可歸檔；清理歸檔工作台與歸檔規則，決策點收斂為 7 個（①~⑦）。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.2.1</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 內容變更</div>'+
       '事件總覽圖表自適應、卡片等高；商戶列表「更多」改下拉；側欄 NEW 徽標縮小、折疊態改浮出二級列表；'+
       'api-alarm.html、api-detail.html 按基線規範重做並對齊原生頁；分頁器箭頭改左右並統一兩個子頁；篩選欄換行留間隙、日期控件內嵌化。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.2.0</span>'+
@@ -2384,6 +2465,301 @@ window.addEventListener('scroll',closePopover,true);
 setInterval(tickClock,1000);
 renderShell();
 
+
+/* ===== 事件歸檔功能（重做集成：源 event-archive-prototype 頁面1 + 產品基線口徑；
+
+   隱藏工作台/規則頁，保留事件歸檔頁 + 事件列表歸檔） ===== */
+
+const EVARC={sel:{},archived:{},pending:[]}
+
+function evCanArchive(id){
+  if(EVARC.archived[id])return false;
+  const r=EVENTS.find(function(x){return x[0]===id;});
+  return !!r&&r[4]==='ended';
+}
+
+function evListRows(){
+  const tabs=catTabs();
+  const curCat=state.eventCat&&tabs.indexOf(state.eventCat)>=0?state.eventCat:tabs[0];
+  return EVENTS.filter(function(r){return r[8]===curCat&&!EVARC.archived[r[0]];});
+}
+
+function evSelIds(){return Object.keys(EVARC.sel).filter(function(k){return EVARC.sel[k]&&evCanArchive(k);});}
+
+function evToggleRow(id,on){if(on&&!evCanArchive(id))return;EVARC.sel[id]=on;evSyncBulk();}
+
+function evToggleAll(on){
+  evListRows().forEach(function(r){EVARC.sel[r[0]]=on&&evCanArchive(r[0]);});
+  renderShell();
+}
+
+function evClearSel(){EVARC.sel={};renderShell();}
+
+function evSyncBulk(){
+  const ids=evSelIds(),bar=document.getElementById('ev-bulkbar');
+  if(bar){
+    bar.classList.toggle('show',ids.length>0);
+    const c=document.getElementById('ev-sel-count');if(c)c.textContent=ids.length;
+    const b=document.getElementById('ev-batch-btn');if(b)b.disabled=ids.length===0;
+  }
+  const all=document.getElementById('ev-check-all');
+  if(all){
+    /* 全選狀態只統計可歸檔（未禁用）的行 */
+    const boxes=document.querySelectorAll('.ev-row-check:not(:disabled)');
+    const n=[].filter.call(boxes,function(x){return x.checked;}).length;
+    all.checked=boxes.length>0&&n===boxes.length;
+    all.indeterminate=n>0&&n<boxes.length;
+  }
+}
+
+function evOpenArchive(ids){
+  const raw=(ids&&ids.length?ids:evSelIds()).filter(function(id){return !EVARC.archived[id];});
+  const list=raw.filter(function(id){return evCanArchive(id);});
+  const skipped=raw.length-list.length;
+  if(!list.length){toast(skipped?'僅已結束事件可歸檔':'請先勾選要歸檔的事件','err');return;}
+  if(skipped)toast('已排除 '+skipped+' 個非已結束事件','info');
+  EVARC.pending=list;
+  const body='<div class="ar-alert warn">即將歸檔 <b id="ev-mma-count">'+list.length+
+      '</b> 個已結束事件。可在下方清單中<b>取消勾選</b>以排除不想歸檔的事件；歸檔後事件將從「事件列表」移除，'+
+      '移入「事件歸檔」，<b>歸檔後不支援恢復</b>，請確認後再操作。</div>'+
+    '<ul class="ev-mma-list" id="ev-mma-list">'+list.map(function(id){
+      const r=EVENTS.find(function(x){return x[0]===id;});
+      return '<li><label class="ev-mma-item"><input type="checkbox" checked data-ev-id="'+id+
+        '" onchange="evOnMmaToggle(this)"><span class="t"><b>'+esc(r?r[1]:id)+'</b> '+
+        '<span class="muted num">'+id+'</span></span></label></li>';
+    }).join('')+'</ul>'+
+    '<div class="ev-mma-empty" id="ev-mma-empty">已取消全部事件，本次不會歸檔任何數據，可直接關閉彈窗。</div>';
+  openModal(modalShell({title:'歸檔確認',body:body,
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-primary" id="ev-mma-confirm" onclick="evDoArchive()">確認歸檔（'+list.length+'）</button>'}));
+}
+
+function evOnMmaToggle(el){
+  const id=String(el.dataset.evId);
+  el.closest('.ev-mma-item').classList.toggle('off',!el.checked);
+  const row=document.querySelector('.ev-row-check[data-ev-id="'+id+'"]');
+  if(row){row.checked=el.checked;EVARC.sel[id]=el.checked;}
+  evMmaCount();evSyncBulk();
+}
+
+function evMmaCount(){
+  const boxes=document.querySelectorAll('#ev-mma-list input[type="checkbox"]');
+  const n=[].filter.call(boxes,function(x){return x.checked;}).length;
+  const c=document.getElementById('ev-mma-count');if(c)c.textContent=n;
+  const b=document.getElementById('ev-mma-confirm');
+  if(b){b.textContent='確認歸檔（'+n+'）';b.disabled=n===0;}
+  const e=document.getElementById('ev-mma-empty');if(e)e.style.display=n===0?'block':'none';
+}
+
+function evDoArchive(){
+  const boxes=document.querySelectorAll('#ev-mma-list input[type="checkbox"]');
+  /* 提交前再次校驗准入，避免殘留勾選或 DOM 變動繞過前置限制 */
+  const ids=[].filter.call(boxes,function(x){return x.checked&&evCanArchive(String(x.dataset.evId));})
+    .map(function(x){return String(x.dataset.evId);});
+  if(!ids.length){toast('沒有需要歸檔的事件','err');return;}
+  const now=arNow();let n=0;
+  ids.forEach(function(id){
+    const r=EVENTS.find(function(x){return x[0]===id;});
+    if(!r)return;
+    EVARC.archived[id]=true;
+    delete EVARC.sel[id];
+    ARCH.events.push({id:'EV-'+id,title:r[1],status:'archived',owner:'管理員',
+      endedAt:r[4]==='ended'?arAgo(3):null,lastUpdateAt:now,lastUpdateBy:'管理員',lastUpdateKind:'人工',
+      archivedAt:now,archiveSource:'manual',archiveBy:'管理員'});
+    n++;
+  });
+  EVARC.pending=[];
+  closeModal();renderShell();
+  toast('已歸檔 '+n+' 個事件，已移入事件歸檔');
+}
+
+const AR_DEC=[
+  ['①','歸檔對象範圍與「已結束」口徑','僅「事件」允許歸檔，工單 / 故障 / 任務等其它對象不進入歸檔流程；需明確「已結束 = 已關閉 / 已解決 / 已取消中的哪些狀態」，以及事件是否允許重新打開。'],
+  ['②','靜默期 30 天：固定還是可配置','推薦系統默認 30 天，支援按業務線覆蓋（如結算類事件 90 天），兼顧審計要求。'],
+  ['③','「無更新」的認定：任意更新 vs 實質性更新','若系統心跳 / 自動巡檢也算更新，事件會被永遠續命，自動歸檔形同虛設。推薦只認人工實質性操作，排除系統自動日誌。'],
+  ['④','自動歸檔執行頻率','推薦每日 02:00 定時批量掃描，失敗重試 3 次 + 告警；不採用實時計算（成本高、收益低）。'],
+  ['⑤','歸檔前是否預警','推薦提前 3 天通知負責人，負責人可一鍵延期，防止重要事件被靜默清走。'],
+  ['⑥','歸檔數據保留與清理策略','推薦邏輯歸檔（is_archived 標記）+ 長期保留；是否物理清理 / 保留年限需結合合規要求拍板。'],
+  ['⑦','歸檔後的可見性：搜尋與統計口徑','推薦從活躍列表 / 活躍統計剔除，全局搜尋支援「包含已歸檔」開關；報表增加歸檔維度。']
+];
+
+function arTag(i){
+  const d=AR_DEC[Number(i)-1]||AR_DEC[0];
+  return '<span class="ar-tag" title="'+esc(d[2])+'">待確認 '+d[0]+'</span>';
+}
+
+function arDecCards(){
+  return AR_DEC.map(function(d){
+    return '<div class="ar-conf"><div class="t"><span class="idx">'+d[0]+'</span>'+d[1]+'</div>'+
+      '<div class="d">'+d[2]+'</div></div>';
+  }).join('');
+}
+
+const AR_DAY=86400000;
+
+function arNow(){return Date.now();}
+
+function arAgo(n){return arNow()-n*AR_DAY;}
+
+function arFmt(ts){
+  if(!ts)return '—';
+  const d=new Date(ts),p=function(x){return String(x).padStart(2,'0');};
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+
+function arDays(ts){return Math.floor((arNow()-ts)/AR_DAY);}
+
+const AR_SEED=[
+ ['EV-1042','客訴：訂單延遲未送達','ended','李娜',32,32,'李娜','人工',null,'',''],
+ ['EV-1038','支付網關 5xx 告警','ended','王強',28,28,'王強','人工',null,'',''],
+ ['EV-1035','月度數據報表失敗','ended','系統',20,3,'巡檢機器人','心跳',null,'',''],
+ ['EV-1031','會員體系需求評審','ended','小白',8,8,'小白','人工',null,'',''],
+ ['EV-1029','API 限流策略調整','processing','王強',null,1,'王強','人工',null,'',''],
+ ['EV-1026','數據庫慢查詢優化','processing','李娜',null,2,'李娜','人工',null,'',''],
+ ['EV-1020','GPU rental prices (RTX 6000) end of November 2026?','archived','系統',40,40,'系統','心跳',5,'auto','系統'],
+ ['EV-1015','GPU rental prices (B200) end of 2027 (Higher Strikes)','archived','李娜',60,60,'李娜','人工',12,'manual','李娜'],
+ ['EV-1014','GPU rental prices (RTX 6000) end of December 2026?','archived','李娜',50,50,'李娜','人工',18,'auto','系統'],
+ ['EV-1010','GPU rental prices (H200) end of December 2026?','archived','王強',55,55,'王強','人工',22,'auto','系統'],
+ ['EV-1006','GPU rental prices (H100) end of December 2026?','archived','小白',70,70,'小白','人工',27,'manual','小白'],
+ ['EV-1002','GPU rental prices (A100) end of December 2026?','archived','李娜',63,63,'李娜','人工',33,'auto','系統'],
+ ['EV-0997','Next Muse Spark Model (1.4+) released on…?','archived','王強',80,80,'王強','人工',40,'manual','王強'],
+ ['EV-0991','Will La-Z-Boy (LZB) beat quarterly earnings?','archived','系統',75,75,'巡檢機器人','心跳',45,'auto','系統'],
+ ['EV-0986','Will Viking (VIK) beat quarterly earnings?','archived','李娜',90,90,'李娜','人工',52,'manual','李娜'],
+ ['EV-0980','Will Woodward (WWD) beat quarterly earnings?','archived','系統',88,88,'巡檢機器人','心跳',58,'auto','系統'],
+ ['EV-0974','Will Williams-Sonoma (WSM) beat quarterly earnings?','archived','小白',95,95,'小白','人工',62,'auto','系統'],
+ ['EV-0968','Will Grab (GRAB) beat quarterly earnings?','archived','王強',100,100,'王強','人工',66,'manual','王強'],
+ ['EV-0961','Will Nvidia (NVDA) beat quarterly earnings?','archived','系統',105,105,'巡檢機器人','心跳',71,'auto','系統'],
+ ['EV-0955','Will Home Depot (HD) beat quarterly earnings?','archived','李娜',110,110,'李娜','人工',77,'manual','李娜'],
+ ['EV-0948','Will Dolby (DLB) beat quarterly earnings?','archived','小白',115,115,'小白','人工',83,'auto','系統'],
+ ['EV-0941','Will Disney (DIS) beat quarterly earnings?','archived','王強',120,120,'王強','人工',89,'manual','王強'],
+ ['EV-0934','Will Amer Sports (AS) beat quarterly earnings?','archived','系統',125,125,'巡檢機器人','心跳',95,'auto','系統'],
+ ['EV-0927','Will Tyson Foods (TSN) beat quarterly earnings?','archived','李娜',130,130,'李娜','人工',102,'manual','李娜'],
+ ['EV-0921','Will Powell Industries (POWL) beat quarterly earnings?','archived','小白',135,135,'小白','人工',110,'auto','系統'],
+ ['EV-0914','Will Getty Images (GETY) beat quarterly earnings?','archived','王強',140,140,'王強','人工',118,'manual','王強']
+];
+
+const ARCH={
+  settings:{silentDays:30,autoEnabled:true,warnEnabled:true,heartbeat:false,
+            upd:{status:true,comment:true,attach:true},scanFreq:'每日 02:00（推薦）'},
+  events:AR_SEED.map(function(r){
+    return {id:r[0],title:r[1],status:r[2],owner:r[3],
+      endedAt:r[4]===null?null:arAgo(r[4]),lastUpdateAt:arAgo(r[5]),
+      lastUpdateBy:r[6],lastUpdateKind:r[7],
+      archivedAt:r[8]===null?null:arAgo(r[8]),archiveSource:r[9]||null,archiveBy:r[10]||null};
+  }),
+  filter:'all',kw:'',sel:{},af:{kw:'',from:'',to:'',source:''},
+  page:{wb:1,arc:1},pageSize:10,pending:[]
+}
+
+function arBase(ev){
+  const s=ARCH.settings;
+  if(ev.lastUpdateKind==='心跳')return s.heartbeat?ev.lastUpdateAt:(ev.endedAt||ev.lastUpdateAt);
+  return (s.upd.status||s.upd.comment||s.upd.attach)?ev.lastUpdateAt:(ev.endedAt||ev.lastUpdateAt);
+}
+
+function arRemain(ev){return ARCH.settings.silentDays-arDays(arBase(ev));}
+
+function arStatus(s){
+  if(s==='archived')return '<span class="chip chip-gray">已歸檔</span>';
+  if(s==='ended')return statusBadge('ended');
+  return statusBadge('live');
+}
+
+function arSource(s){
+  return s==='auto'?'<span class="chip chip-gray">自動歸檔</span>':'<span class="chip chip-blue">手動歸檔</span>';
+}
+
+function arPool(){
+  const f=ARCH.filter,k=ARCH.kw.trim().toLowerCase();
+  return ARCH.events.filter(function(e){
+    if(f!=='all'&&e.status!==f)return false;
+    if(k&&e.title.toLowerCase().indexOf(k)<0&&e.id.toLowerCase().indexOf(k)<0)return false;
+    return true;
+  });
+}
+
+function arArchivedPool(){
+  const a=ARCH.af,k=a.kw.trim().toLowerCase();
+  return ARCH.events.filter(function(e){
+    if(e.status!=='archived')return false;
+    if(k&&e.title.toLowerCase().indexOf(k)<0&&e.id.toLowerCase().indexOf(k)<0)return false;
+    if(a.source&&e.archiveSource!==a.source)return false;
+    if(a.from&&e.archivedAt<new Date(a.from+'T00:00:00').getTime())return false;
+    if(a.to&&e.archivedAt>new Date(a.to+'T23:59:59').getTime())return false;
+    return true;
+  });
+}
+
+function arPager(total,key){
+  const pages=Math.max(1,Math.ceil(total/ARCH.pageSize));
+  const cur=Math.min(ARCH.page[key],pages);
+  let h='<div class="pager ar-pager"><span class="total">合共 '+total+' 條</span>';
+  h+='<span class="pg'+(cur<=1?' disabled':'')+'" onclick="arPage(\''+key+'\','+Math.max(1,cur-1)+')">'+icon('chevron',12)+'</span>';
+  for(let i=1;i<=pages;i++)h+='<span class="pg'+(i===cur?' active':'')+'" onclick="arPage(\''+key+'\','+i+')">'+i+'</span>';
+  h+='<span class="pg'+(cur>=pages?' disabled':'')+'" onclick="arPage(\''+key+'\','+Math.min(pages,cur+1)+')">'+icon('chevron',12)+'</span>';
+  h+='<select onchange="arPageSize(this.value)">';
+  [5,10,20].forEach(function(n){h+='<option value="'+n+'"'+(n===ARCH.pageSize?' selected':'')+'>'+n+' 條 / 頁</option>';});
+  return h+'</select></div>';
+}
+
+function arSlice(pool,key){
+  const pages=Math.max(1,Math.ceil(pool.length/ARCH.pageSize));
+  const cur=Math.min(ARCH.page[key],pages);
+  return pool.slice((cur-1)*ARCH.pageSize,cur*ARCH.pageSize);
+}
+
+function pageArchive(){
+  const pool=arArchivedPool(),list=arSlice(pool,'arc'),a=ARCH.af;
+  const rows=list.map(function(e){
+    return '<tr><td class="num">'+esc(e.id)+'</td>'+
+      '<td><div class="cell-clip" style="max-width:320px">'+esc(e.title)+'</div></td>'+
+      '<td>'+arSource(e.archiveSource)+'</td>'+
+      '<td>'+esc(e.archiveSource==='auto'?'系統':(e.archiveBy||'系統'))+'</td>'+
+      '<td class="num">'+arFmt(e.archivedAt)+'</td>'+
+      '<td class="num">'+arFmt(e.lastUpdateAt)+'</td>'+
+      '<td class="actions"><span class="btn-text" onclick="arView(\''+e.id+'\')">詳情</span></td></tr>';
+  }).join('');
+  return '<div class="card"><div class="card-head"><div class="card-title">已歸檔事件</div></div>'+
+    '<div class="filters">'+
+      '<div class="f-item"><span class="f-label">搜尋</span>'+
+        '<input class="f-input" placeholder="輸入標題 / 編號" value="'+esc(a.kw)+'" onchange="arSetAf(\'kw\',this.value)" /></div>'+
+      '<div class="f-item"><span class="f-label">歸檔時間</span>'+
+        '<input class="f-date" type="date" value="'+a.from+'" onchange="arSetAf(\'from\',this.value)" />'+
+        '<span class="muted"> – </span>'+
+        '<input class="f-date" type="date" value="'+a.to+'" onchange="arSetAf(\'to\',this.value)" /></div>'+
+      '<div class="f-item"><select class="f-select" onchange="arSetAf(\'source\',this.value)">'+
+        '<option value="">全部來源</option>'+
+        '<option value="auto"'+(a.source==='auto'?' selected':'')+'>自動歸檔</option>'+
+        '<option value="manual"'+(a.source==='manual'?' selected':'')+'>手動歸檔</option></select></div>'+
+      '<button class="btn btn-ghost" onclick="arResetAf()">重置</button></div>'+
+    '<div class="table-wrap"><table style="min-width:880px"><thead><tr>'+
+      '<th style="width:100px">編號</th><th>事件標題</th><th style="width:110px">歸檔來源</th>'+
+      '<th style="width:100px">操作人</th><th style="width:150px">歸檔時間</th>'+
+      '<th style="width:150px">原最後更新</th><th style="width:80px">操作</th>'+
+    '</tr></thead><tbody>'+
+      (rows||'<tr><td colspan="7"><div class="ar-empty">未找到相關搜尋結果<br/>請調整篩選條件後重試</div></td></tr>')+
+    '</tbody></table></div>'+arPager(pool.length,'arc')+'</div>';
+}
+
+function arStat(k,v,color){
+  return '<div class="ar-stat"><div class="k">'+k+'</div>'+
+    '<div class="v"'+(color?' style="color:var('+color+')"':'')+'>'+v+'</div></div>';
+}
+
+function arView(id){
+  const e=ARCH.events.find(function(x){return x.id===id;});
+  if(!e)return;
+  const g=function(k,v){return '<div class="info-item"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>';};
+  const body='<div class="info-grid" style="grid-template-columns:1fr 1fr">'+
+    g('編號',e.id)+g('狀態',arStatus(e.status))+
+    g('負責人',esc(e.owner))+g('結束時間',arFmt(e.endedAt))+
+    g('最後更新',arFmt(e.lastUpdateAt))+
+    g('更新類型',e.lastUpdateKind==='心跳'?'系統心跳':'人工更新')+
+    (e.status==='archived'?g('歸檔來源',arSource(e.archiveSource))+g('歸檔時間',arFmt(e.archivedAt)):'')+
+    '</div>';
+  openModal(modalShell({title:'事件詳情',body:body,
+    foot:'<button class="btn btn-primary" onclick="closeModal()">關閉</button>'}));
+}
 </script>
 </body>
 </html>

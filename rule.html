@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 產品基線規範
-  原型版本：V1.2.1 ｜ 入口：index.html
+  原型版本：V1.3.0 ｜ 入口：index.html
 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>產品基線 · 數據中台管理系統 V1.2.1</title>
+<title>產品基線 · 數據中台管理系統 V1.3.0</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
 <link rel="stylesheet" href="assets/app.css?v=1.2.7">
@@ -25,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 產品基線</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.2.1</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.3.0</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -41,7 +41,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.2.7"></script>
+<script src="assets/core.js?v=1.3.0"></script>
 <script>
 
 /* ==================================================================
@@ -115,7 +115,8 @@ const REQ_LIST=[
   ['R-37','角色管理','角色表格，超級管理員為預置角色不可刪','P0'],
   ['R-38','角色管理','權限樹：功能表 × 按鈕兩級勾選聯動','P0'],
   ['R-39','操作日誌','日誌表格（操作人/類型/模組/描述）','P0'],
-  ['R-40','操作日誌','日誌詳情彈窗，含請求參數','P1']
+  ['R-40','操作日誌','日誌詳情彈窗，含請求參數','P1'],
+  ['R-41','事件歸檔','事件列表批量歸檔（勾選/全選/可取消二次確認）與事件歸檔頁，僅已結束事件可歸檔；7 個待確認決策點','P0']
 ];
 const DICT=[
   ['事件','Event','上游平台同步而來的可投注標的，一個事件下含多個市場','事件 ID 為 10 位數字'],
@@ -174,6 +175,7 @@ function specContent(){
 
 function specVersion(){
   const changes=[
+    ['V1.3.0','2026-11-05','功能新增','合併本地歸檔特性：事件列表新增批量歸檔交互（勾選/全選/可取消二次確認），新增事件歸檔頁（歸檔統計指標卡/7 個決策點說明/歸檔池列表/分頁），僅已結束事件可歸檔；清理歸檔工作台與歸檔規則，決策點收斂為 7 個（①~⑦）；頁面清單、菜單分組與覆蓋頁數同步更新。'],
     ['V1.2.1','2026-11-05','內容變更','事件總覽圖表按容器寬度自適應繪製，並排卡片等高、來源分布條形垂直居中；商戶列表「更多」改為下拉菜單；側欄 NEW 徽標縮小、折疊態一級菜單改為浮出二級列表；api-alarm.html、api-detail.html 按基線規範重做（變數層、卡片、表格、標籤、按鈕、輸入框、指標卡、嵌入態背景與佈局），頁面結構對齊管理面原生頁；OpenAPI 調用詳情頁標題合併為「OpenAPI 調用詳情（商戶：xxx）」；分頁器箭頭改為左右方向並統一兩個子頁；篩選欄改為不壓縮、超出換行並留行間隙，日期範圍控件內嵌化；同步修正 1.1 升版規則示例。'],
     ['V1.2.0','2026-11-05','功能新增','合併「API 調用監控」兩項功能：商戶列表更多選單新增 OpenAPI 調用詳情（概覽 / API 調用詳情 / WSS 調用詳情），系統設置新增 API 推送異常（P0 監控指標卡 / 告警列表 / 告警詳情與處理流轉）。新增 api-detail.html、api-alarm.html 兩個嵌入子頁，頁面清單、菜單分組與覆蓋數同步更新。'],
     ['V1.1.2','2026-11-05','內容變更','1.1 升版規則改為按位遞增：功能變更中間位 +1、尾數歸零，內容變更尾數 +1；新增「協作場景的版本衝突」三條處理順序；5.1 衝突處理規則同步改寫版本號與變更記錄的處理方式。'],
@@ -189,7 +191,7 @@ function specVersion(){
       '<div class="ver-card"><div class="k">當前版本</div><div class="v">'+VERSION+'</div></div>'+
       '<div class="ver-card"><div class="k">發布日期</div><div class="v">'+BUILD_DATE+'</div></div>'+
       '<div class="ver-card"><div class="k">覆蓋功能單元</div><div class="v">14</div></div>'+
-      '<div class="ver-card"><div class="k">覆蓋頁面</div><div class="v">12 頁</div></div></div></div>'+
+      '<div class="ver-card"><div class="k">覆蓋頁面</div><div class="v">13 頁</div></div></div></div>'+
     '<div class="spec-block"><h3>原型版本變更記錄</h3><p class="sub">按版本倒序，首行為當前生效版本。</p>'+
       '<table class="spec-table"><thead><tr><th style="width:86px">版本</th><th style="width:104px">日期</th><th style="width:96px">變更類型</th><th>變更摘要</th></tr></thead><tbody>'+
       changes.map(function(c){
@@ -231,6 +233,7 @@ function specStructure(){
     ['事件分類','/event/category','分類表格（14 條）、樹形展開、狀態開關、新增分類/國家過濾/更多'],
     ['事件複核','/event/review','待複核與已複核雙頁籤、7 項篩選、審核彈窗（通過/棄用）'],
     ['投注類係數調控','/event/betting-coefficient','三層頁籤：全域調控（公式/層級/係數/計算範例）、按商戶調控、按事件調控'],
+    ['事件歸檔','/event/archive','歸檔統計指標卡（總量/已歸檔/待歸檔/來源分佈）、7 個決策點說明、歸檔池列表（已結束事件）與來源標記、分頁'],
     ['商戶列表','/merchant/merchant/index','商戶表格（11 列）、權限設定跳轉、IP 白名單、更多操作'],
     ['商戶權限設定','/merchant/merchant/detail','商戶資訊頭 + 四頁籤：類型/分類/數據源/過濾事件'],
     ['用戶管理','/system/user','用戶表格（11 列）、狀態與 MFA 開關、解綁驗證、重置密碼、新增用戶'],
@@ -243,16 +246,16 @@ function specStructure(){
   ];
   return '<div class="spec-crumb">產品基線 / 基線總覽 / 產品信息結構</div>'+
     '<h1 class="spec-h1">產品信息結構</h1>'+
-    '<p class="spec-lead">原型覆蓋管理面單端，共 11 個一級業務頁面與 3 個跳轉頁，按左側菜單四組組織。</p>'+
+    '<p class="spec-lead">原型覆蓋管理面單端，共 12 個一級業務頁面與 3 個跳轉頁，按左側菜單四組組織。</p>'+
     '<div class="spec-block"><h3>頁面清單</h3><p class="sub">路由與頁面承載內容對照。</p>'+
       '<table class="spec-table"><thead><tr><th style="width:140px">頁面</th><th style="width:220px">路由</th><th>承載內容</th></tr></thead><tbody>'+
       pages.map(function(p){
         return '<tr><td>'+p[0]+'</td><td><span class="mono-code">'+p[1]+'</span></td><td style="color:#4e5969">'+p[2]+'</td></tr>';
       }).join('')+'</tbody></table></div>'+
-    '<div class="spec-block"><h3>菜單分組</h3><p class="sub">與原站左側導航一致，四組共 10 個二級入口。</p>'+
+    '<div class="spec-block"><h3>菜單分組</h3><p class="sub">與原站左側導航一致，四組共 11 個二級入口。</p>'+
       '<table class="spec-table"><thead><tr><th style="width:150px">一級菜單</th><th>二級菜單</th></tr></thead><tbody>'+
       '<tr><td>事件總覽</td><td>—（直接進入頁面）</td></tr>'+
-      '<tr><td>事件管理</td><td>事件列表 / 事件分類 / 事件複核 / 投注類係數調控</td></tr>'+
+      '<tr><td>事件管理</td><td>事件列表 / 事件分類 / 事件複核 / 投注類係數調控 / 事件歸檔</td></tr>'+
       '<tr><td>商戶管理</td><td>商戶列表</td></tr>'+
       '<tr><td>系統設置</td><td>用戶管理 / 角色管理 / 操作日誌 / API 推送異常</td></tr>'+
       '</tbody></table></div>'+
@@ -717,7 +720,11 @@ function showVersion(){
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 內容變更</div>'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 功能新增</div>'+
+      '合併本地歸檔特性：事件列表新增批量歸檔交互（勾選/全選/可取消二次確認），新增事件歸檔頁（歸檔統計/決策點/歸檔池/分頁），僅已結束事件可歸檔；清理歸檔工作台與歸檔規則，決策點收斂為 7 個（①~⑦）。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.2.1</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 內容變更</div>'+
       '事件總覽圖表自適應、卡片等高；商戶列表「更多」改下拉；側欄 NEW 徽標縮小、折疊態改浮出二級列表；'+
       'api-alarm.html、api-detail.html 按基線規範重做並對齊原生頁；分頁器箭頭改左右並統一兩個子頁；篩選欄換行留間隙、日期控件內嵌化。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.2.0</span>'+
