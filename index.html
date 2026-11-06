@@ -3,14 +3,14 @@
   數據中台管理系統 · 交互原型統一入口（框架頁）
   用途：在管理面與產品基線之間切換瀏覽。各頁面為獨立 HTML，也可單獨打開。
   文件對應：dmp.html（管理面）/ rule.html（產品基線）
-  原型版本：V1.3.0
+  原型版本：V1.3.1
 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>數據中台管理系統 · 交互原型 V1.3.0</title>
+<title>數據中台管理系統 · 交互原型 V1.3.1</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
 <style>
@@ -85,7 +85,7 @@
     <span class="dot"></span>
     <span class="name">數據中台管理系統</span>
     <small>· 交互原型</small>
-    <span class="vnum" id="proto-ver" onclick="jump('rule')" title="點擊查看版本記錄">V1.3.0</span>
+    <span class="vnum" id="proto-ver" onclick="jump('rule')" title="點擊查看版本記錄">V1.3.1</span>
   </div>
   <nav id="nav"></nav>
   <div class="actions">
@@ -105,10 +105,10 @@
    框架頁：在管理面與產品基線之間切換
    ================================================================== */
 const VIEWS = [
-  { key:'dmp',  label:'管理面',   badge:'13 頁', file:'dmp.html'  },
+  { key:'dmp',  label:'管理面',   badge:'14 頁', file:'dmp.html'  },
   { key:'rule', label:'產品基線', badge:'規範',  file:'rule.html' }
 ];
-const VERSION = 'V1.3.0';
+const VERSION = 'V1.3.1';
 
 let current = 'dmp';
 

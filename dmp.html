@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 管理面
-  原型版本：V1.3.0 ｜ 入口：index.html
+  原型版本：V1.3.1 ｜ 入口：index.html
   配色沿用原站 192.168.10.51:7080；字體按產品基線規範
 -->
 <html lang="zh-CN">
@@ -9,10 +9,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>管理面 · 數據中台管理系統 V1.3.0</title>
+<title>管理面 · 數據中台管理系統 V1.3.1</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.2.7">
+<link rel="stylesheet" href="assets/app.css?v=1.3.1">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -25,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 管理面</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.3.0</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.3.1</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -100,8 +100,14 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 .ev-mma-empty{display:none;margin-top:8px;padding:8px 10px;border-radius:6px;background:var(--border-light);color:var(--text-help);font-size:var(--fs-help)}
 .ev-op-archive{color:var(--danger)}
 .ev-row-check:disabled{cursor:not-allowed;opacity:.45}
+/* 事件列表列多，窄屏時操作列固定在右側，保證「詳情」始終可達 */
+.tbl-fixed-op thead th:last-child,.tbl-fixed-op tbody td.actions{
+  position:sticky;right:0;z-index:2;background:#fff;
+  box-shadow:-6px 0 8px -6px rgba(16,24,40,.14)}
+.tbl-fixed-op thead th:last-child{background:#f7f9fc}
+.tbl-fixed-op tbody tr:hover td.actions{background:#fafcff}
 </style>
-<script src="assets/core.js?v=1.3.0"></script>
+<script src="assets/core.js?v=1.3.1"></script>
 <script>
 /* ==================================================================
    數據中台管理系統 · 交互原型
@@ -115,7 +121,7 @@ const MENU=[
     {label:'事件分類',path:'/event/category'},
     {label:'事件複核',path:'/event/review'},
     {label:'投注類係數調控',path:'/event/betting-coefficient'},
-    {label:'事件歸檔',path:'/event/archive'}
+    {label:'事件歸檔',path:'/event/archive',isNew:true}
   ]},
   {key:'merchant',label:'商戶管理',icon:'shop',children:[
     {label:'商戶列表',path:'/merchant/merchant/index'}
@@ -133,7 +139,7 @@ const MENU=[
 const ROUTE_TITLE={
   '/index':'事件總覽','/event/list':'事件列表','/event/category':'事件分類',
   '/event/review':'事件複核','/event/betting-coefficient':'投注類係數調控',
-  '/event/archive':'事件歸檔',
+  '/event/archive':'事件歸檔','/event/detail':'事件詳情',
   '/merchant/merchant/index':'商戶列表','/system/user':'用戶管理','/system/role':'角色管理',
   '/system/operation':'操作日誌','/system/role/create':'新增角色',
   '/merchant/merchant/detail':'商戶權限設定','/event/review/detail':'事件審核詳情',
@@ -390,6 +396,8 @@ const state={
   drawer:false, coefTab:'global', reviewTab:'basic', merchantTab:'type', specSection:'version',
   topRange:'24h', mfaBound:false, eventCat:null, trendRange:'7',
   apiDetailId:80001, apiDetailName:'', moreName:'',
+  /* 事件詳情頁：detailId 為當前查看的事件；detailFrom 記錄來源路由，供「返回」使用 */
+  detailId:null, detailFrom:'/event/list', detailFromTab:null, detailTab:'basic',
   /* 開關狀態：key 形如 'ev:8016024137:push'，避免重繪後狀態丟失 */
   sw:{}
 };
@@ -521,7 +529,8 @@ const PAGES={
   '/login':pageLogin,
   '/system/api-alarm':pageApiAlarm,
   '/merchant/api-detail':pageApiDetail,
-  '/event/archive':pageArchive
+  '/event/archive':pageArchive,
+  '/event/detail':pageEventDetail
 };
 function renderRoute(){return (PAGES[state.route]||pageDashboard)();}
 function go(path){
@@ -725,7 +734,7 @@ function pageEventList(){
       '<button class="btn btn-ghost" onclick="evClearSel()">取消選取</button>'+
       '<span style="flex:1"></span>'+
       '<button class="btn btn-primary" id="ev-batch-btn" onclick="evOpenArchive()"'+(evSelIds().length?'':' disabled')+'>批量歸檔</button></div>'+
-    '<div class="table-wrap"><table><thead><tr>'+
+    '<div class="table-wrap"><table class="tbl-fixed-op"><thead><tr>'+
     '<th style="width:36px"><input type="checkbox" id="ev-check-all" style="accent-color:var(--primary)"'+
       (list.some(function(r){return evCanArchive(r[0]);})?'':' disabled title="僅已結束事件可歸檔"')+
       ' onchange="evToggleAll(this.checked)" /></th>'+
@@ -790,8 +799,81 @@ function openEventDetail(id,name,cat,st,src){
       '<div class="card-title" style="margin-bottom:10px">規則</div>'+
       '<div class="rule-text"><div class="h">基本規則</div>In the upcoming National League South game between Maidenhead United FC and Tonbridge Angels, scheduled for October 10, 2026 at 10:00 AM ET: This market will resolve based on the final score of the Maidenhead United FC vs. Tonbridge Angels match, considering only the result at the end of 90 minutes of regulation plus stoppage time.</div></div>',
     foot:'<button class="btn btn-ghost" onclick="closeModal()">關閉</button>'+
-      '<button class="btn btn-primary" onclick="closeModal();go(\'/event/list\')">前往事件列表</button>'
+      '<button class="btn btn-primary" onclick="openEventDetailPage(\''+esc(id)+'\')">進入詳情</button>'
   }));
+}
+/* 由彈窗進入正式詳情頁：記錄來源路由與頁簽，供詳情頁「返回」精確回跳 */
+function openEventDetailPage(id){
+  state.detailId=id;
+  state.detailFrom=state.route;
+  state.detailFromTab=state.route==='/event/betting-coefficient'?state.coefTab:null;
+  /* 每次進入都從基本資訊起，避免殘留上次查看的頁籤 */
+  state.detailTab='basic';
+  closeModal();
+  go('/event/detail');
+}
+
+/* ==================================================================
+   頁面：事件詳情
+   入口：事件列表「詳情」、投注類係數調控·按事件調控「詳情」、
+        事件歸檔「詳情」——三處均先彈摘要彈窗，再由彈窗「進入詳情」到此頁。
+   結構：沿用事件審核詳情四頁簽（基本資訊 / 市場 / 倉位情況 / 欄位映射），
+        去掉複核語境，底部改為返回來源頁。
+   ================================================================== */
+function pageEventDetail(){
+  const id=state.detailId;
+  const ev=EVENTS.find(function(e){return e[0]===id;});
+  const arc=(!ev&&typeof ARCH!=='undefined'&&ARCH.events)?ARCH.events.find(function(x){return x.id===id;}):null;
+  const from=state.detailFrom||'/event/list';
+  const fromName=ROUTE_TITLE[from]||'事件列表';
+  const tab=state.detailTab||'basic';
+  const tabsBar='<div class="sub-tabs">'+
+    ['basic|基本資訊','market|市場','position|倉位情況','mapping|欄位映射'].map(function(x){
+      const k=x.split('|')[0],n=x.split('|')[1];
+      return '<div class="sub-tab'+(tab===k?' active':'')+'" onclick="setDetailTab(\''+k+'\')">'+n+'</div>';
+    }).join('')+'</div>';
+
+  let title,catName,status,source,tags,headTop,isArch;
+  if(arc){
+    /* 歸檔池事件：已歸檔與未歸檔的頭部語境不同，狀態徽標沿用歸檔頁口徑 */
+    isArch=arc.status==='archived';
+    title=arc.title;catName='—';source='polymarket';
+    tags='<span class="muted">–</span>';
+    headTop=isArch
+      ? '已歸檔事件 · 歸檔時間：'+arFmt(arc.archivedAt)
+      : '歸檔池事件 · 負責人：'+esc(arc.owner);
+  }else{
+    title=ev?ev[1]:'—';catName=ev?ev[2]:'—';status=ev?ev[4]:'ended';source=ev?ev[6]:'polymarket';
+    tags=ev&&ev[7]?ev[7].map(function(t){
+      return t.charAt(0)==='+'?'<span style="color:#86909c;font-size:11px">'+t+'</span>':'<span class="chip chip-line">'+t+'</span>';
+    }).join(' '):'<span class="muted">–</span>';
+    headTop='事件 ID：'+esc(id||'—');
+  }
+
+  const head='<div class="card"><div class="detail-head"><div class="dh-ico">'+icon('file',17)+'</div>'+
+    '<div style="flex:1;min-width:0"><div class="dh-top">'+esc(headTop)+'</div>'+
+    '<h3 class="dh-title">'+esc(title)+'</h3>'+
+    '<div class="dh-meta">'+(arc
+      ? arStatus(arc.status)+'<span class="chip chip-line">'+(isArch?(arc.archiveSource==='auto'?'自動歸檔':'手動歸檔'):'歸檔池')+'</span>'
+      : statusBadge(status)+
+        '<span class="chip chip-blue">'+esc(catName)+'</span>'+
+        '<span class="chip chip-line">'+esc(source)+'</span>')+'</div></div></div>'+
+    tabsBar+'</div>';
+
+  let body='';
+  if(tab==='basic') body=rdBasic(id,catName,tags,arc);
+  else if(tab==='market') body=rdMarket();
+  else if(tab==='position') body=rdPosition();
+  else body=rdMapping();
+
+  return head+body+
+    '<div style="display:flex;justify-content:flex-end;margin-top:14px;gap:10px">'+
+    '<button class="btn btn-ghost" onclick="backFromEventDetail()">返回'+esc(fromName)+'</button></div>';
+}
+function setDetailTab(t){ state.detailTab=t; renderShell(); }
+function backFromEventDetail(){
+  if(state.detailFromTab&&state.detailFrom==='/event/betting-coefficient')state.coefTab=state.detailFromTab;
+  go(state.detailFrom||'/event/list');
 }
 
 /* ==================================================================
@@ -1371,21 +1453,39 @@ function pageReviewDetail(){
 }
 function setReviewTab(t){ state.reviewTab=t; renderShell(); }
 
-/* 基本資訊 */
-function rdBasic(){
+/* 基本資訊：复核详情（无参）与事件详情（传 id/cat/tags）共用 */
+function rdBasic(id,catName,tags,arc){
+  const eid=id||'108068';
+  const catVal=catName&&catName!=='—'?esc(catName):'<span style="color:#c9cdd4">暫無數據</span>';
+  const tagVal=tags&&tags.indexOf('muted')<0?tags:'<span style="color:#c9cdd4">暫無數據</span>';
+  /* 歸檔池事件補充歸檔語境欄位：已歸檔與仍在池中兩種狀態欄位不同 */
+  const arcItems=arc?(function(){
+    const isArch=arc.status==='archived';
+    let h='<div class="info-item"><div class="k">負責人</div><div class="v">'+esc(arc.owner)+'</div></div>'+
+      '<div class="info-item"><div class="k">結束時間</div><div class="v">'+arFmt(arc.endedAt)+'</div></div>';
+    if(isArch){
+      h+='<div class="info-item"><div class="k">歸檔來源</div><div class="v">'+(arc.archiveSource?arSource(arc.archiveSource):'—')+'</div></div>'+
+         '<div class="info-item"><div class="k">歸檔時間</div><div class="v">'+arFmt(arc.archivedAt)+'</div></div>';
+    }else{
+      h+='<div class="info-item"><div class="k">最後更新</div><div class="v">'+arFmt(arc.lastUpdateAt)+'</div></div>'+
+         '<div class="info-item"><div class="k">更新類型</div><div class="v">'+(arc.lastUpdateKind==='心跳'?'系統心跳':'人工更新')+'</div></div>';
+    }
+    return h;
+  })():'';
   return '<div class="card">'+
     '<div class="collapse-bar" onclick="toast(\'原型示意：收合基礎資訊\',\'info\')" style="margin-bottom:16px">'+
       '<span class="t">基礎資訊</span><span class="arrow">'+icon('chevron',15)+'</span></div>'+
     '<div class="info-grid">'+
-    '<div class="info-item"><div class="k">事件 ID <span class="copy" onclick="toast(\'已複製事件 ID\',\'info\')">'+icon('copy',12)+'</span></div><div class="v">108068</div></div>'+
+    '<div class="info-item"><div class="k">事件 ID <span class="copy" onclick="toast(\'已複製事件 ID\',\'info\')">'+icon('copy',12)+'</span></div><div class="v">'+esc(eid)+'</div></div>'+
     '<div class="info-item"><div class="k">源事件 ID <span class="copy" onclick="toast(\'已複製源事件 ID\',\'info\')">'+icon('copy',12)+'</span></div><div class="v">1159904</div></div>'+
     '<div class="info-item"><div class="k">源 slug <span class="copy" onclick="toast(\'已複製源 slug\',\'info\')">'+icon('copy',12)+'</span></div><div class="v" style="font-size:11.5px;color:#86909c">nls-mu-ton-2026-10-10-exact-score</div></div>'+
     '<div class="info-item"><div class="k">開始時間</div><div class="v">2026-10-09 16:55:15</div></div>'+
     '<div class="info-item"><div class="k">截止時間</div><div class="v">2026-10-10 14:00:00</div></div>'+
     '<div class="info-item"><div class="k">入庫時間</div><div class="v">2026-10-10 10:17:28</div></div>'+
     '<div class="info-item"><div class="k">更新時間</div><div class="v">2026-11-03 16:03:32</div></div>'+
-    '<div class="info-item"><div class="k">標籤</div><div class="v" style="color:#c9cdd4">暫無數據</div></div>'+
-    '<div class="info-item"><div class="k">分類</div><div class="v" style="color:#c9cdd4">暫無數據</div></div></div></div>'+
+    '<div class="info-item"><div class="k">標籤</div><div class="v">'+tagVal+'</div></div>'+
+    '<div class="info-item"><div class="k">分類</div><div class="v">'+catVal+'</div></div>'+
+    arcItems+'</div></div>'+
   '<div class="card"><div class="collapse-bar" onclick="toast(\'原型示意：收合賽事\',\'info\')">'+
     '<span class="t">'+icon('trophy',16)+' 賽事 <span style="font-weight:400;color:#86909c;font-size:12px">Oct 10 · 2:00 PM</span></span>'+
     '<span class="arrow">'+icon('chevron',15)+'</span></div>'+
@@ -2416,7 +2516,13 @@ function showVersion(){
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 功能新增</div>'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 功能修復</div>'+
+      '修復三處事件相關「詳情」的跳轉：事件列表、投注類係數調控、事件歸檔的摘要彈窗主按鈕由「前往事件列表」改為「進入詳情」，'+
+      '跳轉事件詳情頁（/event/detail）；詳情頁沿用事件審核詳情四頁籤結構（基本資訊 / 市場 / 倉位情況 / 欄位映射），'+
+      '去掉複核語境，補賽事比分與規則區；底部返回按來源回跳並還原係數調控頁籤。事件歸檔菜單加 NEW 標籤。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.3.0</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 功能新增</div>'+
       '合併本地歸檔特性：事件列表新增批量歸檔交互（勾選/全選/可取消二次確認），新增事件歸檔頁（歸檔統計/決策點/歸檔池/分頁），僅已結束事件可歸檔；清理歸檔工作台與歸檔規則，決策點收斂為 7 個（①~⑦）。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.2.1</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
@@ -2758,7 +2864,8 @@ function arView(id){
     (e.status==='archived'?g('歸檔來源',arSource(e.archiveSource))+g('歸檔時間',arFmt(e.archivedAt)):'')+
     '</div>';
   openModal(modalShell({title:'事件詳情',body:body,
-    foot:'<button class="btn btn-primary" onclick="closeModal()">關閉</button>'}));
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">關閉</button>'+
+      '<button class="btn btn-primary" onclick="openEventDetailPage(\''+esc(e.id)+'\')">進入詳情</button>'}));
 }
 </script>
 </body>
