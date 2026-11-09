@@ -3,7 +3,7 @@
    被 dmp.html / rule.html 共用；修改此處會同時影響兩端
    ========================================================== */
 
-const VERSION='V1.3.2';
+const VERSION='V1.4.0';
 const BUILD_DATE='2026-11-09';
 
 const ICONS={
@@ -57,7 +57,7 @@ function toast(msg,type){
   const el=document.createElement('div');
   el.className='toast '+(type||'ok');
   const ic=type==='err'?'warn':(type==='info'?'info':'check');
-  el.innerHTML='<span class="ti">'+icon(ic,15)+'</span><span>'+esc(msg)+'</span>';
+  el.innerHTML='<span class="ti">'+icon(ic,16)+'</span><span>'+esc(msg)+'</span>';
   root.appendChild(el);
   setTimeout(function(){
     el.style.transition='.2s';el.style.opacity='0';el.style.transform='translateY(-6px)';
@@ -87,7 +87,7 @@ function closeModal(){
 }
 function modalShell(o){
   return '<div class="modal '+(o.size||'')+'"><div class="modal-head"><div class="modal-title">'+o.title+'</div>'+
-    '<button class="modal-close" onclick="closeModal()">'+icon('close',15)+'</button></div>'+
+    '<button class="modal-close" onclick="closeModal()">'+icon('close',16)+'</button></div>'+
     '<div class="modal-body">'+o.body+'</div>'+
     (o.foot===false?'':'<div class="modal-foot">'+(o.foot||'')+'</div>')+'</div>';
 }

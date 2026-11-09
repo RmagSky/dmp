@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 管理面
-  原型版本：V1.3.2 ｜ 入口：index.html
+  原型版本：V1.4.0 ｜ 入口：index.html
   配色沿用原站 192.168.10.51:7080；字體按產品基線規範
 -->
 <html lang="zh-CN">
@@ -9,10 +9,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>管理面 · 數據中台管理系統 V1.3.2</title>
+<title>管理面 · 數據中台管理系統 V1.4.0</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.3.2">
+<link rel="stylesheet" href="assets/app.css?v=1.4.0">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -25,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 管理面</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.3.2</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.4.0</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -42,12 +42,6 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="toast-root"></div>
 
 <style>
-:root{
-  --card:#fff; --border:#e5e6eb; --border-light:#f2f3f5;
-  --text:#1d2129; --text-sub:#4e5969; --text-help:#86909c;
-  --warning:#ff7d00; --danger:#f53f3f;
-  --fs-tag:12px; --fs-help:12px; --fs-body:13px; --fs-table:13px;
-}
 /* 事件歸檔專屬：色值全部取自 :root 變量；字號只用產品基線七檔 */
 .ar-tag{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:4px;
   border:1px solid var(--danger);background:var(--card);color:var(--danger);
@@ -57,8 +51,8 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 .ar-stat .k{color:var(--text-help);font-size:var(--fs-help);margin-bottom:6px}
 .ar-stat .v{font-size:var(--fs-stat);font-weight:600;font-variant-numeric:tabular-nums}
 .ar-cd{min-width:150px}
-.ar-cd-t{font-size:var(--fs-help);color:var(--text-sub);margin-bottom:5px}
-.ar-cd-bar{height:5px;border-radius:3px;background:var(--border-light);overflow:hidden}
+.ar-cd-t{font-size:var(--fs-help);color:var(--text-sub);margin-bottom:6px}
+.ar-cd-bar{height:6px;border-radius:3px;background:var(--border-light);overflow:hidden}
 .ar-cd-fill{height:100%;background:var(--primary);border-radius:3px}
 .ar-cd-fill.soon{background:var(--warning)}
 .ar-cd-fill.over{background:var(--danger)}
@@ -68,20 +62,20 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 .ar-form-label{font-size:var(--fs-body);font-weight:600;margin-bottom:4px}
 .ar-form-desc{font-size:var(--fs-help);color:var(--text-sub);line-height:1.7;max-width:520px}
 .ar-form-ctrl{min-width:230px;text-align:right;font-size:var(--fs-table)}
-.ar-check{display:flex;align-items:center;gap:6px;font-size:var(--fs-table);margin:5px 0;text-align:left}
+.ar-check{display:flex;align-items:center;gap:6px;font-size:var(--fs-table);margin:6px 0;text-align:left}
 .ar-flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .ar-flow-node{border:1px solid var(--border);border-radius:8px;padding:8px 14px;
   font-size:var(--fs-table);background:var(--card);text-align:center;min-width:96px}
 .ar-flow-node small{display:block;font-size:var(--fs-tag);color:var(--text-help);font-weight:400}
 .ar-flow-arw{color:var(--text-help);font-size:var(--fs-help);text-align:center}
-.ar-conf{border:1px solid var(--danger);border-radius:8px;padding:13px 15px;margin-bottom:10px;background:var(--card)}
-.ar-conf .t{font-size:var(--fs-body);font-weight:600;margin-bottom:5px;display:flex;gap:8px;align-items:center}
+.ar-conf{border:1px solid var(--danger);border-radius:8px;padding:14px 16px;margin-bottom:10px;background:var(--card)}
+.ar-conf .t{font-size:var(--fs-body);font-weight:600;margin-bottom:6px;display:flex;gap:8px;align-items:center}
 .ar-conf .idx{width:20px;height:20px;border-radius:50%;background:var(--danger);color:var(--card);
   display:inline-flex;align-items:center;justify-content:center;font-size:var(--fs-tag);flex:0 0 auto}
 .ar-conf .d{font-size:var(--fs-help);color:var(--text-sub);line-height:1.8}
 .ar-pager .pg{cursor:pointer}
 .ar-empty{padding:28px;text-align:center;color:var(--text-help);font-size:var(--fs-help);line-height:1.9}
-.ar-alert{border-left:3px solid var(--primary);background:var(--primary-light);padding:10px 14px;
+.ar-alert{border-left:4px solid var(--primary);background:var(--primary-light);padding:10px 14px;
   border-radius:0 6px 6px 0;font-size:var(--fs-help);color:var(--text-sub);line-height:1.8;margin-top:10px}
 .ar-alert.warn{border-left-color:var(--warning);background:var(--card);border:1px solid var(--border)}
 /* 事件列表 · 批量歸檔（來源：event-archive-prototype.html 頁面 1） */
@@ -90,9 +84,9 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 .ev-bulkbar b{color:var(--primary);font-weight:600}
 .ev-mma-list{list-style:none;margin:12px 0 0;padding:8px 10px;max-height:216px;overflow-y:auto;border:1px solid var(--border-light);border-radius:8px}
 .ev-mma-list li{margin:6px 0}
-.ev-mma-item{display:flex;align-items:flex-start;gap:9px;cursor:pointer;padding:5px 9px;border:1px solid var(--border-light);border-radius:6px;font-size:var(--fs-help);background:var(--card)}
+.ev-mma-item{display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:6px 10px;border:1px solid var(--border-light);border-radius:6px;font-size:var(--fs-help);background:var(--card)}
 .ev-mma-item:hover{border-color:var(--primary)}
-.ev-mma-item input{margin-top:3px;flex-shrink:0;accent-color:var(--primary);cursor:pointer}
+.ev-mma-item input{margin-top:4px;flex-shrink:0;accent-color:var(--primary);cursor:pointer}
 .ev-mma-item .t{flex:1;min-width:0;word-break:break-all;line-height:1.7;color:var(--text-sub)}
 .ev-mma-item .t b{font-weight:500;color:var(--text)}
 .ev-mma-item.off{opacity:.5;background:transparent}
@@ -104,10 +98,11 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 .tbl-fixed-op thead th:last-child,.tbl-fixed-op tbody td.actions{
   position:sticky;right:0;z-index:2;background:#fff;
   box-shadow:-6px 0 8px -6px rgba(16,24,40,.14)}
-.tbl-fixed-op thead th:last-child{background:#f7f9fc}
-.tbl-fixed-op tbody tr:hover td.actions{background:#fafcff}
+.tbl-fixed-op thead th:last-child{background:var(--bg-soft)}
+.tbl-fixed-op tbody tr:hover td.actions{background:var(--bg-soft)}
 </style>
-<script src="assets/core.js?v=1.3.2"></script>
+<script src="assets/core.js?v=1.4.0"></script>
+<script src="assets/entity.js?v=1.4.0"></script>
 <script>
 /* ==================================================================
    數據中台管理系統 · 交互原型
@@ -125,6 +120,10 @@ const MENU=[
   ]},
   {key:'merchant',label:'商戶管理',icon:'shop',children:[
     {label:'商戶列表',path:'/merchant/merchant/index'}
+  ]},
+  {key:'entity',label:'實體標識庫',icon:'layers',children:[
+    {label:'標識庫總覽',path:'/entity/index',isNew:true},
+    {label:'實體列表',path:'/entity/list'}
   ]},
   {key:'system',label:'系統設置',icon:'gear',children:[
     {label:'用戶管理',path:'/system/user'},
@@ -145,17 +144,18 @@ const ROUTE_TITLE={
   '/merchant/merchant/detail':'商戶權限設定','/event/review/detail':'事件審核詳情',
   '/login':'登錄頁',
   '/system/api-alarm':'API推送異常',
-  '/merchant/api-detail':'OpenAPI調用詳情'
+  '/merchant/api-detail':'OpenAPI調用詳情',
+  '/entity/index':'標識庫總覽','/entity/list':'實體列表'
 };
 
 /* ---------- 資料 ---------- */
 const DASH={
   stats:[
-    {label:'事件總量',value:'138,988',unit:'件',icon:'layers',color:'#2f6bf6',bg:'#eaf1ff',foot:'較上月 <span class="up">14.98% ↑</span>'},
-    {label:'今日新入庫',value:'4,142',unit:'件',icon:'file',color:'#00b42a',bg:'#e8f8ec'},
-    {label:'待處理',value:'60',unit:'件',icon:'pause',color:'#86909c',bg:'#f2f4f7'},
-    {label:'即將結束',value:'6,338',unit:'件',icon:'clock',color:'#ff7d00',bg:'#fff3e8'},
-    {label:'已結束',value:'111,543',unit:'件',icon:'check',color:'#2f6bf6',bg:'#eaf1ff'},
+    {label:'事件總量',value:'138,988',unit:'件',icon:'layers',color:'var(--primary)',bg:'var(--primary-light)',foot:'較上月 <span class="up">14.98% ↑</span>'},
+    {label:'今日新入庫',value:'4,142',unit:'件',icon:'file',color:'var(--success)',bg:'#e8f8ec'},
+    {label:'待處理',value:'60',unit:'件',icon:'pause',color:'var(--text-help)',bg:'#f2f4f7'},
+    {label:'即將結束',value:'6,338',unit:'件',icon:'clock',color:'var(--warning)',bg:'#fff3e8'},
+    {label:'已結束',value:'111,543',unit:'件',icon:'check',color:'var(--primary)',bg:'var(--primary-light)'},
     {label:'商戶總數',value:'19',unit:'家',icon:'shop',color:'#8b5cf6',bg:'#f3edff',foot:'啟用 19 家 · 停用 0 家'}
   ],
   trend:{labels:['10-29','10-30','10-31','11-1','11-2','11-3','11-4'],values:[2400,1700,3800,2300,1950,9240,4100]},
@@ -188,51 +188,51 @@ const DASH={
 /* 分類頁籤：與「事件分類」頁共用同一份分類樹，不另立數據源 */
 function catTabs(){ return CAT_TREE.map(function(g){ return g.name; }); }
 const EVENTS=[
-  ['8016024137','Gold Up or Down – November 4, 10AM ET','General Finance','','live','on','polymarket',['15M','+5'],'Finance','Commodities'],
-  ['8016024136','Silver Up or Down – November 4, 10AM ET','General Finance','','live','on','polymarket',['15M','+5'],'Finance','Commodities'],
-  ['8015839204','KOSPI Composite Index (Korea) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2'],'Finance','Equities'],
-  ['8015839203','UNITREE (宇樹科技) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2'],'Business','Big Tech Companies'],
-  ['8015839202','Gold Up or Down – November 4, 8AM ET','General Finance','+1','live','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
-  ['8015839201','HANG SENG INDEX (恆生指數) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+3'],'Finance','Equities'],
-  ['8015726418','SK Hynix Inc. Up or Down – Nov 4','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2'],'Business','Earnings'],
-  ['8015726417','Gold Up or Down – November 4, 6AM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
-  ['8015726416','Zhipu AI Up or Down – Nov 4','General Finance','+1','ended','on','predict.fun',['ZHIPU','+4'],'Science','AI'],
-  ['8015726415','Gold Up or Down – November 3, 10PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
-  ['8015726414','Gold Up or Down – November 3, 8PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
-  ['8015726413','SK Hynix Inc. Up or Down – Nov 3','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4'],'Business','Earnings'],
-  ['8015726412','SK Hynix Inc. Up or Down – Nov 3 (Late)','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4'],'Business','Earnings'],
-  ['8015726411','Gold Up or Down – November 3, 6PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
-  ['8015726410','Gold Up or Down – November 3, 4PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
-  ['8015621048','Unitree Robotics Up or Down – Nov 3','General Finance','+1','ended','on','predict.fun',['UNITREE','+4'],'Business','Big Tech Companies'],
-  ['8015621047','Unitree Robotics Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['UNITREE','+4'],'Business','Big Tech Companies'],
-  ['8015621046','Gold Up or Down – November 2, 10PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities'],
-  ['8015621045','Zhipu AI Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['ZHIPU','+4'],'Science','AI'],
-  ['8015621044','SK Hynix Inc. Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4'],'Business','Earnings'],
+  ['8016024137','Gold Up or Down – November 4, 10AM ET','General Finance','','live','on','polymarket',['15M','+5'],'Finance','Commodities','2026-11-07 05:00:00','2026-11-07 04:30:00','2026-11-09 16:20:00','2026-11-09 15:05:00'],
+  ['8016024136','Silver Up or Down – November 4, 10AM ET','General Finance','','live','on','polymarket',['15M','+5'],'Finance','Commodities','2026-11-07 04:49:00','2026-11-07 04:19:00','2026-11-09 17:20:00','2026-11-09 15:05:00'],
+  ['8015839204','KOSPI Composite Index (Korea) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2'],'Finance','Equities','2026-11-09 16:20:00','2026-11-08 14:56:00','2026-11-10 16:20:00','2026-11-08 15:01:00'],
+  ['8015839203','UNITREE (宇樹科技) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2'],'Business','Big Tech Companies','2026-11-09 17:20:00','2026-11-08 14:49:00','2026-11-10 17:20:00','2026-11-08 14:54:00'],
+  ['8015839202','Gold Up or Down – November 4, 8AM ET','General Finance','+1','live','on','predict.fun',['XAU','+4'],'Finance','Commodities','2026-11-07 04:16:00','2026-11-07 03:46:00','2026-11-09 20:20:00','2026-11-09 15:05:00'],
+  ['8015839201','HANG SENG INDEX (恆生指數) Up or Down','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+3'],'Finance','Equities','2026-11-09 19:20:00','2026-11-08 14:35:00','2026-11-10 19:20:00','2026-11-08 14:40:00'],
+  ['8015726418','SK Hynix Inc. Up or Down – Nov 4','General Finance','+1','created','on','predict.fun',['Daily Up/Down','+2'],'Business','Earnings','2026-11-09 20:20:00','2026-11-08 14:28:00','2026-11-10 20:20:00','2026-11-08 14:33:00'],
+  ['8015726417','Gold Up or Down – November 4, 6AM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities','2026-11-04 15:20:00','2026-11-04 14:20:00','2026-11-04 21:20:00','2026-11-04 21:32:00'],
+  ['8015726416','Zhipu AI Up or Down – Nov 4','General Finance','+1','ended','on','predict.fun',['ZHIPU','+4'],'Science','AI','2026-11-03 14:20:00','2026-11-03 13:20:00','2026-11-03 20:20:00','2026-11-03 20:32:00'],
+  ['8015726415','Gold Up or Down – November 3, 10PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities','2026-11-02 13:20:00','2026-11-02 12:20:00','2026-11-02 19:20:00','2026-11-02 19:32:00'],
+  ['8015726414','Gold Up or Down – November 3, 8PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities','2026-11-06 12:20:00','2026-11-06 11:20:00','2026-11-06 18:20:00','2026-11-06 18:32:00'],
+  ['8015726413','SK Hynix Inc. Up or Down – Nov 3','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4'],'Business','Earnings','2026-11-05 11:20:00','2026-11-05 10:20:00','2026-11-05 17:20:00','2026-11-05 17:32:00'],
+  ['8015726412','SK Hynix Inc. Up or Down – Nov 3 (Late)','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4'],'Business','Earnings','2026-11-04 10:20:00','2026-11-04 09:20:00','2026-11-04 16:20:00','2026-11-04 16:32:00'],
+  ['8015726411','Gold Up or Down – November 3, 6PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities','2026-11-03 16:20:00','2026-11-03 15:20:00','2026-11-03 22:20:00','2026-11-03 22:32:00'],
+  ['8015726410','Gold Up or Down – November 3, 4PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities','2026-11-02 15:20:00','2026-11-02 14:20:00','2026-11-02 21:20:00','2026-11-02 21:32:00'],
+  ['8015621048','Unitree Robotics Up or Down – Nov 3','General Finance','+1','ended','on','predict.fun',['UNITREE','+4'],'Business','Big Tech Companies','2026-11-06 14:20:00','2026-11-06 13:20:00','2026-11-06 20:20:00','2026-11-06 20:32:00'],
+  ['8015621047','Unitree Robotics Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['UNITREE','+4'],'Business','Big Tech Companies','2026-11-05 13:20:00','2026-11-05 12:20:00','2026-11-05 19:20:00','2026-11-05 19:32:00'],
+  ['8015621046','Gold Up or Down – November 2, 10PM ET','General Finance','+1','ended','on','predict.fun',['XAU','+4'],'Finance','Commodities','2026-11-04 12:20:00','2026-11-04 11:20:00','2026-11-04 18:20:00','2026-11-04 18:32:00'],
+  ['8015621045','Zhipu AI Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['ZHIPU','+4'],'Science','AI','2026-11-03 11:20:00','2026-11-03 10:20:00','2026-11-03 17:20:00','2026-11-03 17:32:00'],
+  ['8015621044','SK Hynix Inc. Up or Down – Nov 2','General Finance','+1','ended','on','predict.fun',['SKHYNIX','+4'],'Business','Earnings','2026-11-02 10:20:00','2026-11-02 09:20:00','2026-11-02 16:20:00','2026-11-02 16:32:00'],
   /* Weather */
-  ['8015512203','Hurricane Melissa landfall by Nov 6?','Weather','','live','on','polymarket',['hurricane','+3'],'Weather','Hurricanes'],
-  ['8015512202','Atlantic named storms above 18 in 2026?','Weather','','live','on','polymarket',['climate','+2'],'Weather','Climate Change'],
-  ['8015512201','Tokyo snowfall on Dec 25?','Weather','','created','on','polymarket',['Weather','+2'],'Weather','General Weather'],
-  ['8015512200','Magnitude 7+ earthquake before year end?','Weather','','ended','on','polymarket',['earthquake','+4'],'Weather','Earthquakes'],
+  ['8015512203','Hurricane Melissa landfall by Nov 6?','Weather','','live','on','polymarket',['hurricane','+3'],'Weather','Hurricanes','2026-11-07 01:09:00','2026-11-07 00:39:00','2026-11-09 17:20:00','2026-11-09 15:05:00'],
+  ['8015512202','Atlantic named storms above 18 in 2026?','Weather','','live','on','polymarket',['climate','+2'],'Weather','Climate Change','2026-11-07 00:58:00','2026-11-07 00:28:00','2026-11-09 18:20:00','2026-11-09 15:05:00'],
+  ['8015512201','Tokyo snowfall on Dec 25?','Weather','','created','on','polymarket',['Weather','+2'],'Weather','General Weather','2026-11-09 19:20:00','2026-11-08 12:29:00','2026-11-10 19:20:00','2026-11-08 12:34:00'],
+  ['8015512200','Magnitude 7+ earthquake before year end?','Weather','','ended','on','polymarket',['earthquake','+4'],'Weather','Earthquakes','2026-11-02 12:20:00','2026-11-02 11:20:00','2026-11-02 18:20:00','2026-11-02 18:32:00'],
   /* Culture */
-  ['8015413305','Oscars 2027 Best Picture – Nominee','Culture','','live','on','polymarket',['Awards','+6'],'Culture','Awards'],
-  ['8015413304','Grammy Album of the Year 2027?','Culture','','live','on','predict.fun',['Music','+5'],'Culture','Music'],
-  ['8015413303','Top-grossing film of 2026?','Culture','','created','on','polymarket',['Movies','+7'],'Culture','Movies'],
-  ['8015413302','Taylor Swift announces new tour?','Culture','','ended','on','predict.fun',['Celebrity','+8'],'Culture','Celebrity'],
+  ['8015413305','Oscars 2027 Best Picture – Nominee','Culture','','live','on','polymarket',['Awards','+6'],'Culture','Awards','2026-11-07 00:14:00','2026-11-06 23:44:00','2026-11-09 17:20:00','2026-11-09 15:05:00'],
+  ['8015413304','Grammy Album of the Year 2027?','Culture','','live','on','predict.fun',['Music','+5'],'Culture','Music','2026-11-07 00:03:00','2026-11-06 23:33:00','2026-11-09 18:20:00','2026-11-09 15:05:00'],
+  ['8015413303','Top-grossing film of 2026?','Culture','','created','on','polymarket',['Movies','+7'],'Culture','Movies','2026-11-09 18:20:00','2026-11-08 11:54:00','2026-11-10 18:20:00','2026-11-08 11:59:00'],
+  ['8015413302','Taylor Swift announces new tour?','Culture','','ended','on','predict.fun',['Celebrity','+8'],'Culture','Celebrity','2026-11-02 14:20:00','2026-11-02 13:20:00','2026-11-02 20:20:00','2026-11-02 20:32:00'],
   /* Crypto */
-  ['8015314407','BTC above $120K on Nov 30?','Crypto','','live','on','polymarket',['BTC','+9'],'Crypto','BTC'],
-  ['8015314406','ETH above $6K by year end?','Crypto','','live','on','predict.fun',['ETH','+6'],'Crypto','ETH'],
-  ['8015314405','Solana hits $500 in 2026?','Crypto','','created','on','polymarket',['Altcoins','+7'],'Crypto','Altcoins'],
-  ['8015314404','DeFi TVL above $300B?','Crypto','','ended','on','predict.fun',['DeFi','+5'],'Crypto','DeFi'],
+  ['8015314407','BTC above $120K on Nov 30?','Crypto','','live','on','polymarket',['BTC','+9'],'Crypto','BTC','2026-11-06 23:19:00','2026-11-06 22:49:00','2026-11-09 17:20:00','2026-11-09 15:05:00'],
+  ['8015314406','ETH above $6K by year end?','Crypto','','live','on','predict.fun',['ETH','+6'],'Crypto','ETH','2026-11-06 23:08:00','2026-11-06 22:38:00','2026-11-09 18:20:00','2026-11-09 15:05:00'],
+  ['8015314405','Solana hits $500 in 2026?','Crypto','','created','on','polymarket',['Altcoins','+7'],'Crypto','Altcoins','2026-11-09 17:20:00','2026-11-08 11:19:00','2026-11-10 17:20:00','2026-11-08 11:24:00'],
+  ['8015314404','DeFi TVL above $300B?','Crypto','','ended','on','predict.fun',['DeFi','+5'],'Crypto','DeFi','2026-11-02 16:20:00','2026-11-02 15:20:00','2026-11-02 22:20:00','2026-11-02 22:32:00'],
   /* Sports */
-  ['8015215508','Premier League: Man City vs Liverpool','Sports','','live','on','polymarket',['Rugby','+9'],'Sports','Football'],
-  ['8015215507','NBA: Lakers vs Celtics – Winner','Sports','','live','on','predict.fun',['Ncaa','+7'],'Sports','Basketball'],
-  ['8015215506','LoL Worlds 2026 – Champion','Sports','','created','on','polymarket',['Esports','+8'],'Sports','Esports'],
-  ['8015215505','UFC 320 main event winner?','Sports','','ended','on','predict.fun',['UFC','+6'],'Sports','Combat'],
+  ['8015215508','Premier League: Man City vs Liverpool','Sports','','live','on','polymarket',['Rugby','+9'],'Sports','Football','2026-11-06 22:24:00','2026-11-06 21:54:00','2026-11-09 17:20:00','2026-11-09 15:05:00'],
+  ['8015215507','NBA: Lakers vs Celtics – Winner','Sports','','live','on','predict.fun',['Ncaa','+7'],'Sports','Basketball','2026-11-06 22:13:00','2026-11-06 21:43:00','2026-11-09 18:20:00','2026-11-09 15:05:00'],
+  ['8015215506','LoL Worlds 2026 – Champion','Sports','','created','on','polymarket',['Esports','+8'],'Sports','Esports','2026-11-09 16:20:00','2026-11-08 10:44:00','2026-11-10 16:20:00','2026-11-08 10:49:00'],
+  ['8015215505','UFC 320 main event winner?','Sports','','ended','on','predict.fun',['UFC','+6'],'Sports','Combat','2026-11-02 11:20:00','2026-11-02 10:20:00','2026-11-02 17:20:00','2026-11-02 17:32:00'],
   /* Politics */
-  ['8015116609','Which party wins the House in 2026?','Politics','','live','on','polymarket',['Trump','+9'],'Politics','Elections'],
-  ['8015116608','Government shutdown before Dec 31?','Politics','','live','on','predict.fun',['USA','+7'],'Politics','Policy'],
-  ['8015116607','US–China tariff deal in 2026?','Politics','','created','on','polymarket',['China','+8'],'Politics','Geopolitics'],
-  ['8015116606','UK general election turnout above 70%?','Politics','','ended','on','predict.fun',['UK','+6'],'Politics','Elections']
+  ['8015116609','Which party wins the House in 2026?','Politics','','live','on','polymarket',['Trump','+9'],'Politics','Elections','2026-11-06 21:29:00','2026-11-06 20:59:00','2026-11-09 17:20:00','2026-11-09 15:05:00'],
+  ['8015116608','Government shutdown before Dec 31?','Politics','','live','on','predict.fun',['USA','+7'],'Politics','Policy','2026-11-06 21:18:00','2026-11-06 20:48:00','2026-11-09 18:20:00','2026-11-09 15:05:00'],
+  ['8015116607','US–China tariff deal in 2026?','Politics','','created','on','polymarket',['China','+8'],'Politics','Geopolitics','2026-11-09 21:20:00','2026-11-08 10:09:00','2026-11-10 21:20:00','2026-11-08 10:14:00'],
+  ['8015116606','UK general election turnout above 70%?','Politics','','ended','on','predict.fun',['UK','+6'],'Politics','Elections','2026-11-02 13:20:00','2026-11-02 12:20:00','2026-11-02 19:20:00','2026-11-02 19:32:00']
 ];
 const CATEGORIES=[
   ['CF測試83447',2,'1212','阿富汗、亞美尼亞、亞塞拜然…',[],true,true],
@@ -274,47 +274,47 @@ const REVIEWED=[
   ['7958','SCOTUS invalidates AR–15 bans?','Judicial','已分類','通過','–','mjhbud002','2026-10-10 09:31:22','2026-10-10 14:00:00','polymarket','live']
 ];
 const REVIEWS=[
-  ['108068','Maidenhead United FC vs. Tonbridge Angels – …','ended','無法分類','–'],
-  ['108051','Dagenham and Redbridge FC vs. Hemel Hempst…','ended','無法分類','–'],
-  ['108042','AFC Totten vs. Walton and Hersham FC – Exact…','ended','無法分類','–'],
-  ['108024','Radcliffe FC vs. Scarborough Athletic – Exact S…','ended','無法分類','–'],
-  ['8659','Who Will Max Holloway Fight Next?','live','無法分類','–'],
-  ['7958','SCOTUS invalidates AR–15 bans?','live','無法分類','Judicial'],
-  ['7574','UFC: Who Will Manel Kape Fight Next?','ended','無法分類','–'],
-  ['7536','Social Security Insolvent by…?','live','無法分類','–'],
-  ['54','Will there be more than 120 million confirmed C…','ended','無法分類','All'],
-  ['53','Will Croatia or England win their Euro 2020 mat…','ended','無法分類','All'],
-  ['52','Will $ETH be above $1,200 on July 15?','ended','無法分類','All'],
-  ['50','Will natural gas close above $8 on May 20, 2022?','ended','無法分類','All'],
-  ['49','NBA: Will the 76ers beat the Hornets by more t…','ended','無法分類','All'],
-  ['48','NBA: Will the Heat beat the Magic by more than…','ended','無法分類','All'],
-  ['47','Will Hikaru Nakamura or Fabiano Caruana win i…','ended','無法分類','All'],
-  ['46','Will the 7-day COVID-19 case average on Janu…','ended','無法分類','All'],
-  ['45','Will Hikaru Nakamura win the 2021 St. Louis Ra…','ended','無法分類','All'],
-  ['44','Will F9 gross more than $62M domestically on …','ended','無法分類','All'],
-  ['42','Will Hungary or France win their Euro 2020 mat…','ended','無法分類','All'],
-  ['41','Will the Raiders beat the Dolphins by more than…','ended','無法分類','All']
+  ['108068','Maidenhead United FC vs. Tonbridge Angels – …','ended','無法分類','–','2026-11-09 12:40:00','2026-11-11 12:40:00','polymarket'],
+  ['108051','Dagenham and Redbridge FC vs. Hemel Hempst…','ended','無法分類','–','2026-11-09 09:40:00','2026-11-11 10:40:00','predict.fun'],
+  ['108042','AFC Totten vs. Walton and Hersham FC – Exact…','ended','無法分類','–','2026-11-09 06:40:00','2026-11-11 08:40:00','polymarket'],
+  ['108024','Radcliffe FC vs. Scarborough Athletic – Exact S…','ended','無法分類','–','2026-11-09 03:40:00','2026-11-11 06:40:00','predict.fun'],
+  ['8659','Who Will Max Holloway Fight Next?','live','無法分類','–','2026-11-09 00:40:00','2026-11-11 00:40:00','polymarket'],
+  ['7958','SCOTUS invalidates AR–15 bans?','live','無法分類','Judicial','2026-11-08 21:40:00','2026-11-10 22:40:00','predict.fun'],
+  ['7574','UFC: Who Will Manel Kape Fight Next?','ended','無法分類','–','2026-11-08 18:40:00','2026-11-10 20:40:00','polymarket'],
+  ['7536','Social Security Insolvent by…?','live','無法分類','–','2026-11-08 15:40:00','2026-11-10 18:40:00','predict.fun'],
+  ['54','Will there be more than 120 million confirmed C…','ended','無法分類','All','2026-11-08 12:40:00','2026-11-10 12:40:00','polymarket'],
+  ['53','Will Croatia or England win their Euro 2020 mat…','ended','無法分類','All','2026-11-08 09:40:00','2026-11-10 10:40:00','predict.fun'],
+  ['52','Will $ETH be above $1,200 on July 15?','ended','無法分類','All','2026-11-08 06:40:00','2026-11-10 08:40:00','polymarket'],
+  ['50','Will natural gas close above $8 on May 20, 2022?','ended','無法分類','All','2026-11-08 03:40:00','2026-11-10 06:40:00','predict.fun'],
+  ['49','NBA: Will the 76ers beat the Hornets by more t…','ended','無法分類','All','2026-11-08 00:40:00','2026-11-10 00:40:00','polymarket'],
+  ['48','NBA: Will the Heat beat the Magic by more than…','ended','無法分類','All','2026-11-07 21:40:00','2026-11-09 22:40:00','predict.fun'],
+  ['47','Will Hikaru Nakamura or Fabiano Caruana win i…','ended','無法分類','All','2026-11-07 18:40:00','2026-11-09 20:40:00','polymarket'],
+  ['46','Will the 7-day COVID-19 case average on Janu…','ended','無法分類','All','2026-11-07 15:40:00','2026-11-09 18:40:00','predict.fun'],
+  ['45','Will Hikaru Nakamura win the 2021 St. Louis Ra…','ended','無法分類','All','2026-11-07 12:40:00','2026-11-09 12:40:00','polymarket'],
+  ['44','Will F9 gross more than $62M domestically on …','ended','無法分類','All','2026-11-07 09:40:00','2026-11-09 10:40:00','predict.fun'],
+  ['42','Will Hungary or France win their Euro 2020 mat…','ended','無法分類','All','2026-11-07 06:40:00','2026-11-09 08:40:00','polymarket'],
+  ['41','Will the Raiders beat the Dolphins by more than…','ended','無法分類','All','2026-11-07 03:40:00','2026-11-09 06:40:00','predict.fun']
 ];
 const MERCHANTS=[
-  ['55','www','+11352895263','5225@163.com',0,0,'06f94••••••70e2','6a7c2••••••6cd68','+1'],
-  ['煩煩煩方法','fff','+11332456785','342556@qq.com',0,1,'8663f••••••2f917','6b7de••••••ee9aa','19'],
-  ['hhu','eee','+1123546','2584621@qq.com',0,3,'307fc••••••59951','cddb2••••••0fb12','+2'],
-  ['呃啊色','–','–','21212121@998.com',0,0,'bd139••••••9608b','fbf99••••••3cec2','–'],
-  ['david–test','david','–','david@outlook.com',1,0,'52cdf••••••8062f','34f44••••••22938','–'],
-  ['kan02','dsds','+1112121212','kan102@qq.com',1,48,'15c56••••••cff79','9e13b••••••0137f','+1'],
-  ['kan01','dsds','+1112121212','youyouu@qq.com',0,1,'d29b5••••••23a24','60920••••••03a08','+1'],
-  ['bubu','–','–','bubu1@qq.com',0,8,'2b5f8••••••6a481','b5f63••••••e3be9','+2'],
-  ['bubu002','–','+6015222','bubu002@qq.com',0,0,'10cc8••••••9d3bf','fdae••••••18860','–'],
-  ['bubu','–','+8618888888','bubu@qq.com',0,0,'7bf49••••••57006','337b5••••••0402b','–'],
-  ['kan01','dsds','+1112121212','kan02@qq.com',0,40,'72135••••••4dee6','4a67e••••••0042e','+1'],
-  ['kan','–','+112312121','kan01@qq.com',0,0,'ba7c6••••••4422d','05c05••••••467e9','–'],
-  ['mi002','1111111','–','dasdas@qq.com',0,0,'2ec88••••••8d46d','32151••••••e86fc','–'],
-  ['mini002','–','–','da@qq.com',0,0,'b5b1e••••••2ca9b','e3487••••••4861c','–'],
-  ['mini','–','–','mini@qq.com',0,0,'03dc2••••••ada1d','435b5••••••1908f','–'],
-  ['jiqian','–','–','jiqian@qq.com',0,0,'57f46••••••59659','46536••••••675a2','–'],
-  ['test','–','–','merchant-80007@mi…',2,3,'a26ae••••••8a610','2a8cb••••••d776c','–'],
-  ['小王商行','小王','+112121212','merchant-80005@mi…',0,1,'f5b76••••••d5d87','8df3f••••••b2b7a','–'],
-  ['測試商戶','王','+1123456789','merchant-80001@mi…',0,2,'620fa••••••1de7d','41d93••••••7da0c','–']
+  ['55','www','+11352895263','5225@163.com',0,0,'06f94••••••70e2','6a7c2••••••6cd68','+1',1,'2026-11-06 15:40:00'],
+  ['煩煩煩方法','fff','+11332456785','342556@qq.com',0,1,'8663f••••••2f917','6b7de••••••ee9aa','19',1,'2026-11-04 14:40:00'],
+  ['hhu','eee','+1123546','2584621@qq.com',0,3,'307fc••••••59951','cddb2••••••0fb12','+2',1,'2026-11-02 13:40:00'],
+  ['呃啊色','–','–','21212121@998.com',0,0,'bd139••••••9608b','fbf99••••••3cec2','–',0,'2026-10-31 12:40:00'],
+  ['david–test','david','–','david@outlook.com',1,0,'52cdf••••••8062f','34f44••••••22938','–',1,'2026-10-29 11:40:00'],
+  ['kan02','dsds','+1112121212','kan102@qq.com',1,48,'15c56••••••cff79','9e13b••••••0137f','+1',1,'2026-10-27 15:40:00'],
+  ['kan01','dsds','+1112121212','youyouu@qq.com',0,1,'d29b5••••••23a24','60920••••••03a08','+1',1,'2026-10-25 14:40:00'],
+  ['bubu','–','–','bubu1@qq.com',0,8,'2b5f8••••••6a481','b5f63••••••e3be9','+2',0,'2026-10-23 13:40:00'],
+  ['bubu002','–','+6015222','bubu002@qq.com',0,0,'10cc8••••••9d3bf','fdae••••••18860','–',1,'2026-10-21 12:40:00'],
+  ['bubu','–','+8618888888','bubu@qq.com',0,0,'7bf49••••••57006','337b5••••••0402b','–',1,'2026-10-19 11:40:00'],
+  ['kan01','dsds','+1112121212','kan02@qq.com',0,40,'72135••••••4dee6','4a67e••••••0042e','+1',1,'2026-10-17 15:40:00'],
+  ['kan','–','+112312121','kan01@qq.com',0,0,'ba7c6••••••4422d','05c05••••••467e9','–',0,'2026-10-15 14:40:00'],
+  ['mi002','1111111','–','dasdas@qq.com',0,0,'2ec88••••••8d46d','32151••••••e86fc','–',1,'2026-10-13 13:40:00'],
+  ['mini002','–','–','da@qq.com',0,0,'b5b1e••••••2ca9b','e3487••••••4861c','–',1,'2026-10-11 12:40:00'],
+  ['mini','–','–','mini@qq.com',0,0,'03dc2••••••ada1d','435b5••••••1908f','–',1,'2026-10-09 11:40:00'],
+  ['jiqian','–','–','jiqian@qq.com',0,0,'57f46••••••59659','46536••••••675a2','–',0,'2026-10-07 15:40:00'],
+  ['test','–','–','merchant-80007@mi…',2,3,'a26ae••••••8a610','2a8cb••••••d776c','–',1,'2026-10-05 14:40:00'],
+  ['小王商行','小王','+112121212','merchant-80005@mi…',0,1,'f5b76••••••d5d87','8df3f••••••b2b7a','–',1,'2026-10-03 13:40:00'],
+  ['測試商戶','王','+1123456789','merchant-80001@mi…',0,2,'620fa••••••1de7d','41d93••••••7da0c','–',1,'2026-10-01 12:40:00']
 ];
 const USERS=[
   ['100030','mjhbud000002','mjhbu…','超級管理員',true,false,'–','2026-11-02 16:59:02','2026-11-02 16:59:55'],
@@ -349,26 +349,26 @@ const ROLES=[
   ['測試','測試用的','2026-08-14 02:4…'],['超級管理員','系統預置超級管理員角色','2026-06-29 08:2…']
 ];
 const LOGS=[
-  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
-  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
-  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
-  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
-  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
-  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
-  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
-  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
-  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
-  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
-  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
-  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
-  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
-  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
-  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
-  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
-  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
-  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)'],
-  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…'],
-  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)']
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…','2026-11-09 15:38:00'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)','2026-11-09 15:31:00'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…','2026-11-09 15:24:00'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)','2026-11-09 15:17:00'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…','2026-11-09 15:10:00'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)','2026-11-09 15:03:00'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…','2026-11-09 14:56:00'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)','2026-11-09 14:49:00'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…','2026-11-09 14:42:00'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)','2026-11-09 14:35:00'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…','2026-11-09 14:28:00'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)','2026-11-09 14:21:00'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)','2026-11-09 14:14:00'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…','2026-11-09 14:07:00'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)','2026-11-09 14:00:00'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)','2026-11-09 13:53:00'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…','2026-11-09 13:46:00'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)','2026-11-09 13:39:00'],
+  ['mjhbud002','設定IP白名單啟用狀態','商戶','設定IP白名單啟用狀態商戶 (8…','2026-11-09 13:32:00'],
+  ['mjhbud002','新增白名單IP','商戶','新增白名單IP商戶 (80058)','2026-11-09 13:25:00']
 ];
 const PERM_TREE=[
   {name:'事件總覽',perms:[]},
@@ -392,7 +392,7 @@ const PERM_TREE=[
 const state={
   view:'admin', loggedIn:true, route:'/index',
   tabs:[{path:'/index',title:'事件總覽'}],
-  navOpen:{event:true,merchant:false,system:false,auth:false},
+  navOpen:{event:true,merchant:false,entity:true,system:false,auth:false},
   drawer:false, coefTab:'global', reviewTab:'basic', merchantTab:'type', specSection:'version',
   topRange:'24h', mfaBound:false, eventCat:null, trendRange:'7',
   apiDetailId:80001, apiDetailName:'', moreName:'',
@@ -436,23 +436,23 @@ function pageLogin(){
       '</div>'+
       '<div class="login-form-wrap">'+
         '<div class="login-top">'+
-          '<button class="hbtn">未登錄 '+icon('chevron',13)+'</button>'+
-          '<button class="hbtn" onclick="toast(\'原型示意：語言切換\',\'info\')"><span class="flag"><svg width="16" height="16" viewBox="0 0 16 16"><rect width="16" height="16" fill="#de2910"/><circle cx="5" cy="5" r="2" fill="#ffde00"/></svg></span>繁體中文 '+icon('chevron',13)+'</button></div>'+
+          '<button class="hbtn">未登錄 '+icon('chevron',12)+'</button>'+
+          '<button class="hbtn" onclick="toast(\'原型示意：語言切換\',\'info\')"><span class="flag"><svg width="16" height="16" viewBox="0 0 16 16"><rect width="16" height="16" fill="#de2910"/><circle cx="5" cy="5" r="2" fill="#ffde00"/></svg></span>繁體中文 '+icon('chevron',12)+'</button></div>'+
         '<div class="login-body" style="padding-bottom:20px"><div class="login-box">'+
           '<h1 class="login-title">歡迎登錄數據中台</h1>'+
           '<p class="login-sub">請輸入您的帳號密碼以登入</p>'+
           '<form onsubmit="doLogin(event)">'+
             '<div class="field"><label class="field-label">帳號</label>'+
-            '<div class="input-wrap"><span class="ico">'+icon('user',15)+'</span>'+
+            '<div class="input-wrap"><span class="ico">'+icon('user',16)+'</span>'+
             '<input class="input" id="login-account" placeholder="請輸入" autocomplete="username" /></div></div>'+
             '<div class="field"><label class="field-label">密碼</label>'+
-            '<div class="input-wrap"><span class="ico">'+icon('lock',15)+'</span>'+
+            '<div class="input-wrap"><span class="ico">'+icon('lock',16)+'</span>'+
             '<input class="input" id="login-pwd" type="password" placeholder="請輸入" autocomplete="current-password" style="padding-right:36px" />'+
             '<span class="suffix" id="pwd-eye" onclick="togglePwd()">'+icon('eyeOff',16)+'</span></div></div>'+
             '<div class="login-row"><label class="check"><input type="checkbox" />記住帳號</label>'+
             '<span class="link" style="font-size:13px" onclick="toast(\'原型示意：忘記密碼\',\'info\')">忘記密碼？</span></div>'+
             '<button class="btn btn-primary btn-block" type="submit">登入</button></form>'+
-          '<p style="text-align:center;color:#c9cdd4;font-size:11px;margin-top:22px">原型設計稿 · 不含真實後端 · 任意帳密可進入</p>'+
+          '<p style="text-align:center;color:var(--text-disabled);font-size:11px;margin-top:22px">原型設計稿 · 不含真實後端 · 任意帳密可進入</p>'+
         '</div></div>'+
       '</div>'+
     '</div></div>';
@@ -496,11 +496,11 @@ function renderAdmin(){
     }).join('');
     return '<div class="nav-group"><div class="nav-item'+(isActive?' active':'')+open+'" onclick="onNavGroup(\''+m.key+'\',\''+m.children[0].path+'\',this)" title="'+m.label+'">'+
       '<span class="ni">'+icon(m.icon,16)+'</span><span class="nl">'+m.label+'</span>'+
-      '<span class="caret">'+icon('chevron',13)+'</span></div>'+
+      '<span class="caret">'+icon('chevron',12)+'</span></div>'+
       '<div class="nav-sub'+open+'">'+subs+'</div></div>';
   }).join('');
   const tabsHtml=state.tabs.map(function(t){
-    const close=state.tabs.length>1?'<span class="x" onclick="closeTab(event,\''+t.path+'\')">'+icon('close',11)+'</span>':'';
+    const close=state.tabs.length>1?'<span class="x" onclick="closeTab(event,\''+t.path+'\')">'+icon('close',16)+'</span>':'';
     return '<div class="tab'+(state.route===t.path?' active':'')+'" onclick="go(\''+t.path+'\')">'+t.title+close+'</div>';
   }).join('');
   return '<div class="app">'+
@@ -509,13 +509,13 @@ function renderAdmin(){
       '<div class="sb-brand"><svg width="26" height="19" viewBox="0 0 40 28" fill="none"><path d="M3 20C3 11 10 5 19 5c7 0 12 4 12 9 0 4-3 7-7 7" stroke="#2f6bf6" stroke-width="3.4" stroke-linecap="round"/><circle cx="30" cy="20" r="3.6" fill="#2f6bf6"/></svg>'+
       '<span class="brand-name">數據中台</span></div>'+
       '<nav class="nav">'+navHtml+'</nav>'+
-      '<div class="sb-foot"><span class="vnum" onclick="showVersion()" style="font-size:10px;padding:2px 6px">'+VERSION+'</span>'+
-      '<span style="color:#86909c;font-size:11px">原型設計</span></div></aside>'+
+      '<div class="sb-foot"><span class="vnum" onclick="showVersion()" style="font-size:11px;padding:2px 6px">'+VERSION+'</span>'+
+      '<span style="color:var(--text-help);font-size:11px">原型設計</span></div></aside>'+
     '<div class="main"><header class="admin-header">'+
-      '<button class="hamburger" onclick="toggleDrawer(true)">'+icon('menu',19)+'</button>'+
+      '<button class="hamburger" onclick="toggleDrawer(true)">'+icon('menu',20)+'</button>'+
       '<div class="header-spacer"></div><div class="header-right"><div class="divider-v"></div>'+
-      '<button class="hbtn" id="user-btn" onclick="showUserMenu()"><span class="avatar">S</span>Sky.r '+icon('chevron',13)+'</button>'+
-      '<button class="hbtn" onclick="toast(\'原型示意：語言切換\',\'info\')"><span class="flag"><svg width="16" height="16" viewBox="0 0 16 16"><rect width="16" height="16" fill="#de2910"/><circle cx="5" cy="5" r="2" fill="#ffde00"/></svg></span>繁體中文 '+icon('chevron',13)+'</button>'+
+      '<button class="hbtn" id="user-btn" onclick="showUserMenu()"><span class="avatar">S</span>Sky.r '+icon('chevron',12)+'</button>'+
+      '<button class="hbtn" onclick="toast(\'原型示意：語言切換\',\'info\')"><span class="flag"><svg width="16" height="16" viewBox="0 0 16 16"><rect width="16" height="16" fill="#de2910"/><circle cx="5" cy="5" r="2" fill="#ffde00"/></svg></span>繁體中文 '+icon('chevron',12)+'</button>'+
       '<span class="clock num" id="clock"></span></div></header>'+
       '<div class="tabs">'+tabsHtml+'</div>'+
       '<main class="content" id="content">'+renderRoute()+'</main></div></div>';
@@ -530,7 +530,9 @@ const PAGES={
   '/system/api-alarm':pageApiAlarm,
   '/merchant/api-detail':pageApiDetail,
   '/event/archive':pageArchive,
-  '/event/detail':pageEventDetail
+  '/event/detail':pageEventDetail,
+  '/entity/index':pageEntityDashboard,
+  '/entity/list':pageEntityList
 };
 function renderRoute(){return (PAGES[state.route]||pageDashboard)();}
 function go(path){
@@ -573,7 +575,7 @@ function pageDashboard(){
   const range=state.trendRange||'7';
   const tr=range==='30'?d.trend30:d.trend;
   const statsHtml=d.stats.map(function(s){
-    return '<div class="stat"><div class="stat-ico" style="background:'+s.bg+';color:'+s.color+'">'+icon(s.icon,17)+'</div>'+
+    return '<div class="stat"><div class="stat-ico" style="background:'+s.bg+';color:'+s.color+'">'+icon(s.icon,16)+'</div>'+
       '<div class="stat-main"><div class="stat-label">'+s.label+'</div>'+
       '<div class="stat-value">'+s.value+'<small>'+s.unit+'</small></div>'+
       (s.foot?'<div class="stat-foot">'+s.foot+'</div>':'')+'</div></div>';
@@ -589,12 +591,12 @@ function pageDashboard(){
   const xHtml=tr.labels.map(function(l){return '<span>'+l+'</span>';}).join('');
   const srcMax=Math.max.apply(null,d.sources.map(function(s){return s.v;}));
   const srcHtml=d.sources.map(function(s,i){
-    const color=i===0?'linear-gradient(90deg,#a8c8ff,#2f6bf6)':'linear-gradient(90deg,#d8c6ff,#8b5cf6)';
+    const color='var(--primary)';
     return '<div class="src-bar-row">'+
-      '<span style="width:78px;color:#4e5969;font-size:12px">'+s.name+'</span>'+
-      '<div style="flex:1;height:11px;background:#f4f7fc;border-radius:6px;overflow:hidden">'+
+      '<span style="width:78px;color:var(--text-sub);font-size:12px">'+s.name+'</span>'+
+      '<div style="flex:1;height:12px;background:#f4f7fc;border-radius:6px;overflow:hidden">'+
       '<div style="width:'+((s.v/srcMax)*100)+'%;height:100%;background:'+color+';border-radius:6px"></div></div>'+
-      '<span class="num" style="width:78px;text-align:right;color:#86909c;font-size:11px">'+s.v.toLocaleString()+'</span></div>';
+      '<span class="num" style="width:78px;text-align:right;color:var(--text-help);font-size:11px">'+s.v.toLocaleString()+'</span></div>';
   }).join('');
   const isTotal=state.topRange==='total';
   const topSrc=isTotal?d.topTotal:d.top;
@@ -610,15 +612,15 @@ function pageDashboard(){
       '<div class="legend" style="justify-content:flex-end;margin-bottom:4px"><i style="background:#5b8cff"></i>新增事件</div>'+
       '<div class="chart-trend"><div class="bars">'+gridHtml+barsHtml+'</div><div class="bar-x">'+xHtml+'</div></div></section>'+
     '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>類型分布</div>'+
-      '<div class="right"><select class="f-select" style="border:1px solid #e5e8ef;border-radius:6px;height:28px"><option>全部事件</option><option>Crypto</option><option>Sports</option></select></div></div>'+
+      '<div class="right"><select class="f-select" style="border:1px solid var(--border);border-radius:6px;height:28px"><option>全部事件</option><option>Crypto</option><option>Sports</option></select></div></div>'+
       '<div class="legend" style="justify-content:flex-end"><i style="background:#5b8cff"></i>事件數</div>'+
       '<div class="chart-area" id="area-chart"></div></section></div>'+
   '<div class="grid-2">'+
     '<section class="panel panel-col"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>來源分布</div>'+
-      '<div class="right"><select class="f-select" style="border:1px solid #e5e8ef;border-radius:6px;height:28px"><option>全部事件</option><option>polymarket</option><option>predict.fun</option></select></div></div>'+
+      '<div class="right"><select class="f-select" style="border:1px solid var(--border);border-radius:6px;height:28px"><option>全部事件</option><option>polymarket</option><option>predict.fun</option></select></div></div>'+
       '<div class="legend" style="justify-content:flex-end;margin-bottom:10px"><i style="background:#5b8cff"></i>polymarket&nbsp;&nbsp;<i style="background:#a78bfa"></i>predict.fun</div>'+
       '<div class="src-bars">'+srcHtml+'</div>'+
-      '<div class="num" style="display:flex;justify-content:space-between;color:#c9cdd4;font-size:10.5px;padding-left:88px;margin-top:2px;flex:none">'+
+      '<div class="num" style="display:flex;justify-content:space-between;color:var(--text-disabled);font-size:11px;padding-left:88px;margin-top:2px;flex:none">'+
       '<span>0</span><span>20,000</span><span>40,000</span><span>60,000</span><span>80,000</span><span>100,000</span><span>120,000</span><span>140,000</span></div></section>'+
     '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>上游交易量 TOP10</div>'+
       '<div class="right">'+
@@ -626,7 +628,7 @@ function pageDashboard(){
         '<button class="'+(isTotal?'':'active')+'" onclick="setTopRange(\'24h\')">24h 交易量</button>'+
         '<button class="'+(isTotal?'active':'')+'" onclick="setTopRange(\'total\')">總交易量</button>'+
       '</div></div></div>'+
-      '<div style="display:grid;grid-template-columns:34px 1fr 132px;gap:10px;padding:10px 6px 6px;color:#86909c;font-size:11px">'+
+      '<div style="display:grid;grid-template-columns:34px 1fr 132px;gap:10px;padding:10px 6px 6px;color:var(--text-help);font-size:11px">'+
       '<span style="text-align:center">排名</span><span>事件名稱</span><span style="text-align:right">交易量 ($)</span></div>'+
       '<div class="top-list">'+topHtml+'</div></section></div>';
 }
@@ -650,7 +652,7 @@ function drawAreaChart(){
   for(let i=0;i<6;i++){
     const y=padT+ih-(i/5)*ih;
     grid+='<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y.toFixed(1)+'" stroke="#f0f3f8" stroke-dasharray="3 3"/>'+
-      '<text x="'+(padL-8)+'" y="'+(y+3).toFixed(1)+'" font-size="9.5" fill="#c9cdd4" text-anchor="end" font-family="Outfit,sans-serif">'+
+      '<text x="'+(padL-8)+'" y="'+(y+3).toFixed(1)+'" font-size="11" fill="#86909c" text-anchor="end" font-family="Outfit,sans-serif">'+
       Math.round(cMax*i/5).toLocaleString()+'</text>';
   }
   let area='M'+xs[0].toFixed(1)+','+(padT+ih)+' L'+xs[0].toFixed(1)+','+ys[0].toFixed(1);
@@ -659,15 +661,16 @@ function drawAreaChart(){
   let line='M'+xs[0].toFixed(1)+','+ys[0].toFixed(1);
   for(let i=1;i<xs.length;i++)line+=' L'+xs[i].toFixed(1)+','+ys[i].toFixed(1);
   const labels=d.labels.map(function(l,i){
-    return '<text x="'+xs[i].toFixed(1)+'" y="'+(H-10)+'" font-size="10" fill="#86909c" text-anchor="middle" font-family="Outfit,sans-serif">'+l+'</text>';
+    return '<text x="'+xs[i].toFixed(1)+'" y="'+(H-10)+'" font-size="11" fill="#86909c" text-anchor="middle" font-family="Outfit,sans-serif">'+l+'</text>';
   }).join('');
   const vals=cv.map(function(v,i){
     if(v<5000)return '';
-    return '<text x="'+xs[i].toFixed(1)+'" y="'+(ys[i]-9).toFixed(1)+'" font-size="10" fill="#4e5969" text-anchor="middle" font-family="Outfit,sans-serif">'+v.toLocaleString()+'</text>';
+    /* 首點的數值標籤會與縱軸刻度擠在同一處，頂點數值已在刻度上顯示，兩處都不再重複標 */
+    if(i===0||v===cMax)return '';
+    return '<text x="'+xs[i].toFixed(1)+'" y="'+(ys[i]-9).toFixed(1)+'" font-size="11" fill="#4e5969" text-anchor="middle" font-family="Outfit,sans-serif">'+v.toLocaleString()+'</text>';
   }).join('');
   host.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="100%">'+
-    '<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8fbaff" stop-opacity=".85"/><stop offset="100%" stop-color="#c9dcff" stop-opacity=".28"/></linearGradient></defs>'+
-    grid+'<path d="'+area+'" fill="url(#ag)"/><path d="'+line+'" fill="none" stroke="#4d86ff" stroke-width="1.6"/>'+
+    grid+'<path d="'+area+'" fill="#4d86ff" fill-opacity=".12"/><path d="'+line+'" fill="none" stroke="#4d86ff" stroke-width="1.6"/>'+
     labels+vals+'</svg>';
 }
 
@@ -683,7 +686,7 @@ function pageEventList(){
   /* 按當前分類篩選；分類下無事件時顯示空態 */
   /* 已歸檔事件不進入活躍列表；歸檔為邏輯標記，不改變事件三態 */
   const list=evListRows();
-  const rows=list.map(function(r){
+  const rows=list.map(function(r,idx){
     const tags=r[7].map(function(t){return '<span class="chip">'+t+'</span>';}).join(' ');
     const catChip=r[9]?'<span class="chip chip-blue" style="margin-left:6px">'+r[9]+'</span>':'';
     /* 歸檔准入：僅「已結束」事件可歸檔，與歸檔工作台及產品基線口徑一致 */
@@ -691,20 +694,25 @@ function pageEventList(){
     return '<tr><td style="width:36px"><input type="checkbox" class="ev-row-check" data-ev-id="'+r[0]+'"'+
       (can?(EVARC.sel[r[0]]?' checked':'')+' onchange="evToggleRow(\''+r[0]+'\',this.checked)"':' disabled title="僅已結束事件可歸檔"')+
       ' style="accent-color:var(--primary)" /></td>'+
-      '<td class="num" style="color:#86909c">'+r[0]+'</td>'+
+      '<td class="num" style="color:var(--text-help)">'+(idx+1)+'</td>'+
+      '<td class="num" style="color:var(--text-help)">'+r[0]+'</td>'+
       '<td class="name"><div class="cell-clip" title="'+esc(r[1])+'">'+esc(r[1])+'</div></td>'+
-      '<td><div style="width:34px;height:24px;border-radius:3px;background:linear-gradient(135deg,#eef4ff,#dbe8ff);display:flex;align-items:center;justify-content:center;color:#9db8e8">'+icon('file',13)+'</div></td>'+
+      '<td><div style="width:34px;height:24px;border-radius:3px;background:#eef4ff;display:flex;align-items:center;justify-content:center;color:#9db8e8">'+icon('file',16)+'</div></td>'+
       '<td>'+r[2]+catChip+'</td><td>'+statusBadge(r[4])+'</td>'+
       '<td><span class="switch '+(swGet('ev:'+r[0]+':push',r[5]==='on')?'on':'')+'" data-label="推送狀態" onclick="toggleSwitch(this,\'ev:'+r[0]+':push\')"></span></td>'+
       '<td><span class="chip chip-line">'+r[6]+'</span></td><td>'+tags+'</td>'+
+      '<td class="num" style="color:var(--text-sub);white-space:nowrap">'+r[10]+'</td>'+
+      '<td class="num" style="color:var(--text-sub);white-space:nowrap">'+r[11]+'</td>'+
+      '<td class="num" style="color:var(--text-sub);white-space:nowrap">'+r[12]+'</td>'+
+      '<td class="num" style="color:var(--text-sub);white-space:nowrap">'+r[13]+'</td>'+
       '<td class="actions"><span class="btn-text" onclick="openCountryFilter(\''+esc(r[1])+'\',\'event\')">國家過濾</span>'+
       '<span class="btn-text" onclick="openEventEdit(\''+r[0]+'\')">編輯</span>'+
       '<span class="btn-text" onclick="openEventDetail(\''+r[0]+'\')">詳情</span>'+
       (can?'<span class="btn-text ev-op-archive" onclick="evOpenArchive([\''+r[0]+'\'])">歸檔</span>':
            '<span class="btn-text muted" title="僅已結束事件可歸檔">歸檔</span>')+'</td></tr>';
   }).join('');
-  const bodyHtml=rows||'<tr><td colspan="10"><div class="empty-state">'+
-      icon('file',26)+'<p>「'+esc(curCat)+'」分類下暫無事件</p></div></td></tr>';
+  const bodyHtml=rows||'<tr><td colspan="15"><div class="empty-state">'+
+      icon('file',24)+'<p>「'+esc(curCat)+'」分類下暫無事件</p></div></td></tr>';
   return '<div class="card"><div class="cat-strip-wrap">'+
     '<button class="cat-nav" onclick="scrollCat(-1)" aria-label="向前滾動">'+
       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
@@ -720,25 +728,25 @@ function pageEventList(){
     '<div class="f-item"><select class="f-select"><option>狀態</option><option>進行中</option><option>已創建</option><option>已結束</option></select></div>'+
     '<div class="f-item"><select class="f-select"><option>推送狀態</option><option>已推送</option><option>未推送</option></select></div>'+
     '<div class="f-item"><select class="f-select"><option>數據來源</option><option>polymarket</option><option>predict.fun</option></select></div>'+
-    '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:#4e5969;white-space:nowrap;font-size:13px">截止時間</span>'+
+    '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:var(--text-sub);white-space:nowrap;font-size:13px">截止時間</span>'+
     '<input class="f-date" id="dp-ev-start" placeholder="開始日期" readonly onclick="openDatePicker({mode:\'single\',target:\'dp-ev-start\',title:\'截止時間 · 開始\'})" />'+
-    '<span style="color:#c9cdd4">–</span>'+
+    '<span style="color:var(--text-disabled)">–</span>'+
     '<input class="f-date" id="dp-ev-end" placeholder="結束日期" readonly onclick="openDatePicker({mode:\'single\',target:\'dp-ev-end\',title:\'截止時間 · 結束\'})" /></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
     '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button>'+
     '<div style="margin-left:auto;display:flex;gap:6px">'+
-    '<button class="btn btn-ghost" style="width:34px;padding:0" onclick="toast(\'原型示意：列表檢視\',\'info\')">'+icon('list',15)+'</button>'+
-    '<button class="btn btn-ghost" style="width:34px;padding:0" onclick="toast(\'原型示意：欄位設定\',\'info\')">'+icon('grid',15)+'</button></div></div>'+
+    '<button class="btn btn-ghost" style="width:34px;padding:0" onclick="toast(\'原型示意：列表檢視\',\'info\')">'+icon('list',16)+'</button>'+
+    '<button class="btn btn-ghost" style="width:34px;padding:0" onclick="toast(\'原型示意：欄位設定\',\'info\')">'+icon('grid',16)+'</button></div></div>'+
     '<div class="ev-bulkbar'+(evSelIds().length?' show':'')+'" id="ev-bulkbar">'+
       '<span>已選 <b id="ev-sel-count">'+evSelIds().length+'</b> 條</span>'+
       '<button class="btn btn-ghost" onclick="evClearSel()">取消選取</button>'+
       '<span style="flex:1"></span>'+
       '<button class="btn btn-primary" id="ev-batch-btn" onclick="evOpenArchive()"'+(evSelIds().length?'':' disabled')+'>批量歸檔</button></div>'+
-    '<div class="table-wrap"><table class="tbl-fixed-op"><thead><tr>'+
+    '<div class="table-wrap"><table class="tbl-fixed-op" style="min-width:1980px"><thead><tr>'+
     '<th style="width:36px"><input type="checkbox" id="ev-check-all" style="accent-color:var(--primary)"'+
       (list.some(function(r){return evCanArchive(r[0]);})?'':' disabled title="僅已結束事件可歸檔"')+
       ' onchange="evToggleAll(this.checked)" /></th>'+
-    '<th>事件 ID</th><th>名稱</th><th>封面</th><th>二級分類</th><th>事件狀態</th><th>推送狀態</th><th>數據來源</th><th>關聯標籤</th><th>操作</th>'+
+    '<th style="width:56px">序號</th><th style="width:96px">事件 ID</th><th style="width:230px">名稱</th><th style="width:72px">封面</th><th>二級分類</th><th style="width:100px">事件狀態</th><th style="width:100px">推送狀態</th><th style="width:110px">數據來源</th><th style="width:200px">關聯標籤</th><th style="width:170px">開始時間</th><th style="width:170px">入庫時間</th><th style="width:170px">截止時間</th><th style="width:170px">更新時間</th><th>操作</th>'+
     '</tr></thead><tbody>'+bodyHtml+'</tbody></table></div>'+pager(Math.max(list.length,1),1)+'</div>';
 }
 function setEventCat(c){ EVARC.sel={};
@@ -773,11 +781,11 @@ function openEventDetail(id,name,cat,st,src){
   const status=st || (ev?ev[4]:'ended');
   const source=src || (ev?ev[6]:'polymarket');
   const tags=ev&&ev[7]?ev[7].map(function(t){
-    return t.charAt(0)==='+'?'<span style="color:#86909c;font-size:11px">'+t+'</span>':'<span class="chip chip-line">'+t+'</span>';
+    return t.charAt(0)==='+'?'<span style="color:var(--text-help);font-size:11px">'+t+'</span>':'<span class="chip chip-line">'+t+'</span>';
   }).join(' '):'<span class="muted">–</span>';
   openModal(modalShell({
     title:'事件詳情',size:'wide',
-    body:'<div class="detail-head"><div class="dh-ico">'+icon('file',17)+'</div>'+
+    body:'<div class="detail-head"><div class="dh-ico">'+icon('file',16)+'</div>'+
       '<div style="flex:1;min-width:0">'+
         '<h3 class="dh-title" style="margin-bottom:10px">'+esc(title)+'</h3>'+
         '<div class="dh-meta">'+statusBadge(status)+
@@ -785,9 +793,9 @@ function openEventDetail(id,name,cat,st,src){
           '<span class="chip chip-line">'+esc(source)+'</span></div>'+
       '</div></div>'+
       '<div class="info-grid">'+
-      '<div class="info-item"><div class="k">事件 ID <span class="copy" onclick="toast(\'已複製事件 ID\',\'info\')">'+icon('copy',12)+'</span></div><div class="v">'+esc(id)+'</div></div>'+
+      '<div class="info-item"><div class="k">事件 ID <span class="copy" onclick="toast(\'已複製事件 ID\',\'info\')">'+icon('copy',16)+'</span></div><div class="v">'+esc(id)+'</div></div>'+
       '<div class="info-item"><div class="k">源事件 ID</div><div class="v">1159904</div></div>'+
-      '<div class="info-item"><div class="k">源 slug</div><div class="v" style="font-size:11.5px;color:#86909c">nls-mu-ton-2026-10-10-exact-score</div></div>'+
+      '<div class="info-item"><div class="k">源 slug</div><div class="v" style="font-size:11px;color:var(--text-help)">nls-mu-ton-2026-10-10-exact-score</div></div>'+
       '<div class="info-item"><div class="k">二級分類</div><div class="v">'+esc(catName)+'</div></div>'+
       '<div class="info-item"><div class="k">開始時間</div><div class="v">2026-10-09 16:55:15</div></div>'+
       '<div class="info-item"><div class="k">截止時間</div><div class="v">2026-10-10 14:00:00</div></div>'+
@@ -795,7 +803,7 @@ function openEventDetail(id,name,cat,st,src){
       '<div class="info-item"><div class="k">更新時間</div><div class="v">2026-11-04 09:12:33</div></div>'+
       '<div class="info-item"><div class="k">關聯標籤</div><div class="v">'+tags+'</div></div>'+
       '</div>'+
-      '<div style="margin-top:18px;border-top:1px solid #eef1f6;padding-top:14px">'+
+      '<div style="margin-top:18px;border-top:1px solid var(--border-light);padding-top:14px">'+
       '<div class="card-title" style="margin-bottom:10px">規則</div>'+
       '<div class="rule-text"><div class="h">基本規則</div>In the upcoming National League South game between Maidenhead United FC and Tonbridge Angels, scheduled for October 10, 2026 at 10:00 AM ET: This market will resolve based on the final score of the Maidenhead United FC vs. Tonbridge Angels match, considering only the result at the end of 90 minutes of regulation plus stoppage time.</div></div>',
     foot:'<button class="btn btn-ghost" onclick="closeModal()">關閉</button>'+
@@ -845,12 +853,12 @@ function pageEventDetail(){
   }else{
     title=ev?ev[1]:'—';catName=ev?ev[2]:'—';status=ev?ev[4]:'ended';source=ev?ev[6]:'polymarket';
     tags=ev&&ev[7]?ev[7].map(function(t){
-      return t.charAt(0)==='+'?'<span style="color:#86909c;font-size:11px">'+t+'</span>':'<span class="chip chip-line">'+t+'</span>';
+      return t.charAt(0)==='+'?'<span style="color:var(--text-help);font-size:11px">'+t+'</span>':'<span class="chip chip-line">'+t+'</span>';
     }).join(' '):'<span class="muted">–</span>';
     headTop='事件 ID：'+esc(id||'—');
   }
 
-  const head='<div class="card"><div class="detail-head"><div class="dh-ico">'+icon('file',17)+'</div>'+
+  const head='<div class="card"><div class="detail-head"><div class="dh-ico">'+icon('file',16)+'</div>'+
     '<div style="flex:1;min-width:0"><div class="dh-top">'+esc(headTop)+'</div>'+
     '<h3 class="dh-title">'+esc(title)+'</h3>'+
     '<div class="dh-meta">'+(arc
@@ -943,10 +951,10 @@ function pageCategory(){
     idx++;
     const collapsed=CAT_COLLAPSED[g.name]===true;
     const tags=g.tags.map(function(t){
-      return t.charAt(0)==='+'?'<span style="color:#86909c;font-size:11px">'+t+'</span>':'<span class="chip chip-line">'+t+'</span>';
+      return t.charAt(0)==='+'?'<span style="color:var(--text-help);font-size:11px">'+t+'</span>':'<span class="chip chip-line">'+t+'</span>';
     }).join(' ');
     let html='<tr class="cat-parent">'+
-      '<td class="num" style="width:56px;color:#86909c">'+idx+'</td>'+
+      '<td class="num" style="width:56px;color:var(--text-help)">'+idx+'</td>'+
       '<td class="name" style="min-width:190px">'+
         '<div style="display:flex;align-items:center;gap:6px">'+
           '<button class="expander'+(collapsed?' collapsed':'')+'" onclick="toggleCat(\''+esc(g.name)+'\')" aria-label="展開子分類">'+
@@ -963,23 +971,23 @@ function pageCategory(){
       '<td class="actions" style="width:230px">'+
         '<span class="btn-text" onclick="openCategoryAdd(\''+esc(g.name)+'\')">新增分類</span>'+
         '<span class="btn-text" onclick="openCountryFilter(\''+esc(g.name)+'\',\'category\')">國家過濾</span>'+
-        '<span class="btn-text" onclick="openMoreMenu(\''+esc(g.name)+'\')">更多</span>'+
+        '<span class="btn-text" onclick="openMoreMenu(\''+esc(g.name)+'\',this)">更多</span>'+
       '</td></tr>';
     if(!collapsed){
       g.children.forEach(function(c){
         html+='<tr class="cat-child">'+
           '<td></td>'+
-          '<td class="name" style="padding-left:34px"><span style="color:#4e5969;font-weight:400">'+esc(c.name)+'</span></td>'+
+          '<td class="name" style="padding-left:34px"><span style="color:var(--text-sub);font-weight:400">'+esc(c.name)+'</span></td>'+
           '<td class="num muted">–</td>'+
           '<td class="num muted" title="二級分類不參與排序權重">–</td>'+
-          '<td><div class="cell-clip" style="color:#86909c">'+esc(c.desc)+'</div></td>'+
+          '<td><div class="cell-clip" style="color:var(--text-help)">'+esc(c.desc)+'</div></td>'+
           '<td class="muted">–</td>'+
           '<td class="muted">–</td>'+
           '<td><span class="switch '+(swGet('subcat:'+c.name+':on',true)?'on':'')+'" data-label="子分類狀態" onclick="toggleSwitch(this,\'subcat:'+esc(c.name)+':on\')"></span></td>'+
           '<td class="actions">'+
             '<span class="btn-text" onclick="toast(\'原型示意：關聯標籤設定\',\'info\')">關聯標籤</span>'+
             '<span class="btn-text" onclick="openCountryFilter(\''+esc(c.name)+'\',\'category\')">國家過濾</span>'+
-            '<span class="btn-text" onclick="openMoreMenu(\''+esc(c.name)+'\')">更多</span>'+
+            '<span class="btn-text" onclick="openMoreMenu(\''+esc(c.name)+'\',this)">更多</span>'+
           '</td></tr>';
       });
     }
@@ -991,7 +999,7 @@ function pageCategory(){
     '<div class="f-item"><select class="f-select"><option>狀態</option><option>啟用</option><option>停用</option></select></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
     '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
-    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openCategoryAdd()">'+icon('plus',14)+' 新增分類</button></div>'+
+    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openCategoryAdd()">'+icon('plus',16)+' 新增分類</button></div>'+
     '<div class="table-wrap"><table style="min-width:1276px"><thead><tr>'+
     '<th style="width:56px">序號</th><th>分類名稱</th><th style="width:96px">排序權重</th><th style="width:96px">子分類數量</th><th>描述</th>'+
     '<th>已過濾國家</th><th>關聯標籤</th><th style="width:64px">狀態</th><th style="width:230px">操作</th>'+
@@ -1082,16 +1090,16 @@ function openCountryFilter(name,scope){
   openModal(
     '<div class="modal cf-modal">'+
       '<div class="modal-head"><div class="modal-title">國家過濾'+(name?' · '+name:'')+'</div>'+
-      '<button class="modal-close" onclick="closeCountryFilter()">'+icon('close',15)+'</button></div>'+
+      '<button class="modal-close" onclick="closeCountryFilter()">'+icon('close',16)+'</button></div>'+
       '<div class="modal-body" style="padding-top:0">'+
-        '<p style="color:#86909c;font-size:12px;margin:0 0 14px">'+hint+'</p>'+
+        '<p style="color:var(--text-help);font-size:12px;margin:0 0 14px">'+hint+'</p>'+
         '<div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">'+
           '<div class="f-item" style="flex:1;min-width:180px;height:34px">'+
             '<input class="f-input" id="cf-search" placeholder="搜尋 輸入關鍵字查詢" style="min-width:0;flex:1" oninput="cfSearch(this.value)" />'+
           '</div>'+
           '<label class="check" style="white-space:nowrap"><input type="checkbox" id="cf-all" onchange="cfToggleAll(this.checked)" />全選</label>'+
         '</div>'+
-        '<div style="display:flex;border:1px solid #eef1f6;border-radius:8px;overflow:hidden;min-height:340px">'+
+        '<div style="display:flex;border:1px solid var(--border-light);border-radius:8px;overflow:hidden;min-height:340px">'+
           '<div class="cf-side" id="cf-side">'+
             COUNTRY_GROUPS.map(function(g){
               return '<button class="cf-side-item'+(g.key===cfState.group?' active':'')+'" data-k="'+g.key+'" onclick="cfGroup(\''+g.key+'\')">'+g.label+'</button>';
@@ -1117,7 +1125,7 @@ function renderCfList(){
   const box=document.getElementById('cf-list');
   if(!box)return;
   if(!list.length){
-    box.innerHTML='<div style="padding:40px 20px;text-align:center;color:#c9cdd4;font-size:13px">未找到相關國家</div>';
+    box.innerHTML='<div style="padding:40px 20px;text-align:center;color:var(--text-disabled);font-size:13px">未找到相關國家</div>';
   } else {
     box.innerHTML='<div class="cf-grid">'+list.map(function(c){
       const on=!!cfState.selected[c];
@@ -1201,7 +1209,7 @@ function openDatePicker(opt){
   openModal(
     '<div class="modal dp-modal">'+
       '<div class="modal-head"><div class="modal-title">'+esc(dpState.title)+'</div>'+
-      '<button class="modal-close" onclick="closeModal()">'+icon('close',15)+'</button></div>'+
+      '<button class="modal-close" onclick="closeModal()">'+icon('close',16)+'</button></div>'+
       '<div class="modal-body" style="padding-top:0">'+
         (mode==='time'?'':'<div class="dp-quick" id="dp-quick"></div>')+
         (mode==='time'?dpTimeBody():'<div class="dp-cal" id="dp-cal"></div>')+
@@ -1276,9 +1284,9 @@ function renderDpCal(){
 
   box.innerHTML=
     '<div class="dp-cal-head">'+
-      '<button class="dp-nav" onclick="dpShift(-1)">'+icon('chevron',14)+'</button>'+
+      '<button class="dp-nav" onclick="dpShift(-1)">'+icon('chevron',12)+'</button>'+
       '<div class="dp-cal-title">'+y+' 年 '+(m+1)+' 月</div>'+
-      '<button class="dp-nav" style="transform:rotate(180deg)" onclick="dpShift(1)">'+icon('chevron',14)+'</button>'+
+      '<button class="dp-nav" style="transform:rotate(180deg)" onclick="dpShift(1)">'+icon('chevron',12)+'</button>'+
     '</div>'+
     '<div class="dp-week">'+DP_WEEK.map(function(w){return '<span>'+w+'</span>';}).join('')+'</div>'+
     '<div class="dp-grid">'+cells+'</div>';
@@ -1347,25 +1355,20 @@ function dpConfirm(){
   closeModal();
   toast(e?'已設定日期範圍 '+s+' 至 '+e:'已選擇 '+s);
 }
-function openMoreMenu(name){
-  /* 二級分類不可再新增分類：隱藏「子分類管理」；該層級操作為「關聯標籤」 */
-  const subBtn=catIsChild(name)?'':
-    '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：子分類管理\',\'info\')">子分類管理</button>';
-  openModal(modalShell({
-    title:'更多操作'+(name?' · '+name:''),size:'narrow',
-    body:'<div style="display:flex;flex-direction:column;gap:2px">'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();openCategoryEdit(\''+esc(name)+'\')">編輯分類</button>'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：關聯標籤設定\',\'info\')">關聯標籤</button>'+
-      subBtn+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px;color:#f53f3f" onclick="closeModal();confirmDelete(\'分類\')">刪除分類</button></div>',
-    foot:false
-  }));
+function openMoreMenu(name,el){
+  /* 行內操作菜單：錨定「更多」按鈕向下展開，不再打斷列表上下文
+     關聯標籤與子分類管理已從此菜單移出，二級分類的關聯標籤入口在行內 */
+  openPopover(
+    popItem('編輯分類','gear',"closePopover();openCategoryEdit('"+esc(name)+"')")+
+    '<div class="popover-sep"></div>'+
+    popItem('刪除分類','close',"closePopover();confirmDelete('分類')",true),
+    el);
 }
 function confirmDelete(what){
   openModal(modalShell({
     title:'確認刪除',size:'narrow',
-    body:'<div style="display:flex;gap:10px;padding:4px 0 8px"><span style="color:#ff7d00;flex:0 0 auto">'+icon('warn',20)+'</span>'+
-      '<div style="color:#4e5969;line-height:1.7">刪除後將無法復原，且關聯的'+what+'資料會一併失效。<br/>確定要刪除嗎？</div></div>',
+    body:'<div style="display:flex;gap:10px;padding:4px 0 8px"><span style="color:var(--warning);flex:0 0 auto">'+icon('warn',20)+'</span>'+
+      '<div style="color:var(--text-sub);line-height:1.7">刪除後將無法復原，且關聯的'+what+'資料會一併失效。<br/>確定要刪除嗎？</div></div>',
     foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
       '<button class="btn btn-danger" onclick="closeModal();toast(\'已刪除\')">確定刪除</button>'
   }));
@@ -1377,17 +1380,20 @@ function confirmDelete(what){
 function pageReview(){
   const done=state.reviewDone===true;
   const src=done?REVIEWED:REVIEWS;
-  const thumb='<div style="width:26px;height:26px;border-radius:4px;background:linear-gradient(135deg,#eef4ff,#dbe8ff);flex:0 0 auto"></div>';
+  const thumb='<div style="width:26px;height:26px;border-radius:4px;background:#eef4ff;flex:0 0 auto"></div>';
 
   /* 待複核：事件 ID / 名稱 / 封面 / 複核類型 / 關聯標籤 / 事件狀態 / 操作 */
   const rowsPending=REVIEWS.map(function(r){
-    return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></td>'+
-      '<td class="num" style="color:#86909c">'+r[0]+'</td>'+
+    return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:var(--primary)" /></td>'+
+      '<td class="num" style="color:var(--text-help)">'+r[0]+'</td>'+
       '<td class="name"><div class="cell-clip" title="'+esc(r[1])+'">'+esc(r[1])+'</div></td>'+
       '<td>'+thumb+'</td>'+
       '<td><span class="chip chip-blue">'+r[3]+'</span></td>'+
       '<td>'+(r[4]==='–'?'<span class="muted">–</span>':'<span class="chip chip-line">'+r[4]+'</span>')+'</td>'+
       '<td>'+statusBadge(r[2])+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:var(--text-sub)">'+r[5]+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:var(--text-sub)">'+r[6]+'</td>'+
+      '<td><span class="chip chip-line">'+r[7]+'</span></td>'+
       '<td class="actions">'+
         '<span class="btn-text" onclick="openReviewModal(\''+r[0]+'\',\''+esc(r[1])+'\')">審核</span>'+
         '<span class="btn-text" onclick="go(\'/event/review/detail\')">詳情</span>'+
@@ -1398,34 +1404,34 @@ function pageReview(){
   const rowsDone=REVIEWED.map(function(r){
     const pass=r[4]==='通過';
     return '<tr>'+
-      '<td style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></td>'+
-      '<td class="num" style="color:#86909c">'+esc(r[0])+'</td>'+
+      '<td class="num" style="color:var(--text-help)">'+esc(r[0])+'</td>'+
       '<td class="name" style="min-width:210px"><div class="cell-clip" title="'+esc(r[1])+'">'+esc(r[1])+'</div></td>'+
       '<td>'+thumb+'</td>'+
       '<td><span class="chip chip-blue">'+esc(r[3])+'</span></td>'+
       '<td>'+(r[2]==='–'?'<span class="muted">–</span>':'<span class="chip chip-line">'+esc(r[2])+'</span>')+'</td>'+
       '<td>'+statusBadge(r[10])+'</td>'+
       '<td><span class="dot-badge"><span class="d '+(pass?'d-on':'d-off')+'"></span>'+esc(r[4])+'</span></td>'+
-      '<td>'+(r[5]==='–'?'<span class="muted">–</span>':'<span style="color:#4e5969">'+esc(r[5])+'</span>')+'</td>'+
-      '<td style="color:#4e5969">'+esc(r[6])+'</td>'+
-      '<td class="num" style="white-space:nowrap;color:#4e5969">'+esc(r[7])+'</td>'+
-      '<td class="num" style="white-space:nowrap;color:#4e5969">'+esc(r[8])+'</td>'+
+      '<td>'+(r[5]==='–'?'<span class="muted">–</span>':'<span style="color:var(--text-sub)">'+esc(r[5])+'</span>')+'</td>'+
+      '<td style="color:var(--text-sub)">'+esc(r[6])+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:var(--text-sub)">'+esc(r[7])+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:var(--text-sub)">'+esc(r[8])+'</td>'+
       '<td><span class="chip chip-line">'+esc(r[9])+'</span></td>'+
       '<td class="actions" style="white-space:nowrap">'+
         '<span class="btn-text" onclick="go(\'/event/review/detail\')">詳情</span>'+
-        '<span class="btn-text" onclick="toast(\'原型示意：複核記錄\',\'info\')">複核記錄</span>'+
       '</td></tr>';
   }).join('');
 
   const thead = done
-    ? '<th style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></th>'+
-      '<th style="width:88px">事件 ID</th><th>事件名稱</th><th style="width:56px">封面</th>'+
-      '<th style="width:96px">複核類型</th><th style="width:110px">關聯標籤</th><th style="width:100px">事件狀態</th>'+
-      '<th style="width:96px">審核狀態</th><th style="width:100px">審核備註</th><th style="width:110px">操作人</th>'+
-      '<th style="width:160px">審核時間</th><th style="width:160px">截止時間</th><th style="width:110px">數據來源</th>'+
-      '<th style="width:150px">操作</th>'
-    : '<th style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></th>'+
-      '<th>事件 ID</th><th>事件名稱</th><th>封面</th><th>複核類型</th><th>關聯標籤</th><th>事件狀態</th><th>操作</th>';
+    ? '<th style="width:76px">事件 ID</th><th>事件名稱</th><th style="width:48px">封面</th>'+
+      '<th style="width:88px">複核類型</th><th style="width:96px">關聯標籤</th><th style="width:92px">事件狀態</th>'+
+      '<th style="width:88px">審核狀態</th><th style="width:96px">審核備註</th><th style="width:96px">操作人</th>'+
+      '<th style="width:150px">審核時間</th><th style="width:150px">截止時間</th><th style="width:96px">數據來源</th>'+
+      '<th style="width:90px">操作</th>'
+    : '<th style="width:36px"><input type="checkbox" style="accent-color:var(--primary)" /></th>'+
+      '<th style="width:76px">事件 ID</th><th>事件名稱</th><th style="width:48px">封面</th>'+
+      '<th style="width:88px">複核類型</th><th style="width:96px">關聯標籤</th><th style="width:92px">事件狀態</th>'+
+      '<th style="width:150px">入庫時間</th><th style="width:150px">截止時間</th><th style="width:96px">數據來源</th>'+
+      '<th style="width:130px">操作</th>';
 
   return '<div class="card"><div class="sub-tabs">'+
     '<div class="sub-tab'+(done?'':' active')+'" onclick="setReviewList(false)">待複核列表</div>'+
@@ -1438,13 +1444,13 @@ function pageReview(){
     '<div class="f-item"><select class="f-select"><option>複核類型</option><option>無法分類</option><option>已分類</option></select></div>'+
     (done?'<div class="f-item"><select class="f-select"><option>審核狀態</option><option>通過</option><option>棄用</option></select></div>':'')+
     '<div class="f-item"><select class="f-select"><option>數據來源</option><option>polymarket</option><option>predict.fun</option></select></div>'+
-    '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:#4e5969;white-space:nowrap;font-size:13px">截止時間</span>'+
+    '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:var(--text-sub);white-space:nowrap;font-size:13px">截止時間</span>'+
     '<input class="f-date" id="dp-rv-start" placeholder="開始日期" readonly onclick="openDatePicker({mode:\'single\',target:\'dp-rv-start\',title:\'截止時間 · 開始\'})" />'+
-    '<span style="color:#c9cdd4">–</span>'+
+    '<span style="color:var(--text-disabled)">–</span>'+
     '<input class="f-date" id="dp-rv-end" placeholder="結束日期" readonly onclick="openDatePicker({mode:\'single\',target:\'dp-rv-end\',title:\'截止時間 · 結束\'})" /></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
     '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
-    '<div class="table-wrap"><table style="min-width:'+(done?'1620px':'960px')+'"><thead><tr>'+thead+
+    '<div class="table-wrap"><table class="tbl-fixed-op" style="min-width:'+(done?'1360px':'1150px')+'"><thead><tr>'+thead+
     '</tr></thead><tbody>'+(done?rowsDone:rowsPending)+'</tbody></table></div>'+
     pager(done?118:60,1)+'</div>';
 }
@@ -1452,7 +1458,7 @@ function setReviewList(done){ state.reviewDone=done; renderShell(); }
 function openReviewModal(id,name){
   openModal(modalShell({
     title:'審核',
-    body:'<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>提示：審核通過後該事件將對外發佈；棄用該事件將不會對外發佈。</span></div>'+
+    body:'<div class="alert-tip"><span class="i">'+icon('info',16)+'</span><span>提示：審核通過後該事件將對外發佈；棄用該事件將不會對外發佈。</span></div>'+
       '<div class="field"><label class="field-label">事件名稱</label><input class="input readonly" value="'+esc(name)+'" readonly /></div>'+
       '<div class="field"><label class="field-label"><span class="req">*</span>分類</label>'+
       '<select class="input"><option value="">選擇分類</option><option>Sports</option><option>Crypto</option><option>Politics</option><option>Finance</option></select></div>'+
@@ -1474,7 +1480,7 @@ function pageReviewDetail(){
       const k=x.split('|')[0],n=x.split('|')[1];
       return '<div class="sub-tab'+(tab===k?' active':'')+'" onclick="setReviewTab(\''+k+'\')">'+n+'</div>';
     }).join('')+'</div>';
-  const head='<div class="card"><div class="detail-head"><div class="dh-ico">'+icon('file',17)+'</div>'+
+  const head='<div class="card"><div class="detail-head"><div class="dh-ico">'+icon('file',16)+'</div>'+
     '<div style="flex:1;min-width:0"><div class="dh-top">待複核事件 · 複核類型：無法分類</div>'+
     '<h3 class="dh-title">Maidenhead United FC vs. Tonbridge Angels – Exact Score</h3>'+
     '<div class="dh-meta">'+statusBadge('ended')+'<span class="chip chip-line">polymarket</span></div></div></div>'+
@@ -1496,8 +1502,8 @@ function setReviewTab(t){ state.reviewTab=t; renderShell(); }
 /* 基本資訊：复核详情（无参）与事件详情（传 id/cat/tags）共用 */
 function rdBasic(id,catName,tags,arc){
   const eid=id||'108068';
-  const catVal=catName&&catName!=='—'?esc(catName):'<span style="color:#c9cdd4">暫無數據</span>';
-  const tagVal=tags&&tags.indexOf('muted')<0?tags:'<span style="color:#c9cdd4">暫無數據</span>';
+  const catVal=catName&&catName!=='—'?esc(catName):'<span style="color:var(--text-disabled)">暫無數據</span>';
+  const tagVal=tags&&tags.indexOf('muted')<0?tags:'<span style="color:var(--text-disabled)">暫無數據</span>';
   /* 歸檔池事件補充歸檔語境欄位：已歸檔與仍在池中兩種狀態欄位不同 */
   const arcItems=arc?(function(){
     const isArch=arc.status==='archived';
@@ -1514,11 +1520,11 @@ function rdBasic(id,catName,tags,arc){
   })():'';
   return '<div class="card">'+
     '<div class="collapse-bar" onclick="toast(\'原型示意：收合基礎資訊\',\'info\')" style="margin-bottom:16px">'+
-      '<span class="t">基礎資訊</span><span class="arrow">'+icon('chevron',15)+'</span></div>'+
+      '<span class="t">基礎資訊</span><span class="arrow">'+icon('chevron',16)+'</span></div>'+
     '<div class="info-grid">'+
-    '<div class="info-item"><div class="k">事件 ID <span class="copy" onclick="toast(\'已複製事件 ID\',\'info\')">'+icon('copy',12)+'</span></div><div class="v">'+esc(eid)+'</div></div>'+
-    '<div class="info-item"><div class="k">源事件 ID <span class="copy" onclick="toast(\'已複製源事件 ID\',\'info\')">'+icon('copy',12)+'</span></div><div class="v">1159904</div></div>'+
-    '<div class="info-item"><div class="k">源 slug <span class="copy" onclick="toast(\'已複製源 slug\',\'info\')">'+icon('copy',12)+'</span></div><div class="v" style="font-size:11.5px;color:#86909c">nls-mu-ton-2026-10-10-exact-score</div></div>'+
+    '<div class="info-item"><div class="k">事件 ID <span class="copy" onclick="toast(\'已複製事件 ID\',\'info\')">'+icon('copy',16)+'</span></div><div class="v">'+esc(eid)+'</div></div>'+
+    '<div class="info-item"><div class="k">源事件 ID <span class="copy" onclick="toast(\'已複製源事件 ID\',\'info\')">'+icon('copy',16)+'</span></div><div class="v">1159904</div></div>'+
+    '<div class="info-item"><div class="k">源 slug <span class="copy" onclick="toast(\'已複製源 slug\',\'info\')">'+icon('copy',16)+'</span></div><div class="v" style="font-size:11px;color:var(--text-help)">nls-mu-ton-2026-10-10-exact-score</div></div>'+
     '<div class="info-item"><div class="k">開始時間</div><div class="v">2026-10-09 16:55:15</div></div>'+
     '<div class="info-item"><div class="k">截止時間</div><div class="v">2026-10-10 14:00:00</div></div>'+
     '<div class="info-item"><div class="k">入庫時間</div><div class="v">2026-10-10 10:17:28</div></div>'+
@@ -1527,14 +1533,14 @@ function rdBasic(id,catName,tags,arc){
     '<div class="info-item"><div class="k">分類</div><div class="v">'+catVal+'</div></div>'+
     arcItems+'</div></div>'+
   '<div class="card"><div class="collapse-bar" onclick="toast(\'原型示意：收合賽事\',\'info\')">'+
-    '<span class="t">'+icon('trophy',16)+' 賽事 <span style="font-weight:400;color:#86909c;font-size:12px">Oct 10 · 2:00 PM</span></span>'+
-    '<span class="arrow">'+icon('chevron',15)+'</span></div>'+
+    '<span class="t">'+icon('trophy',16)+' 賽事 <span style="font-weight:400;color:var(--text-help);font-size:12px">Oct 10 · 2:00 PM</span></span>'+
+    '<span class="arrow">'+icon('chevron',16)+'</span></div>'+
     '<div class="scoreboard">'+
-    '<div style="text-align:center"><div class="team-score">–</div><div style="font-size:11px;color:#86909c;margin-top:6px">主</div></div>'+
-    '<div class="score-mid"><div class="num" style="font-size:18px;color:#4e5969;letter-spacing:3px">– : –</div><div style="margin-top:6px">未開始</div></div>'+
-    '<div style="text-align:center"><div class="team-score">–</div><div style="font-size:11px;color:#86909c;margin-top:6px">客</div></div></div></div>'+
+    '<div style="text-align:center"><div class="team-score">–</div><div style="font-size:11px;color:var(--text-help);margin-top:6px">主</div></div>'+
+    '<div class="score-mid"><div class="num" style="font-size:18px;color:var(--text-sub);letter-spacing:3px">– : –</div><div style="margin-top:6px">未開始</div></div>'+
+    '<div style="text-align:center"><div class="team-score">–</div><div style="font-size:11px;color:var(--text-help);margin-top:6px">客</div></div></div></div>'+
   '<div class="card"><div class="collapse-bar" onclick="toast(\'原型示意：收合規則\',\'info\')">'+
-    '<span class="t">'+icon('doc',16)+' 規則</span><span class="arrow">'+icon('chevron',15)+'</span></div>'+
+    '<span class="t">'+icon('doc',16)+' 規則</span><span class="arrow">'+icon('chevron',16)+'</span></div>'+
     '<div class="rule-text"><div class="h">基本規則</div>In the upcoming National League South game between Maidenhead United FC and Tonbridge Angels, scheduled for October 10, 2026 at 10:00 AM ET: This market will resolve based on the final score of the Maidenhead United FC vs. Tonbridge Angels match originally scheduled for October 10, 2026 at 10:00 AM ET, considering only the result at the end of 90 minutes of regulation plus stoppage time; extra time and penalty shoot-outs are excluded.</div></div>';
 }
 
@@ -1561,7 +1567,7 @@ function rdMarket(){
     ['18','5345507910','Maidenhead United FC 4 – 1 Tonbridge…','0','0','0','1']
   ];
   const rows=markets.map(function(m){
-    return '<tr><td class="num" style="color:#86909c">'+m[0]+'</td><td class="num" style="color:#86909c">'+m[1]+'</td>'+
+    return '<tr><td class="num" style="color:var(--text-help)">'+m[0]+'</td><td class="num" style="color:var(--text-help)">'+m[1]+'</td>'+
       '<td class="name"><div class="cell-clip">'+m[2]+'</div></td>'+
       '<td class="num">'+m[3]+'</td><td class="num">'+m[4]+'</td>'+
       '<td><span class="chip chip-gray">Yes '+m[5]+'</span></td>'+
@@ -1570,7 +1576,7 @@ function rdMarket(){
       '<td class="actions"><span class="btn-text" onclick="toast(\'原型示意：市場詳情\',\'info\')">詳情</span></td></tr>';
   }).join('');
   return '<div class="card"><div class="card-head"><div class="card-title">市場</div>'+
-    '<div class="right"><span style="color:#86909c;font-size:12px">合共 37 個市場</span></div></div>'+
+    '<div class="right"><span style="color:var(--text-help);font-size:12px">合共 37 個市場</span></div></div>'+
     '<div class="table-wrap" style="margin-top:0"><table style="min-width:1100px"><thead><tr>'+
     '<th style="width:48px">序號</th><th>市場 ID</th><th>名稱</th><th>成交量($)</th><th>流動性($k)</th>'+
     '<th>雙方概率</th><th>買入雙方價格($)</th><th>賣出雙方價格($)</th><th>操作</th>'+
@@ -1597,7 +1603,7 @@ function rdPosition(){
   ];
   const mkRows=function(list){
     return list.map(function(r){
-      return '<tr><td class="num" style="color:#86909c">'+r[0]+'</td>'+
+      return '<tr><td class="num" style="color:var(--text-help)">'+r[0]+'</td>'+
         '<td class="name"><div class="cell-clip">'+r[1]+'</div></td>'+
         '<td class="num">'+r[2]+'</td><td class="num">'+r[3]+'</td><td class="num">'+r[4]+'</td></tr>';
     }).join('');
@@ -1605,13 +1611,13 @@ function rdPosition(){
   return '<div class="cards-row">'+
     '<div class="card"><div class="card-head"><div class="card-title">'+
       '<span class="chip" style="background:#E8F8EC;color:#12923C">YES</span> 持倉</div>'+
-      '<div class="right"><span style="color:#86909c;font-size:12px">合共 37 條</span></div></div>'+
+      '<div class="right"><span style="color:var(--text-help);font-size:12px">合共 37 條</span></div></div>'+
       '<div class="table-wrap" style="margin-top:0"><table style="min-width:0"><thead><tr>'+
       '<th>市場 ID</th><th>名稱</th><th>持倉量</th><th>均價</th><th>盈虧</th>'+
       '</tr></thead><tbody>'+mkRows(yes)+'</tbody></table></div></div>'+
     '<div class="card"><div class="card-head"><div class="card-title">'+
       '<span class="chip" style="background:#FDECEC;color:#D33">NO</span> 持倉</div>'+
-      '<div class="right"><span style="color:#86909c;font-size:12px">合共 37 條</span></div></div>'+
+      '<div class="right"><span style="color:var(--text-help);font-size:12px">合共 37 條</span></div></div>'+
       '<div class="table-wrap" style="margin-top:0"><table style="min-width:0"><thead><tr>'+
       '<th>市場 ID</th><th>名稱</th><th>持倉量</th><th>均價</th><th>盈虧</th>'+
       '</tr></thead><tbody>'+mkRows(no)+'</tbody></table></div></div></div>'+
@@ -1672,13 +1678,13 @@ function rdMapping(){
     ['44','updated_at','updatedAt','上游更新時間']
   ];
   const rows=map.map(function(m){
-    return '<tr><td class="num" style="color:#86909c">'+m[0]+'</td>'+
-      '<td style="color:#1d2129;font-weight:500">'+esc(m[1])+'</td>'+
-      '<td style="color:#4e5969">'+esc(m[2])+'</td>'+
-      '<td style="color:#86909c">'+esc(m[3])+'</td></tr>';
+    return '<tr><td class="num" style="color:var(--text-help)">'+m[0]+'</td>'+
+      '<td style="color:var(--text);font-weight:500">'+esc(m[1])+'</td>'+
+      '<td style="color:var(--text-sub)">'+esc(m[2])+'</td>'+
+      '<td style="color:var(--text-help)">'+esc(m[3])+'</td></tr>';
   }).join('');
   return '<div class="card"><div class="card-head"><div class="card-title">欄位映射</div>'+
-    '<div class="right"><span style="color:#86909c;font-size:12px">合共 44 條</span></div></div>'+
+    '<div class="right"><span style="color:var(--text-help);font-size:12px">合共 44 條</span></div></div>'+
     '<div class="table-wrap" style="margin-top:0"><table style="min-width:820px"><thead><tr>'+
     '<th style="width:64px">序號</th><th style="width:220px">本地欄位</th><th style="width:280px">原始欄位</th><th>欄位說明</th>'+
     '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(44,1)+'</div>';
@@ -1697,7 +1703,7 @@ function pageCoefficient(){
       '<div class="formula">Data_A = 1 / (Yes/No 機率 × 係數)</div>'+
       '<p class="hero-note">Yes/No 機率為上游平台獲取的原始數據（市場 Yes/No 機率）。通過「機率 × 係數」計算得出 Yes/No 分別對應的賠率。</p></div>'+
       '<div class="hero-card"><div style="display:flex;align-items:flex-start"><h3 class="hero-title">調控層級</h3>'+
-      '<button class="guide-link" style="margin-left:auto" onclick="openGuide()">'+icon('info',13)+' 關閉使用指引</button></div>'+
+      '<button class="guide-link" style="margin-left:auto" onclick="openGuide()">'+icon('info',16)+' 關閉使用指引</button></div>'+
       '<p class="hero-desc">高優先級設定將覆蓋低優先級設定</p>'+
       '<div class="tier-flow">'+
       '<div class="tier"><div class="tier-ico">'+icon('globe',20)+'</div><div class="tier-name">1 全域調控</div><div class="tier-tag">低優先級</div><div class="tier-desc">適用於全部商戶與事件</div></div>'+
@@ -1707,10 +1713,10 @@ function pageCoefficient(){
       '<div class="tier"><div class="tier-ico">'+icon('layers',20)+'</div><div class="tier-name">3 按事件調控</div><div class="tier-tag">高優先級</div><div class="tier-desc">僅影響指定事件</div></div>'+
       '</div></div></div>'+
       '<div class="card" style="margin-top:14px"><div class="card-head"><div class="card-title">全域係數設定</div>'+
-      '<span class="alert-inline">'+icon('warn',13)+' 修改後將影響全部事件與商戶，請謹慎操作。</span>'+
+      '<span class="alert-inline">'+icon('warn',16)+' 修改後將影響全部事件與商戶，請謹慎操作。</span>'+
       '<div class="right"><span class="btn-text" onclick="toast(\'原型示意：範圍設定\',\'info\')">範圍設定</span></div></div>'+
-      '<p style="color:#86909c;font-size:12px;margin:0 0 4px">統一調整所有市場的報價係數</p>'+
-      '<div class="coef-set"><span style="color:#4e5969">係數值</span>'+
+      '<p style="color:var(--text-help);font-size:12px;margin:0 0 4px">統一調整所有市場的報價係數</p>'+
+      '<div class="coef-set"><span style="color:var(--text-sub)">係數值</span>'+
       '<div class="stepper"><button onclick="stepCoef(-0.01)">−</button>'+
       '<input id="coef-val" value="1.04" onchange="syncCalc()" />'+
       '<button onclick="stepCoef(0.01)">+</button></div>'+
@@ -1731,7 +1737,7 @@ function pageCoefficient(){
   } else if(tab==='merchant'){
     const rows=MERCHANTS.map(function(m,i){
       const on=i===0;
-      return '<tr><td class="num" style="color:#86909c">'+(i+1)+'</td>'+
+      return '<tr><td class="num" style="color:var(--text-help)">'+(i+1)+'</td>'+
         '<td class="name">'+esc(m[0])+'</td><td>'+statusBadge(on?'on':'off')+'</td>'+
         '<td class="num">'+(on?'1.04':'<span class="muted">–</span>')+'</td>'+
         '<td class="actions"><span class="btn-text" onclick="toggleMerchantCoef(\''+esc(m[0])+'\','+(on?'false':'true')+')">'+(on?'關閉調控':'開啟調控')+'</span>'+
@@ -1753,14 +1759,14 @@ function pageCoefficient(){
       ['9558171','ETH Up or Down – October 14, 8PM ET','1.02','ended','Crypto/ETH','+1','Crypto Prices','+6'],
       ['9558160','Silver Up or Down – October 14, 6PM ET','1.00','ended','General Finance','+1','XAG','+3']
     ].map(function(r){
-      return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></td>'+
-        '<td class="num" style="color:#86909c">'+r[0]+'</td>'+
+      return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:var(--primary)" /></td>'+
+        '<td class="num" style="color:var(--text-help)">'+r[0]+'</td>'+
         '<td class="name"><div class="cell-clip">'+r[1]+'</div></td>'+
-        '<td class="num"><b style="color:#1d2129;font-weight:600">'+r[2]+'</b></td>'+
+        '<td class="num"><b style="color:var(--text);font-weight:600">'+r[2]+'</b></td>'+
         '<td>'+statusBadge(r[3])+'</td>'+
         '<td><span class="dot-badge"><span class="d d-on"></span>上架</span></td>'+
-        '<td><span class="chip chip-line">'+r[4]+'</span> <span style="color:#86909c;font-size:11px">'+r[5]+'</span></td>'+
-        '<td><span class="chip chip-line">'+r[6]+'</span> <span style="color:#86909c;font-size:11px">'+r[7]+'</span></td>'+
+        '<td><span class="chip chip-line">'+r[4]+'</span> <span style="color:var(--text-help);font-size:11px">'+r[5]+'</span></td>'+
+        '<td><span class="chip chip-line">'+r[6]+'</span> <span style="color:var(--text-help);font-size:11px">'+r[7]+'</span></td>'+
         '<td class="actions"><span class="btn-text" onclick="toggleMerchantCoef(\''+r[0]+'\',false)">關閉調控</span>'+
         '<span class="btn-text" onclick="openMerchantCoef(\''+r[0]+'\')">編輯</span>'+
         '<span class="btn-text" onclick="openEventDetail(\''+r[0]+'\',\''+esc(r[1])+'\',\''+esc(r[4])+'\',\''+r[3]+'\')">詳情</span></td></tr>';
@@ -1775,9 +1781,9 @@ function pageCoefficient(){
       '<div class="f-item"><select class="f-select"><option>數據來源</option><option>polymarket</option></select></div>'+
       '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
       '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
-      '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openAddEventCoef()">'+icon('plus',14)+' 新增事件調控</button></div>'+
+      '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openAddEventCoef()">'+icon('plus',16)+' 新增事件調控</button></div>'+
       '<div class="table-wrap"><table style="min-width:1080px"><thead><tr>'+
-      '<th style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></th>'+
+      '<th style="width:36px"><input type="checkbox" style="accent-color:var(--primary)" /></th>'+
       '<th>事件 ID</th><th>事件名稱</th><th>調控係數</th><th>事件狀態</th><th>推送狀態</th><th>分類</th><th>標籤</th><th>操作</th>'+
       '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(1,1);
   }
@@ -1812,8 +1818,8 @@ function saveCoef(){
   const k=el?el.value:'1.04';
   openModal(modalShell({
     title:'確認儲存全域係數',size:'narrow',
-    body:'<div class="alert-tip"><span class="i">'+icon('warn',14)+'</span><span>係數 <b>'+esc(k)+'</b> 將套用至全部商戶與事件，預估影響 4,794 個進行中事件。</span></div>'+
-      '<div style="color:#4e5969;line-height:1.7">儲存後新報價即時生效，已成交訂單不受影響。確定要儲存嗎？</div>',
+    body:'<div class="alert-tip"><span class="i">'+icon('warn',16)+'</span><span>係數 <b>'+esc(k)+'</b> 將套用至全部商戶與事件，預估影響 4,794 個進行中事件。</span></div>'+
+      '<div style="color:var(--text-sub);line-height:1.7">儲存後新報價即時生效，已成交訂單不受影響。確定要儲存嗎？</div>',
     foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
       '<button class="btn btn-primary" onclick="closeModal();toast(\'全域係數已更新為 '+esc(k)+'\')">確定儲存</button>'
   }));
@@ -1822,7 +1828,7 @@ function toggleMerchantCoef(name,on){
   if(on){openMerchantCoef(name,true);return;}
   openModal(modalShell({
     title:'關閉調控',size:'narrow',
-    body:'<div style="color:#4e5969;line-height:1.7">關閉後「'+esc(name)+'」將回退至上層（全域）係數設定。<br/>確定要關閉嗎？</div>',
+    body:'<div style="color:var(--text-sub);line-height:1.7">關閉後「'+esc(name)+'」將回退至上層（全域）係數設定。<br/>確定要關閉嗎？</div>',
     foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
       '<button class="btn btn-primary" onclick="closeModal();toast(\'已關閉「'+esc(name)+'」的調控\')">確定</button>'
   }));
@@ -1830,7 +1836,7 @@ function toggleMerchantCoef(name,on){
 function openMerchantCoef(name,isNew){
   openModal(modalShell({
     title:(isNew?'開啟調控':'編輯調控')+' · '+name,
-    body:'<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>按商戶調控優先級高於全域調控，低於按事件調控。</span></div>'+
+    body:'<div class="alert-tip"><span class="i">'+icon('info',16)+'</span><span>按商戶調控優先級高於全域調控，低於按事件調控。</span></div>'+
       '<div class="field"><label class="field-label"><span class="req">*</span>調控係數</label>'+
       '<input class="input num" id="mc-val" value="'+(isNew?'1.00':'1.04')+'" /></div>'+
       '<div class="field"><label class="field-label">生效範圍</label><select class="input"><option>全部事件</option><option>僅指定分類</option></select></div>'+
@@ -1852,12 +1858,12 @@ function openAddEventCoef(){
 function openGuide(){
   openModal(modalShell({
     title:'使用指引',
-    body:'<div style="line-height:1.85;color:#4e5969;font-size:13px">'+
-      '<p style="margin:0 0 12px"><b style="color:#1d2129">三層調控優先級</b></p>'+
+    body:'<div style="line-height:1.85;color:var(--text-sub);font-size:13px">'+
+      '<p style="margin:0 0 12px"><b style="color:var(--text)">三層調控優先級</b></p>'+
       '<p style="margin:0 0 8px">1. 全域調控（低）— 適用於全部商戶與事件</p>'+
       '<p style="margin:0 0 8px">2. 按商戶調控（中）— 僅影響指定商戶</p>'+
       '<p style="margin:0 0 16px">3. 按事件調控（高）— 僅影響指定事件</p>'+
-      '<p style="margin:0 0 12px"><b style="color:#1d2129">計算方式</b></p>'+
+      '<p style="margin:0 0 12px"><b style="color:var(--text)">計算方式</b></p>'+
       '<p style="margin:0 0 8px">quote_p = fair_p × 係數</p>'+
       '<p style="margin:0">最終賠率 = 1 / quote_p</p></div>',
     foot:'<button class="btn btn-primary" onclick="closeModal()">知道了</button>'
@@ -1869,15 +1875,17 @@ function openGuide(){
    ================================================================== */
 function pageMerchant(){
   const rows=MERCHANTS.map(function(m,i){
-    return '<tr><td class="num" style="color:#86909c">'+(i+1)+'</td>'+
+    return '<tr><td class="num" style="color:var(--text-help)">'+(i+1)+'</td>'+
       '<td class="name">'+esc(m[0])+'</td>'+
       '<td>'+(m[1]==='–'?'<span class="muted">–</span>':esc(m[1]))+'</td>'+
       '<td class="num">'+(m[2]==='–'?'<span class="muted">–</span>':esc(m[2]))+'</td>'+
       '<td><div class="cell-clip">'+(m[3]==='–'?'<span class="muted">–</span>':esc(m[3]))+'</div></td>'+
       '<td class="num">'+m[4]+'</td><td class="num">'+m[5]+'</td>'+
-      '<td style="color:#86909c;font-size:12px">'+m[6]+'</td>'+
-      '<td style="color:#86909c;font-size:12px">'+m[7]+'</td>'+
+      '<td style="color:var(--text-help);font-size:12px">'+m[6]+'</td>'+
+      '<td style="color:var(--text-help);font-size:12px">'+m[7]+'</td>'+
       '<td>'+(m[8]==='–'?'<span class="muted">–</span>':'<span class="chip chip-line">'+m[8]+'</span>')+'</td>'+
+      '<td><span class="switch '+(swGet('mer:'+m[0]+':on',m[9]===1)?'on':'')+'" data-label="商戶狀態" onclick="toggleSwitch(this,\'mer:'+esc(m[0])+':on\')"></span></td>'+
+      '<td class="num" style="white-space:nowrap;color:var(--text-sub)">'+m[10]+'</td>'+
       '<td class="actions"><span class="btn-text" onclick="openMerchantPerm(\''+esc(m[0])+'\')">權限設定</span>'+
       '<span class="btn-text" onclick="openIpWhitelist(\''+esc(m[0])+'\')">IP白名單</span>'+
       '<span class="btn-text" onclick="openMerchantMore(\''+esc(m[0])+'\',this)">更多</span></td></tr>';
@@ -1888,10 +1896,11 @@ function pageMerchant(){
     '<div class="f-item"><select class="f-select"><option>狀態</option><option>啟用</option><option>停用</option></select></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
     '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
-    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openMerchantAdd()">'+icon('plus',14)+' 新增商戶</button></div>'+
-    '<div class="table-wrap"><table style="min-width:1180px"><thead><tr>'+
+    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openMerchantAdd()">'+icon('plus',16)+' 新增商戶</button></div>'+
+    '<div class="table-wrap"><table class="tbl-fixed-op" style="min-width:1430px"><thead><tr>'+
     '<th style="width:56px">序號</th><th>商戶名稱</th><th>聯絡人</th><th>聯絡電話</th><th>電郵</th>'+
-    '<th>過濾分類</th><th>過濾事件</th><th>API Key</th><th>密鑰</th><th>IP白名單</th><th>操作</th>'+
+    '<th>過濾分類</th><th>過濾事件</th><th>API Key</th><th>密鑰</th><th>IP白名單</th>'+
+    '<th style="width:70px">狀態</th><th style="width:180px">創建時間</th><th style="width:230px">操作</th>'+
     '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(19,1)+'</div>';
 }
 function openMerchantAdd(){
@@ -1919,15 +1928,15 @@ function openMerchantPerm(name){go('/merchant/merchant/detail');toast('已開啟
 function openIpWhitelist(name){
   openModal(modalShell({
     title:'IP 白名單 · '+name,
-    body:'<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>僅白名單內的 IP 可透過 API 存取該商戶數據。</span></div>'+
+    body:'<div class="alert-tip"><span class="i">'+icon('info',16)+'</span><span>僅白名單內的 IP 可透過 API 存取該商戶數據。</span></div>'+
       '<div class="field"><label class="field-label">新增 IP</label>'+
       '<div style="display:flex;gap:8px"><input class="input" placeholder="例如 192.168.10.41" /><button class="btn btn-primary" onclick="toast(\'IP 已加入白名單\')">新增</button></div></div>'+
-      '<div style="border:1px solid #eef1f6;border-radius:8px;overflow:hidden">'+
+      '<div style="border:1px solid var(--border-light);border-radius:8px;overflow:hidden">'+
       ['192.168.10.41','10.0.0.28'].map(function(ip){
-        return '<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid #f4f6fa">'+
-          '<span class="num" style="flex:1;color:#4e5969">'+ip+'</span>'+
+        return '<div style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line-soft)">'+
+          '<span class="num" style="flex:1;color:var(--text-sub)">'+ip+'</span>'+
           '<span class="switch '+(swGet('ip:'+ip+':on',true)?'on':'')+'" data-label="IP 啟用" onclick="toggleSwitch(this,\'ip:'+ip+':on\')"></span>'+
-          '<button class="btn-text" style="margin-left:10px;color:#f53f3f" onclick="toast(\'已移除 '+ip+'\',\'info\')">移除</button></div>';
+          '<button class="btn-text" style="margin-left:10px;color:var(--danger)" onclick="toast(\'已移除 '+ip+'\',\'info\')">移除</button></div>';
       }).join('')+'</div>',
     foot:'<button class="btn btn-primary" onclick="closeModal()">完成</button>'
   }));
@@ -1955,14 +1964,14 @@ function openMerchantMore(name,el){
   state.moreName=name;
   openPopover(
     '<button class="popover-item" onclick="closePopover();openApiDetail()">'+
-      '<span class="pi">'+icon('doc',15)+'</span><span class="pl">OpenAPI 調用詳情</span></button>'+
+      '<span class="pi">'+icon('doc',16)+'</span><span class="pl">OpenAPI 調用詳情</span></button>'+
     '<button class="popover-item" onclick="closePopover();toast(\'原型示意：編輯商戶\')">'+
-      '<span class="pi">'+icon('gear',15)+'</span><span class="pl">編輯商戶</span></button>'+
+      '<span class="pi">'+icon('gear',16)+'</span><span class="pl">編輯商戶</span></button>'+
     '<button class="popover-item" onclick="closePopover();toast(\'API Key 已重新生成\')">'+
-      '<span class="pi">'+icon('refresh',15)+'</span><span class="pl">重新生成 API Key</span></button>'+
+      '<span class="pi">'+icon('refresh',16)+'</span><span class="pl">重新生成 API Key</span></button>'+
     '<div class="popover-sep"></div>'+
-    '<button class="popover-item" style="color:#f53f3f" onclick="closePopover();confirmDelete(\'商戶\')">'+
-      '<span class="pi" style="color:#f53f3f">'+icon('close',15)+'</span><span class="pl">刪除商戶</span></button>',
+    '<button class="popover-item" style="color:var(--danger)" onclick="closePopover();confirmDelete(\'商戶\')">'+
+      '<span class="pi" style="color:var(--danger)">'+icon('close',16)+'</span><span class="pl">刪除商戶</span></button>',
     el);
 }
 
@@ -1994,7 +2003,7 @@ function setMerchantTab(t){ state.merchantTab=t; renderShell(); }
 
 function mdType(){
   return '<div class="card"><div class="card-head"><div class="card-title">類型權限</div>'+
-    '<div class="right"><span style="color:#86909c;font-size:12px">控制該商戶可存取的數據類型</span></div></div>'+
+    '<div class="right"><span style="color:var(--text-help);font-size:12px">控制該商戶可存取的數據類型</span></div></div>'+
     '<div class="table-wrap" style="margin-top:0"><table style="min-width:760px"><thead><tr>'+
     '<th>類型</th><th style="width:220px">狀態</th><th style="width:120px">操作</th></tr></thead><tbody>'+
     '<tr><td class="name">中台基礎數據</td><td><span class="dot-badge"><span class="d d-off"></span>未過濾</span></td><td class="muted">–</td></tr>'+
@@ -2020,7 +2029,7 @@ function mdCategory(){
       '<td><span class="switch '+(swGet('mcat:'+c[0]+':on',c[2])?'on':'')+'" data-label="分類權限" onclick="toggleSwitch(this,\'mcat:'+c[0]+':on\')"></span></td></tr>';
   }).join('');
   return '<div class="card"><div class="card-head"><div class="card-title">分類權限</div>'+
-    '<div class="right"><span style="color:#86909c;font-size:12px">已開啟 4 / 8 個分類</span></div></div>'+
+    '<div class="right"><span style="color:var(--text-help);font-size:12px">已開啟 4 / 8 個分類</span></div></div>'+
     '<div class="table-wrap" style="margin-top:0"><table style="min-width:760px"><thead><tr>'+
     '<th style="width:180px">分類名稱</th><th>描述</th><th style="width:90px">狀態</th></tr></thead><tbody>'+
     rows+'</tbody></table></div>'+pager(8,1)+'</div>';
@@ -2041,7 +2050,7 @@ function mdSource(){
       '<td><span class="switch '+(swGet('src:'+s[0]+':on',on)?'on':'')+'" data-label="數據源權限" onclick="toggleSwitch(this,\'src:'+s[0]+':on\')"></span></td></tr>';
   }).join('');
   return '<div class="card"><div class="card-head"><div class="card-title">數據源權限</div>'+
-    '<div class="right"><span style="color:#86909c;font-size:12px">已啟用 '+src.filter(function(s,i){return swGet('src:'+s[0]+':on',i<2);}).length+' / '+src.length+' 個數據源</span></div></div>'+
+    '<div class="right"><span style="color:var(--text-help);font-size:12px">已啟用 '+src.filter(function(s,i){return swGet('src:'+s[0]+':on',i<2);}).length+' / '+src.length+' 個數據源</span></div></div>'+
     '<div class="table-wrap" style="margin-top:0"><table style="min-width:860px"><thead><tr>'+
     '<th style="width:150px">數據源</th><th>說明</th><th style="width:120px">事件數</th>'+
     '<th style="width:110px">狀態</th><th style="width:80px">開關</th></tr></thead><tbody>'+
@@ -2054,14 +2063,14 @@ function mdFilter(){
     ['8016024136','Silver Up or Down – November 4, 10AM ET','General Finance','已過濾'],
     ['8015839204','KOSPI Composite Index (Korea) Up or Down','General Finance','已過濾']
   ].map(function(r){
-    return '<tr><td class="num" style="color:#86909c">'+r[0]+'</td>'+
+    return '<tr><td class="num" style="color:var(--text-help)">'+r[0]+'</td>'+
       '<td class="name"><div class="cell-clip">'+r[1]+'</div></td>'+
       '<td><span class="chip chip-line">'+r[2]+'</span></td>'+
       '<td><span class="dot-badge"><span class="d d-off"></span>'+r[3]+'</span></td>'+
       '<td class="actions"><span class="btn-text" onclick="toast(\'原型示意：移除過濾\',\'info\')">移除</span></td></tr>';
   }).join('');
   return '<div class="card"><div class="card-head"><div class="card-title">過濾事件</div>'+
-    '<div class="right"><button class="btn btn-primary" onclick="toast(\'原型示意：新增過濾事件\',\'info\')">'+icon('plus',14)+' 新增過濾</button></div></div>'+
+    '<div class="right"><button class="btn btn-primary" onclick="toast(\'原型示意：新增過濾事件\',\'info\')">'+icon('plus',16)+' 新增過濾</button></div></div>'+
     '<div class="table-wrap" style="margin-top:0"><table style="min-width:820px"><thead><tr>'+
     '<th>事件 ID</th><th>事件名稱</th><th>二級分類</th><th style="width:110px">狀態</th><th style="width:90px">操作</th>'+
     '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(3,1)+'</div>';
@@ -2072,19 +2081,19 @@ function mdFilter(){
    ================================================================== */
 function pageUser(){
   const rows=USERS.map(function(u){
-    return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></td>'+
-      '<td class="num" style="color:#86909c">'+u[0]+'</td>'+
+    return '<tr><td style="width:36px"><input type="checkbox" style="accent-color:var(--primary)" /></td>'+
+      '<td class="num" style="color:var(--text-help)">'+u[0]+'</td>'+
       '<td style="max-width:110px"><div class="cell-clip num">'+u[1]+'</div></td>'+
       '<td class="name">'+esc(u[2])+'</td>'+
       '<td><span class="chip chip-gray">'+u[3]+'</span></td>'+
       '<td><span class="switch '+(swGet('usr:'+u[0]+':on',u[4])?'on':'')+'" data-label="用戶狀態" onclick="toggleSwitch(this,\'usr:'+u[0]+':on\')"></span></td>'+
       '<td><span class="switch '+(swGet('usr:'+u[0]+':mfa',u[5])?'on':'')+'" data-label="MFA 狀態" onclick="toggleSwitch(this,\'usr:'+u[0]+':mfa\')"></span></td>'+
       '<td class="muted">'+u[6]+'</td>'+
-      '<td class="num" style="white-space:nowrap;color:#4e5969">'+u[7]+'</td>'+
-      '<td class="num" style="white-space:nowrap;color:#4e5969">'+u[8]+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:var(--text-sub)">'+u[7]+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:var(--text-sub)">'+u[8]+'</td>'+
       '<td class="actions"><span class="btn-text '+(swGet('usr:'+u[0]+':mfa',u[5])?'':'muted')+'" '+(swGet('usr:'+u[0]+':mfa',u[5])?'onclick="confirmUnbind(\''+esc(u[1])+'\')"':'')+'>解綁 Google 驗證</span>'+
       '<span class="btn-text" onclick="openResetPwd(\''+esc(u[1])+'\')">重置密碼</span>'+
-      '<span class="btn-text" onclick="openUserMore(\''+esc(u[1])+'\')">更多</span></td></tr>';
+      '<span class="btn-text" onclick="openUserMore(\''+esc(u[1])+'\',this)">更多</span></td></tr>';
   }).join('');
   return '<div class="card"><div class="filters">'+
     '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="輸入帳號 / 用戶名稱搜尋" style="min-width:220px" /></div>'+
@@ -2093,9 +2102,9 @@ function pageUser(){
     '<div class="f-item"><select class="f-select"><option>Google 驗證</option><option>已綁定</option><option>未綁定</option></select></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
     '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
-    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openUserAdd()">'+icon('plus',14)+' 新增用戶</button></div>'+
+    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openUserAdd()">'+icon('plus',16)+' 新增用戶</button></div>'+
     '<div class="table-wrap"><table style="min-width:1160px"><thead><tr>'+
-    '<th style="width:36px"><input type="checkbox" style="accent-color:#2f6bf6" /></th>'+
+    '<th style="width:36px"><input type="checkbox" style="accent-color:var(--primary)" /></th>'+
     '<th>用戶編號</th><th>帳號</th><th>用戶名稱</th><th>角色</th><th>用戶狀態</th><th>Google 驗證狀態</th>'+
     '<th>備註</th><th>創建時間</th><th>更新時間</th><th>操作</th>'+
     '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(24,1)+'</div>';
@@ -2127,7 +2136,7 @@ function submitUser(){
 function confirmUnbind(acc){
   openModal(modalShell({
     title:'解綁 Google 驗證',size:'narrow',
-    body:'<div style="color:#4e5969;line-height:1.7">解綁後「'+esc(acc)+'」登入時將不再需要 Google 驗證碼，帳號安全性會降低。<br/>確定要解綁嗎？</div>',
+    body:'<div style="color:var(--text-sub);line-height:1.7">解綁後「'+esc(acc)+'」登入時將不再需要 Google 驗證碼，帳號安全性會降低。<br/>確定要解綁嗎？</div>',
     foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
       '<button class="btn btn-danger" onclick="closeModal();toast(\'已解綁 Google 驗證\')">確定解綁</button>'
   }));
@@ -2135,23 +2144,21 @@ function confirmUnbind(acc){
 function openResetPwd(acc){
   openModal(modalShell({
     title:'重置密碼 · '+acc,
-    body:'<div class="alert-tip"><span class="i">'+icon('warn',14)+'</span><span>重置後該用戶需使用新密碼重新登入，舊密碼立即失效。</span></div>'+
+    body:'<div class="alert-tip"><span class="i">'+icon('warn',16)+'</span><span>重置後該用戶需使用新密碼重新登入，舊密碼立即失效。</span></div>'+
       '<div class="field"><label class="field-label"><span class="req">*</span>新密碼</label><input class="input" type="password" placeholder="8–20 位，需含字母和數字" /></div>'+
       '<div class="field"><label class="field-label"><span class="req">*</span>確認密碼</label><input class="input" type="password" placeholder="再次輸入新密碼" /></div>',
     foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
       '<button class="btn btn-primary" onclick="closeModal();toast(\'密碼已重置\')">確認重置</button>'
   }));
 }
-function openUserMore(acc){
-  openModal(modalShell({
-    title:'更多操作 · '+acc,size:'narrow',
-    body:'<div style="display:flex;flex-direction:column;gap:2px">'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：編輯用戶\')">編輯用戶</button>'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：設定角色\')">設定角色</button>'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'已重置 MFA\')">重置 MFA</button>'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px;color:#f53f3f" onclick="closeModal();confirmDelete(\'用戶\')">刪除用戶</button></div>',
-    foot:false
-  }));
+function openUserMore(acc,el){
+  openPopover(
+    popItem('編輯用戶','gear',"closePopover();toast('原型示意：編輯用戶')")+
+    popItem('設定角色','shield',"closePopover();toast('原型示意：設定角色')")+
+    popItem('重置 MFA','lock',"closePopover();toast('已重置 MFA')")+
+    '<div class="popover-sep"></div>'+
+    popItem('刪除用戶','close',"closePopover();confirmDelete('用戶')",true),
+    el);
 }
 
 /* ==================================================================
@@ -2160,14 +2167,14 @@ function openUserMore(acc){
 function pageRole(){
   const rows=ROLES.map(function(r,i){
     const locked=i===ROLES.length-1;
-    return '<tr><td class="num" style="color:#86909c">'+(i+1)+'</td>'+
+    return '<tr><td class="num" style="color:var(--text-help)">'+(i+1)+'</td>'+
       '<td class="name">'+esc(r[0])+'</td>'+
       '<td>'+(r[1]==='–'?'<span class="muted">–</span>':esc(r[1]))+'</td>'+
-      '<td class="num" style="white-space:nowrap;color:#4e5969">'+r[2]+'</td>'+
+      '<td class="num" style="white-space:nowrap;color:var(--text-sub)">'+r[2]+'</td>'+
       '<td class="actions">'+
       (locked?'<span class="btn-text muted">編輯</span><span class="btn-text muted">刪除</span>'
         :'<span class="btn-text" onclick="openRoleCreate(\''+esc(r[0])+'\')">編輯</span>'+
-         '<span class="btn-text" style="color:#f53f3f" onclick="confirmDelete(\'角色\')">刪除</span>')+
+         '<span class="btn-text" style="color:var(--danger)" onclick="confirmDelete(\'角色\')">刪除</span>')+
       '</td></tr>';
   }).join('');
   return '<div class="card"><div class="filters">'+
@@ -2175,7 +2182,7 @@ function pageRole(){
     '<div class="f-item"><span class="f-label">描述</span><input class="f-input" placeholder="輸入描述" style="min-width:180px" /></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
     '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
-    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openRoleCreate()">'+icon('plus',14)+' 新增角色</button></div>'+
+    '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openRoleCreate()">'+icon('plus',16)+' 新增角色</button></div>'+
     '<div class="table-wrap"><table style="min-width:880px"><thead><tr>'+
     '<th style="width:56px">序號</th><th>角色名稱</th><th>描述</th><th style="width:190px">創建時間</th><th style="width:140px">操作</th>'+
     '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(17,1)+'</div>';
@@ -2217,7 +2224,7 @@ function pageRoleCreate(){
     '<div class="char-count num" id="role-desc-c">0 / 1000</div></div></div>'+
   '<div class="card"><div class="card-title" style="margin-bottom:14px">功能表權限</div>'+
     '<div class="perm-table">'+
-    '<div class="perm-row head"><div class="perm-c1" style="background:#f7f9fc">功能表名稱</div><div class="perm-c2" style="background:#f7f9fc">功能表按鈕</div></div>'+
+    '<div class="perm-row head"><div class="perm-c1" style="background:var(--bg-soft)">功能表名稱</div><div class="perm-c2" style="background:var(--bg-soft)">功能表按鈕</div></div>'+
     rows+'</div>'+
     '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">'+
     '<button class="btn btn-ghost" onclick="closeTabEvent(\'/system/role/create\')">取消</button>'+
@@ -2260,24 +2267,25 @@ function submitRole(){
    ================================================================== */
 function pageOperation(){
   const rows=LOGS.map(function(l,i){
-    return '<tr><td class="num" style="color:#86909c">'+(i+1)+'</td>'+
+    return '<tr><td class="num" style="color:var(--text-help)">'+(i+1)+'</td>'+
       '<td class="name">'+esc(l[0])+'</td><td>'+l[1]+'</td>'+
       '<td><span class="chip chip-gray">'+l[2]+'</span></td>'+
       '<td><div class="cell-clip">'+esc(l[3])+'</div></td>'+
+      '<td class="num" style="white-space:nowrap;color:var(--text-sub)">'+l[4]+'</td>'+
       '<td class="actions"><span class="btn-text" onclick="openLogDetail('+i+')">詳情</span></td></tr>';
   }).join('');
   return '<div class="card"><div class="filters">'+
     '<div class="f-item"><span class="f-label">搜尋</span><input class="f-input" placeholder="輸入關鍵字查詢" style="min-width:220px" /></div>'+
     '<div class="f-item"><select class="f-select"><option>操作類型</option><option>新增白名單IP</option><option>設定IP白名單啟用狀態</option></select></div>'+
-    '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:#4e5969;white-space:nowrap;font-size:13px">操作時間</span>'+
+    '<div class="f-item" style="border:0;background:transparent;gap:6px"><span style="color:var(--text-sub);white-space:nowrap;font-size:13px">操作時間</span>'+
     '<input class="f-date" id="dp-op-time" placeholder="開始時間" readonly onclick="openDatePicker({mode:\'time\',target:\'dp-op-time\',title:\'操作時間 · 時間範圍\'})" style="min-width:104px" />'+
-    '<span style="color:#c9cdd4">–</span>'+
+    '<span style="color:var(--text-disabled)">–</span>'+
     '<input class="f-date" id="dp-op-time2" placeholder="結束時間" readonly onclick="openDatePicker({mode:\'time\',target:\'dp-op-time2\',title:\'操作時間 · 時間範圍\'})" style="min-width:104px" /></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
     '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
-    '<div class="table-wrap"><table style="min-width:940px"><thead><tr>'+
+    '<div class="table-wrap"><table class="tbl-fixed-op" style="min-width:1120px"><thead><tr>'+
     '<th style="width:56px">序號</th><th style="width:150px">操作人</th><th style="width:210px">操作類型</th>'+
-    '<th style="width:100px">模組</th><th>操作描述</th><th style="width:90px">操作</th>'+
+    '<th style="width:100px">模組</th><th>操作描述</th><th style="width:180px">操作時間</th><th style="width:90px">操作</th>'+
     '</tr></thead><tbody>'+rows+'</tbody></table></div>'+pager(118,1)+'</div>';
 }
 function openLogDetail(i){
@@ -2290,11 +2298,11 @@ function openLogDetail(i){
       '<div class="info-item"><div class="k">操作類型</div><div class="v">'+l[1]+'</div></div>'+
       '<div class="info-item"><div class="k">操作時間</div><div class="v">2026-11-04 09:32:18</div></div>'+
       '<div class="info-item"><div class="k">IP 位址</div><div class="v">192.168.10.41</div></div>'+
-      '<div class="info-item"><div class="k">結果</div><div class="v" style="color:#00b42a">成功</div></div></div>'+
-      '<div style="margin-top:16px"><div style="color:#86909c;font-size:12px;margin-bottom:6px">操作描述</div>'+
-      '<div style="background:#f7f9fc;border-radius:6px;padding:10px 12px;color:#4e5969;line-height:1.7">'+esc(l[3])+'</div></div>'+
-      '<div style="margin-top:14px"><div style="color:#86909c;font-size:12px;margin-bottom:6px">請求參數</div>'+
-      '<pre style="margin:0;background:#f7f9fc;border-radius:6px;padding:10px 12px;color:#4e5969;font-size:11.5px;overflow-x:auto">'+esc('{\n  "merchant_id": 80058,\n  "ip": "192.168.10.41",\n  "enabled": true\n}')+'</pre></div>',
+      '<div class="info-item"><div class="k">結果</div><div class="v" style="color:var(--success)">成功</div></div></div>'+
+      '<div style="margin-top:16px"><div style="color:var(--text-help);font-size:12px;margin-bottom:6px">操作描述</div>'+
+      '<div style="background:var(--bg-soft);border-radius:6px;padding:10px 12px;color:var(--text-sub);line-height:1.7">'+esc(l[3])+'</div></div>'+
+      '<div style="margin-top:14px"><div style="color:var(--text-help);font-size:12px;margin-bottom:6px">請求參數</div>'+
+      '<pre style="margin:0;background:var(--bg-soft);border-radius:6px;padding:10px 12px;color:var(--text-sub);font-size:11px;overflow-x:auto">'+esc('{\n  "merchant_id": 80058,\n  "ip": "192.168.10.41",\n  "enabled": true\n}')+'</pre></div>',
     foot:'<button class="btn btn-primary" onclick="closeModal()">關閉</button>'
   }));
 }
@@ -2305,35 +2313,40 @@ function openLogDetail(i){
 function showUserMenu(){
   openPopover(
     '<div class="popover-head">'+
-      '<span class="popover-avatar">'+icon('user',22)+'</span>'+
+      '<span class="popover-avatar">'+icon('user',20)+'</span>'+
       '<div><div class="popover-name">Sky.r</div><span class="popover-tag">測試</span></div>'+
     '</div>'+
     '<div class="popover-sep"></div>'+
     '<button class="popover-item" onclick="closePopover();toast(\'原型示意：切換深色模式\',\'info\')">'+
-      '<span class="pi">'+icon('moon',17)+'</span><span class="pl">深色模式</span>'+
+      '<span class="pi">'+icon('moon',16)+'</span><span class="pl">深色模式</span>'+
       '<span class="switch" id="dark-sw" onclick="event.stopPropagation();this.classList.toggle(\'on\');toast(this.classList.contains(\'on\')?\'已切換為深色模式（原型示意）\':\'已切換為淺色模式\',\'info\')"></span>'+
     '</button>'+
     '<div class="popover-sep"></div>'+
     '<button class="popover-item" onclick="closePopover();toast(\'原型示意：修改密碼\',\'info\')">'+
-      '<span class="pi">'+icon('lock',17)+'</span><span class="pl">修改密碼</span>'+
-      '<span class="pr">'+icon('chevronRight',15)+'</span></button>'+
+      '<span class="pi">'+icon('lock',16)+'</span><span class="pl">修改密碼</span>'+
+      '<span class="pr">'+icon('chevronRight',16)+'</span></button>'+
     '<button class="popover-item" onclick="onMfaClick()">'+
-      '<span class="pi">'+icon('google',17)+'</span>'+
+      '<span class="pi">'+icon('google',16)+'</span>'+
       (state.mfaBound
-        ? '<span class="pl">Google 驗證 <span class="state" style="color:#00b42a">（已綁定）</span></span>'+
-          '<span class="act" style="color:#86909c">解綁</span>'
+        ? '<span class="pl">Google 驗證 <span class="state" style="color:var(--success)">（已綁定）</span></span>'+
+          '<span class="act" style="color:var(--text-help)">解綁</span>'
         : '<span class="pl">Google 驗證 <span class="state">（未綁定）</span></span>'+
           '<span class="act">綁定</span>')+
       '</button>'+
     '<div class="popover-sep"></div>'+
     '<button class="popover-item danger" onclick="doLogout()">'+
-      '<span class="pi">'+icon('logout',17)+'</span><span class="pl">登出系統</span>'+
-      '<span class="pr">'+icon('chevronRight',15)+'</span></button>',
+      '<span class="pi">'+icon('logout',16)+'</span><span class="pl">登出系統</span>'+
+      '<span class="pr">'+icon('chevronRight',16)+'</span></button>',
     document.getElementById('user-btn')
   );
 }
 /* 下拉浮層：錨定觸發按鈕下方，右對齊 */
 let popoverEl=null;
+/* 菜單項：圖標 + 標籤，danger 用於刪除類操作 */
+function popItem(label,ic,onclick,danger){
+  return '<button class="popover-item'+(danger?' danger':'')+'" onclick="'+onclick+'">'+
+    '<span class="pi">'+icon(ic,16)+'</span><span class="pl">'+label+'</span></button>';
+}
 function openPopover(html,anchor){
   closePopover();
   if(!anchor)return;
@@ -2347,9 +2360,13 @@ function openPopover(html,anchor){
   document.body.appendChild(box);
   const r=anchor.getBoundingClientRect();
   const w=box.offsetWidth||252;
+  const h=box.offsetHeight||0;
   let left=r.right-w;
   if(left<12)left=12;
+  if(left+w>window.innerWidth-12)left=Math.max(12,window.innerWidth-12-w);
   let top=r.bottom+8;
+  /* 下方空間不足時上翻到按鈕上緣，避免菜單被視窗底邊截斷 */
+  if(h&&top+h>window.innerHeight-12)top=Math.max(12,r.top-8-h);
   box.style.left=left+'px';
   box.style.top=top+'px';
   popoverEl={mask:mask,box:box};
@@ -2372,7 +2389,7 @@ function openNavFlyout(key,anchor){
     const act=state.route===c.path?' active':'';
     return '<button class="popover-item'+act+'" onclick="closePopover();go(\''+c.path+'\')">'+
       '<span class="pl">'+c.label+(c.isNew?'<span class="nav-new" style="margin-left:6px">NEW</span>':'')+'</span>'+
-      (act?'<span class="pr">'+icon('chevronRight',15)+'</span>':'')+'</button>';
+      (act?'<span class="pr">'+icon('chevronRight',16)+'</span>':'')+'</button>';
   }).join('');
   closePopover();
   const mask=document.createElement('div');
@@ -2437,12 +2454,12 @@ function openMfaBind(){
   openModal(modalShell({
     title:'綁定 Google 驗證',
     body:
-      '<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>綁定後登入需輸入 6 位動態驗證碼。請先安裝 Google Authenticator 或同類驗證器 App。</span></div>'+
+      '<div class="alert-tip"><span class="i">'+icon('info',16)+'</span><span>綁定後登入需輸入 6 位動態驗證碼。請先安裝 Google Authenticator 或同類驗證器 App。</span></div>'+
       '<div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">'+
-        '<div style="border:1px solid #eef1f6;border-radius:10px;padding:12px;background:#fff;flex:0 0 auto">'+qr+
-          '<div style="text-align:center;color:#86909c;font-size:11px;margin-top:8px">掃描此二維碼</div></div>'+
+        '<div style="border:1px solid var(--border-light);border-radius:10px;padding:12px;background:#fff;flex:0 0 auto">'+qr+
+          '<div style="text-align:center;color:var(--text-help);font-size:11px;margin-top:8px">掃描此二維碼</div></div>'+
         '<div style="flex:1;min-width:200px">'+
-          '<div style="font-size:13px;color:#4e5969;line-height:1.9;margin-bottom:14px">'+
+          '<div style="font-size:13px;color:var(--text-sub);line-height:1.9;margin-bottom:14px">'+
             '① 開啟驗證器 App，選擇「掃描二維碼」<br/>'+
             '② 無法掃碼時，手動輸入下方密鑰<br/>'+
             '③ 將 App 顯示的 6 位驗證碼填入下方'+
@@ -2450,11 +2467,11 @@ function openMfaBind(){
           '<div class="field" style="margin-bottom:12px">'+
             '<label class="field-label">密鑰（手動輸入）</label>'+
             '<div style="display:flex;gap:8px">'+
-              '<input class="input readonly" value="'+MFA_SECRET+'" readonly style="font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:.5px" />'+
+              '<input class="input readonly" value="'+MFA_SECRET+'" readonly style="font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:0" />'+
               '<button class="btn btn-ghost" style="flex:0 0 auto" onclick="copyMfaSecret()">複製</button>'+
             '</div>'+
           '</div>'+
-          '<div style="font-size:12px;color:#86909c">帳戶：<b style="color:#4e5969">DCP-Console : skytest</b></div>'+
+          '<div style="font-size:12px;color:var(--text-help)">帳戶：<b style="color:var(--text-sub)">DCP-Console : skytest</b></div>'+
         '</div>'+
       '</div>'+
       '<div class="field" style="margin-top:18px;margin-bottom:8px">'+
@@ -2463,7 +2480,7 @@ function openMfaBind(){
           '<input class="input" id="mfa-code" maxlength="6" inputmode="numeric" placeholder="請輸入 6 位數字" '+
             'style="width:200px;font-size:18px;letter-spacing:8px;text-align:center;font-variant-numeric:tabular-nums" '+
             'oninput="onMfaInput(this)" />'+
-          '<span id="mfa-count" style="color:#86909c;font-size:12px">有效時間 05:00</span>'+
+          '<span id="mfa-count" style="color:var(--text-help);font-size:12px">有效時間 05:00</span>'+
         '</div>'+
         '<div class="form-error" id="mfa-err" style="display:none"></div>'+
       '</div>',
@@ -2482,7 +2499,7 @@ function startMfaCountdown(){
     if(!el){ stopMfaCountdown(); return; }
     if(mfaLeft<=0){
       el.textContent='已過期，請重新取得';
-      el.style.color='#f53f3f';
+      el.style.color='var(--danger)';
       const s=document.getElementById('mfa-submit');
       if(s){ s.disabled=true; s.style.background='#a9c4f8'; s.style.cursor='not-allowed'; }
       stopMfaCountdown();
@@ -2491,7 +2508,7 @@ function startMfaCountdown(){
     const m=String(Math.floor(mfaLeft/60)).padStart(2,'0');
     const s=String(mfaLeft%60).padStart(2,'0');
     el.textContent='有效時間 '+m+':'+s;
-    el.style.color=mfaLeft<=60?'#ff7d00':'#86909c';
+    el.style.color=mfaLeft<=60?'var(--warning)':'var(--text-help)';
   },1000);
 }
 function stopMfaCountdown(){ if(mfaTimer){ clearInterval(mfaTimer); mfaTimer=null; } }
@@ -2525,8 +2542,8 @@ function openMfaUnbind(){
   openModal(modalShell({
     title:'解綁 Google 驗證',size:'narrow',
     body:'<div style="display:flex;gap:10px;padding:4px 0 8px">'+
-      '<span style="color:#ff7d00;flex:0 0 auto">'+icon('warn',20)+'</span>'+
-      '<div style="color:#4e5969;line-height:1.75">解綁後登入將不再校驗動態驗證碼，帳號安全性降低。<br/>確定要解綁嗎？</div></div>',
+      '<span style="color:var(--warning);flex:0 0 auto">'+icon('warn',20)+'</span>'+
+      '<div style="color:var(--text-sub);line-height:1.75">解綁後登入將不再校驗動態驗證碼，帳號安全性降低。<br/>確定要解綁嗎？</div></div>',
     foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
       '<button class="btn btn-danger" onclick="doUnbindMfa()">確定解綁</button>'
   }));
@@ -2548,54 +2565,61 @@ function doLogout(){
 function showVersion(){
   openModal(modalShell({
     title:'原型版本記錄',
-    body:'<div class="alert-tip"><span class="i">'+icon('info',14)+'</span><span>本原型為界面與交互演示，數據為業務化 mock，不含真實後端邏輯。</span></div>'+
+    body:'<div class="alert-tip"><span class="i">'+icon('info',16)+'</span><span>本原型為界面與交互演示，數據為業務化 mock，不含真實後端邏輯。</span></div>'+
       '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:4px 0 16px">'+
       '<div class="ver-card"><div class="k">當前版本</div><div class="v">'+VERSION+'</div></div>'+
       '<div class="ver-card"><div class="k">發布日期</div><div class="v">'+BUILD_DATE+'</div></div></div>'+
-      '<div style="border-top:1px solid #eef1f6;padding-top:14px">'+
+      '<div style="border-top:1px solid var(--border-light);padding-top:14px">'+
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
-      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 內容變更</div>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">'+BUILD_DATE+' · 功能新增</div>'+
+      '合併「多源實體標識庫」MVP 原型：側欄新增實體標識庫分組與兩個頁面（標識庫總覽、實體列表）。'+
+      '總覽呈現 1,019 條實體構成與端到端六步鏈路；實體列表按 01_entity 13 字段呈現標誌、別名、上位名稱、主源側ID、其餘平台ID 與更新時間，支持實體類別、上位名稱、數據狀態篩選與詳情、編輯、錄入彈窗。'+
+      '演示數據取自 entity-lib/ 的初始化數據字典，均為源側原值；別名多值樣本為界面示意。實體列表改為一實體一行，收斂後的多個賽事歸屬與多個源側編號在行內並列。頁面清單、菜單分組與覆蓋頁數同步更新。'+
+      '全站樣式按基線收口：字號收進七檔、間距歸 4px 階、圓角四檔、動效兩檔並共用一條緩動曲線，清除漸變、彩色陰影與 700 字重，transition 改寫具名屬性；五類令牌統一由 assets/app.css 的 :root 提供，刪除本頁內的重复定義，並為三個獨立頁補齊缺失令牌；修正柱狀圖縱軸刻度壓在柱體上的定位缺陷，SVG 內聯字號一併收進七檔；修正別名添加按鈕在輸入框為空時無響應的問題，改為點擊即新增待輸入位、回車轉標籤、失焦收回。合併上游 V1.3.2 事件分類排序權重與關聯標籤改動。事件分類與用戶管理的「更多」由窄彈窗改為錨定行內的下拉菜單，菜單在視窗底部空間不足時上翻；事件分類菜單移除關聯標籤與子分類管理兩項。事件列表按源平台列结构补齐：新增序號與開始時間、入庫時間、截止時間、更新時間四個時間列，表格由 10 列增至 15 列，橫向滾動、操作列固定右側。事件複核待複核頁籤補入庫時間、截止時間、數據來源三列（11 列），已複核頁籤去掉勾選列（13 列，勾選僅待複核）；商戶列表補狀態與創建時間（13 列）；操作日誌補操作時間（7 列）；事件複核、商戶、日誌三張寬表操作列固定右側。已複核操作列去掉複核記錄佔位，只保留詳情。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.3.2</span>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-09 · 內容變更</div>'+
       '事件分類列表新增排序權重字段，僅一級分類於新增/編輯彈窗錄入（0–9999，越小越靠前）；新增二級分類不帶該字段，二級分類不可再新增分類，該入口改為「關聯標籤」；二級「更多」隱藏子分類管理。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.3.1</span>'+
-      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-06 · 功能修復</div>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-06 · 功能修復</div>'+
       '修復三處事件相關「詳情」的跳轉：事件列表、投注類係數調控、事件歸檔的摘要彈窗主按鈕由「前往事件列表」改為「進入詳情」，'+
       '跳轉事件詳情頁（/event/detail）；詳情頁沿用事件審核詳情四頁籤結構（基本資訊 / 市場 / 倉位情況 / 欄位映射），'+
       '去掉複核語境，補賽事比分與規則區；底部返回按來源回跳並還原係數調控頁籤。事件歸檔菜單加 NEW 標籤。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.3.0</span>'+
-      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 功能新增</div>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-05 · 功能新增</div>'+
       '合併本地歸檔特性：事件列表新增批量歸檔交互（勾選/全選/可取消二次確認），新增事件歸檔頁（歸檔統計/決策點/歸檔池/分頁），僅已結束事件可歸檔；清理歸檔工作台與歸檔規則，決策點收斂為 7 個（①~⑦）。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.2.1</span>'+
-      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 內容變更</div>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-05 · 內容變更</div>'+
       '事件總覽圖表自適應、卡片等高；商戶列表「更多」改下拉；側欄 NEW 徽標縮小、折疊態改浮出二級列表；'+
       'api-alarm.html、api-detail.html 按基線規範重做並對齊原生頁；分頁器箭頭改左右並統一兩個子頁；篩選欄換行留間隙、日期控件內嵌化。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.2.0</span>'+
-      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 功能新增</div>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-05 · 功能新增</div>'+
       '合併 API 調用監控兩項功能：商戶列表「更多」新增 OpenAPI 調用詳情（概覽 / API / WSS 三頁籤），'+
       '系統設置新增 API 推送異常（P0 指標卡 / 告警列表 / 告警詳情與處理流轉）。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.1.2</span>'+
-      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 內容變更</div>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-05 · 內容變更</div>'+
       '規範頁 1.1 升版規則改為按位遞增：功能變更中間位 +1、尾數歸零，內容變更尾數 +1；'+
       '新增協作場景的版本衝突處理順序，5.1 衝突規則同步改寫。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.1.1</span>'+
-      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 內容變更</div>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-05 · 內容變更</div>'+
       '規範頁 5.1 補緩存策略與驗證說明：Cloudflare 每次回源，GitHub Pages 的 HTML 緩存 10 分鐘；'+
       '上傳前檢查清單第 2 項擴展為版本號與變更記錄同查。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.1.0</span>'+
-      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-05 · 功能新增</div>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-05 · 功能新增</div>'+
       '產品基線新增「團隊協作」分組與團隊更新上傳流程，規範頁補入倉庫入口、五步流程、'+
       '衝突處理規則、提交信息格式、上傳前檢查清單與禁止事項。</div></div>'+
       '<div style="display:flex;gap:12px"><span class="vnum" style="align-self:flex-start">V1.0.0</span>'+
-      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-04 · 首次發布</div>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-04 · 首次發布</div>'+
       '依原站前端還原管理面 9 個業務頁面與 7 類彈窗；外框改為產品基線結構，新增「產品基線 · 規範」文檔頁；'+
       '字體按基線規範統一為 Outfit + 系統中文字體，配色沿用原站藍色體系。</div></div></div>',
     foot:'<button class="btn btn-primary" onclick="closeModal()">關閉</button>'

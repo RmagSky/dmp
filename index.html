@@ -3,21 +3,30 @@
   數據中台管理系統 · 交互原型統一入口（框架頁）
   用途：在管理面與產品基線之間切換瀏覽。各頁面為獨立 HTML，也可單獨打開。
   文件對應：dmp.html（管理面）/ rule.html（產品基線）
-  原型版本：V1.3.2
+  原型版本：V1.4.0
 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>數據中台管理系統 · 交互原型 V1.3.2</title>
+<title>數據中台管理系統 · 交互原型 V1.4.0</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
 <style>
   :root{
     --primary:#2f6bf6; --primary-hover:#1f5ae8; --primary-light:#eaf1ff;
     --bg:#eaf1f9; --card:#ffffff;
-    --border:#e5e8ef; --text:#1d2129; --text-sub:#4e5969; --text-disabled:#c9cdd4;
+    --border:#e5e8ef; --border-light:#eef1f6;
+    --border-accent:#cdddff; --border-chip:#dbe4f2; --border-info:#dbe6fb;
+    --text:#1d2129; --text-sub:#4e5969; --text-disabled:#c9cdd4; --text-help:#86909c;
+    --fs-stat:24px; --fs-page:18px; --fs-block:16px;
+    --fs-body:14px; --fs-table:13px; --fs-help:12px; --fs-tag:11px;
+    --r-sm:4px; --r-md:6px; --r-lg:8px; --r-xl:12px;
+    --ease:cubic-bezier(.2,.7,.3,1);
+    --motion:140ms var(--ease); --motion-slow:200ms var(--ease);
+    --motion-ui:background var(--motion),color var(--motion),border-color var(--motion),box-shadow var(--motion);
+    --bg-soft:#f7f9fc; --bg-hover:#f2f5fa; --line-soft:#f0f3f8;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -35,11 +44,11 @@
   }
   .brand{display:flex;align-items:center;gap:9px;white-space:nowrap}
   .brand .dot{width:11px;height:11px;border-radius:3px;background:var(--primary);flex:0 0 auto}
-  .brand .name{font-size:15px;font-weight:600;letter-spacing:-.1px}
+  .brand .name{font-size:var(--fs-block);font-weight:600}
   .brand small{font-weight:400;color:var(--text-sub);font-size:12px}
   /* 原型版本徽標：與 rule.html 內的版本記錄同步 */
   .vnum{
-    font-weight:700;font-size:11px;background:var(--primary);color:#fff;
+    font-weight:600;font-size:11px;background:var(--primary);color:#fff;
     padding:2px 7px;border-radius:4px;letter-spacing:.5px;flex:0 0 auto;
     cursor:pointer;font-variant-numeric:tabular-nums;
   }
@@ -47,11 +56,11 @@
   nav::-webkit-scrollbar{height:0;width:0;display:none}
   .tab{
     padding:8px 16px;border-radius:6px;font-size:14px;color:var(--text-sub);
-    cursor:pointer;border:1px solid transparent;background:transparent;transition:all .15s;
+    cursor:pointer;border:1px solid transparent;background:transparent;transition:background .15s var(--ease),color .15s var(--ease),border-color .15s var(--ease);
     display:flex;align-items:center;gap:6px;white-space:nowrap;flex:0 0 auto;
   }
   .tab:hover{background:var(--bg);color:var(--text)}
-  .tab.active{background:var(--primary-light);color:var(--primary);font-weight:600;border-color:#cdddff}
+  .tab.active{background:var(--primary-light);color:var(--primary);font-weight:600;border-color:var(--border-accent)}
   .tab .badge{
     font-size:11px;padding:1px 6px;border-radius:4px;background:var(--bg);
     color:var(--text-sub);font-weight:500;
@@ -60,7 +69,7 @@
   .actions{display:flex;align-items:center;gap:10px;flex:0 0 auto}
   .btn{
     padding:7px 14px;border-radius:6px;font-size:13px;cursor:pointer;
-    border:1px solid var(--border);background:var(--card);color:var(--text-sub);transition:all .15s;
+    border:1px solid var(--border);background:var(--card);color:var(--text-sub);transition:background .15s var(--ease),color .15s var(--ease),border-color .15s var(--ease);
     font-family:inherit;white-space:nowrap;
   }
   .btn:hover{border-color:var(--primary);color:var(--primary)}
@@ -85,7 +94,7 @@
     <span class="dot"></span>
     <span class="name">數據中台管理系統</span>
     <small>· 交互原型</small>
-    <span class="vnum" id="proto-ver" onclick="jump('rule')" title="點擊查看版本記錄">V1.3.2</span>
+    <span class="vnum" id="proto-ver" onclick="jump('rule')" title="點擊查看版本記錄">V1.4.0</span>
   </div>
   <nav id="nav"></nav>
   <div class="actions">
@@ -105,10 +114,10 @@
    框架頁：在管理面與產品基線之間切換
    ================================================================== */
 const VIEWS = [
-  { key:'dmp',  label:'管理面',   badge:'14 頁', file:'dmp.html'  },
+  { key:'dmp',  label:'管理面',   badge:'16 頁', file:'dmp.html'  },
   { key:'rule', label:'產品基線', badge:'規範',  file:'rule.html' }
 ];
-const VERSION = 'V1.3.2';
+const VERSION = 'V1.4.0';
 
 let current = 'dmp';
 
