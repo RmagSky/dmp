@@ -3,8 +3,8 @@
    被 dmp.html / rule.html 共用；修改此處會同時影響兩端
    ========================================================== */
 
-const VERSION='V1.3.1';
-const BUILD_DATE='2026-11-05';
+const VERSION='V1.3.2';
+const BUILD_DATE='2026-11-09';
 
 const ICONS={
   dashboard:'<path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/>',

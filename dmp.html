@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 管理面
-  原型版本：V1.3.1 ｜ 入口：index.html
+  原型版本：V1.3.2 ｜ 入口：index.html
   配色沿用原站 192.168.10.51:7080；字體按產品基線規範
 -->
 <html lang="zh-CN">
@@ -9,10 +9,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>管理面 · 數據中台管理系統 V1.3.1</title>
+<title>管理面 · 數據中台管理系統 V1.3.2</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.3.1">
+<link rel="stylesheet" href="assets/app.css?v=1.3.2">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -25,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 管理面</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.3.1</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.3.2</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -107,7 +107,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 .tbl-fixed-op thead th:last-child{background:#f7f9fc}
 .tbl-fixed-op tbody tr:hover td.actions{background:#fafcff}
 </style>
-<script src="assets/core.js?v=1.3.1"></script>
+<script src="assets/core.js?v=1.3.2"></script>
 <script>
 /* ==================================================================
    數據中台管理系統 · 交互原型
@@ -881,54 +881,54 @@ function backFromEventDetail(){
    ================================================================== */
 /* 分類樹數據：一級分類 + 子分類 */
 const CAT_TREE=[
-  {name:'Business',count:5,desc:'商業、企業、併購、商業事件',countries:'阿富汗、亞塞拜然、以色列、印度尼西亞、日本、菲律賓',tags:['Meta','Apple','Microsoft','NVIDIA','Tesla','google','amazon','+4'],
+  {name:'Business',weight:10,count:5,desc:'商業、企業、併購、商業事件',countries:'阿富汗、亞塞拜然、以色列、印度尼西亞、日本、菲律賓',tags:['Meta','Apple','Microsoft','NVIDIA','Tesla','google','amazon','+4'],
    children:[
      {name:'Big Tech Companies',desc:'大型科技公司相關事件'},
      {name:'Earnings',desc:'企業季度財報、營收、利潤預期'},
      {name:'Mergers',desc:'企業合併、收購、股權交易'},
      {name:'IPO',desc:'公司上市、首次公開募股相關事件'}
    ]},
-  {name:'Weather',count:4,desc:'氣候、天氣、自然災害',countries:'阿富汗、亞塞拜然、以色列',tags:['earthquake','hurricane','climate','Weather'],
+  {name:'Weather',weight:20,count:4,desc:'氣候、天氣、自然災害',countries:'阿富汗、亞塞拜然、以色列',tags:['earthquake','hurricane','climate','Weather'],
    children:[
      {name:'Earthquakes',desc:'地震、地質活動相關事件'},
      {name:'Hurricanes',desc:'熱帶氣旋、颱風路徑、強度、登陸預測'},
      {name:'Climate Change',desc:'長期氣候趨勢、全球變暖、氣候政策相關事件'},
      {name:'General Weather',desc:'泛天氣事件，包括溫度、降雨、降雪、風暴等'}
    ]},
-  {name:'Culture',count:13,desc:'文化、娛樂、獎項、流行文化、名人',countries:'–',tags:['education','social','Mareil','Reality','TV','TikTok','YouTube','+11'],
+  {name:'Culture',weight:30,count:13,desc:'文化、娛樂、獎項、流行文化、名人',countries:'–',tags:['education','social','Mareil','Reality','TV','TikTok','YouTube','+11'],
    children:[
      {name:'Awards',desc:'影視、音樂、文學等獎項評選'},
      {name:'Celebrity',desc:'名人動態、爭議、婚姻、事業變動'},
      {name:'Movies',desc:'電影票房、上映、評價相關事件'},
      {name:'Music',desc:'音樂榜單、專輯、演唱會相關事件'}
    ]},
-  {name:'Science',count:14,desc:'科技、AI、航天、生物、醫學',countries:'–',tags:['astronomy','quantum','Medicine','health','FDA','vaccine','+19'],
+  {name:'Science',weight:40,count:14,desc:'科技、AI、航天、生物、醫學',countries:'–',tags:['astronomy','quantum','Medicine','health','FDA','vaccine','+19'],
    children:[
      {name:'AI',desc:'人工智慧模型、公司、監管相關事件'},
      {name:'Space',desc:'航天發射、衛星、太空探索'},
      {name:'Medicine',desc:'藥物審批、臨床試驗、公共衛生'}
    ]},
-  {name:'Finance',count:12,desc:'經濟、宏觀經濟、股市、財報、利率、匯率',countries:'–',tags:['Pyth Finance','Finance Updown','Earnings','Oil','Commodities','+15'],
+  {name:'Finance',weight:50,count:12,desc:'經濟、宏觀經濟、股市、財報、利率、匯率',countries:'–',tags:['Pyth Finance','Finance Updown','Earnings','Oil','Commodities','+15'],
    children:[
      {name:'Macro',desc:'利率、通膨、就業、GDP 等宏觀指標'},
      {name:'Equities',desc:'個股、指數、板塊漲跌相關事件'},
      {name:'Commodities',desc:'原油、黃金、農產品等大宗商品'}
    ]},
-  {name:'Crypto',count:14,desc:'加密貨幣、區塊鏈、NFT、DeFi',countries:'–',tags:['coinbase','binance','Stablecoins','Coin','token','nft','+7'],
+  {name:'Crypto',weight:60,count:14,desc:'加密貨幣、區塊鏈、NFT、DeFi',countries:'–',tags:['coinbase','binance','Stablecoins','Coin','token','nft','+7'],
    children:[
      {name:'BTC',desc:'比特幣價格、減半、ETF 相關事件'},
      {name:'ETH',desc:'以太坊升級、價格、生態相關事件'},
      {name:'Altcoins',desc:'其他代幣價格與生態事件'},
      {name:'DeFi',desc:'去中心化金融協議、TVL、治理事件'}
    ]},
-  {name:'Sports',count:15,desc:'體育/賽事，各類體育賽事、聯賽、盃賽',countries:'–',tags:['Rugby','Cricket','2026 Winter Games','Ncaa','F1','UFC','+23'],
+  {name:'Sports',weight:70,count:15,desc:'體育/賽事，各類體育賽事、聯賽、盃賽',countries:'–',tags:['Rugby','Cricket','2026 Winter Games','Ncaa','F1','UFC','+23'],
    children:[
      {name:'Football',desc:'足球聯賽、盃賽、國際賽事'},
      {name:'Basketball',desc:'NBA、CBA、歐洲籃球聯賽'},
      {name:'Esports',desc:'LoL、CS2、Dota2 等電競賽事'},
      {name:'Combat',desc:'拳擊、UFC、MMA 格鬥賽事'}
    ]},
-  {name:'Politics',count:11,desc:'政治、政治選舉、地緣政治、政府決策、國際關係',countries:'–',tags:['Trump','China','England','UK','House','United States','USA','+21'],
+  {name:'Politics',weight:80,count:11,desc:'政治、政治選舉、地緣政治、政府決策、國際關係',countries:'–',tags:['Trump','China','England','UK','House','United States','USA','+21'],
    children:[
      {name:'Elections',desc:'各國選舉、民調、席位預測'},
      {name:'Geopolitics',desc:'國際衝突、外交、制裁相關事件'},
@@ -954,6 +954,7 @@ function pageCategory(){
           '</button>'+
           '<span>'+esc(g.name)+'</span>'+
         '</div></td>'+
+      '<td class="num" style="width:96px">'+g.weight+'</td>'+
       '<td class="num" style="width:96px">'+g.count+'</td>'+
       '<td style="min-width:220px"><div class="cell-clip" title="'+esc(g.desc)+'">'+esc(g.desc)+'</div></td>'+
       '<td style="min-width:210px"><div class="cell-clip" title="'+esc(g.countries)+'">'+(g.countries==='–'?'<span class="muted">–</span>':esc(g.countries))+'</div></td>'+
@@ -970,12 +971,13 @@ function pageCategory(){
           '<td></td>'+
           '<td class="name" style="padding-left:34px"><span style="color:#4e5969;font-weight:400">'+esc(c.name)+'</span></td>'+
           '<td class="num muted">–</td>'+
+          '<td class="num muted" title="二級分類不參與排序權重">–</td>'+
           '<td><div class="cell-clip" style="color:#86909c">'+esc(c.desc)+'</div></td>'+
           '<td class="muted">–</td>'+
           '<td class="muted">–</td>'+
           '<td><span class="switch '+(swGet('subcat:'+c.name+':on',true)?'on':'')+'" data-label="子分類狀態" onclick="toggleSwitch(this,\'subcat:'+esc(c.name)+':on\')"></span></td>'+
           '<td class="actions">'+
-            '<span class="btn-text" onclick="openCategoryAdd(\''+esc(c.name)+'\')">新增分類</span>'+
+            '<span class="btn-text" onclick="toast(\'原型示意：關聯標籤設定\',\'info\')">關聯標籤</span>'+
             '<span class="btn-text" onclick="openCountryFilter(\''+esc(c.name)+'\',\'category\')">國家過濾</span>'+
             '<span class="btn-text" onclick="openMoreMenu(\''+esc(c.name)+'\')">更多</span>'+
           '</td></tr>';
@@ -990,8 +992,8 @@ function pageCategory(){
     '<button class="btn btn-ghost" onclick="toast(\'已重置篩選條件\',\'info\')">重置</button>'+
     '<button class="btn btn-primary" onclick="toast(\'已套用篩選條件\')">搜尋</button></div>'+
     '<div style="margin:14px 0 4px"><button class="btn btn-primary" onclick="openCategoryAdd()">'+icon('plus',14)+' 新增分類</button></div>'+
-    '<div class="table-wrap"><table style="min-width:1180px"><thead><tr>'+
-    '<th style="width:56px">序號</th><th>分類名稱</th><th style="width:96px">子分類數量</th><th>描述</th>'+
+    '<div class="table-wrap"><table style="min-width:1276px"><thead><tr>'+
+    '<th style="width:56px">序號</th><th>分類名稱</th><th style="width:96px">排序權重</th><th style="width:96px">子分類數量</th><th>描述</th>'+
     '<th>已過濾國家</th><th>關聯標籤</th><th style="width:64px">狀態</th><th style="width:230px">操作</th>'+
     '</tr></thead><tbody>'+body+'</tbody></table></div>'+pager(8,1)+'</div>';
 }
@@ -1001,11 +1003,17 @@ function toggleCat(name){
 }
 function openCategoryAdd(name){
   const init=name?esc(name)+'（副本）':'';
+  /* 頂部按鈕新增一級分類才帶排序權重；從一級分類行發起的新增二級分類不帶該字段 */
+  const weightField=name?'':
+    '<div class="field"><label class="field-label"><span class="req">*</span>排序權重</label>'+
+      '<input class="input" id="cat-weight" inputmode="numeric" maxlength="4" placeholder="請輸入 0–9999 的整數" />'+
+      '<div style="color:#86909c;font-size:11.5px;margin-top:6px">數值越小越靠前；僅一級分類有效</div></div>';
   openModal(modalShell({
-    title:'新增分類',
+    title:name?'新增二級分類':'新增分類',
     body:'<div class="field"><label class="field-label"><span class="req">*</span>分類名稱</label>'+
       '<input class="input" id="cat-name" maxlength="25" placeholder="輸入分類名稱" value="'+init+'" oninput="countChars(this,\'cat-name-c\',25)" />'+
       '<div class="char-count num" id="cat-name-c">'+init.length+' / 25</div></div>'+
+      weightField+
       '<div class="field"><label class="field-label">狀態</label><div><span class="switch on" data-label="角色狀態" onclick="toggleSwitch(this,\'role:new:on\')"></span></div></div>'+
       '<div class="field"><label class="field-label">描述</label>'+
       '<textarea class="textarea" id="cat-desc" maxlength="100" placeholder="輸入描述" oninput="countChars(this,\'cat-desc-c\',100)"></textarea>'+
@@ -1018,10 +1026,39 @@ function countChars(el,id,max){
   const t=document.getElementById(id);
   if(t)t.textContent=(el.value||'').length+' / '+max;
 }
+function catIsChild(name){return !!name&&!CAT_TREE.some(function(g){return g.name===name;});}
+function catFind(name){return CAT_TREE.find(function(x){return x.name===name;});}
+function catWeightValid(v){return /^[0-9]{1,4}$/.test((v||'').trim());}
 function submitCategory(){
   const n=(document.getElementById('cat-name').value||'').trim();
   if(!n){toast('請輸入分類名稱','err');return;}
+  const wEl=document.getElementById('cat-weight');
+  if(wEl&&!catWeightValid(wEl.value)){toast('排序權重需為 0–9999 的整數','err');return;}
   closeModal();toast('分類「'+n+'」已新增');
+}
+function openCategoryEdit(name){
+  const isChild=catIsChild(name);
+  const g=catFind(name);
+  const weightField=isChild?
+    '<div class="field"><label class="field-label">排序權重</label><div style="color:#86909c;font-size:12px;padding:10px 0">二級分類不參與排序權重</div></div>':
+    '<div class="field"><label class="field-label"><span class="req">*</span>排序權重</label>'+
+      '<input class="input" id="cat-edit-weight" inputmode="numeric" maxlength="4" value="'+(g?g.weight:100)+'" />'+
+      '<div style="color:#86909c;font-size:11.5px;margin-top:6px">數值越小越靠前；僅一級分類有效</div></div>';
+  openModal(modalShell({
+    title:'編輯分類'+(name?' · '+esc(name):''),
+    body:'<div class="field"><label class="field-label"><span class="req">*</span>分類名稱</label>'+
+      '<input class="input" id="cat-edit-name" maxlength="25" value="'+esc(name||'')+'" /></div>'+
+      weightField+
+      '<div class="field"><label class="field-label">狀態</label><div><span class="switch on" data-label="分類狀態" onclick="toggleSwitch(this,\'cat:edit:on\')"></span></div></div>',
+    foot:'<button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="submitCategoryEdit(\''+esc(name)+'\')">確認</button>'
+  }));
+}
+function submitCategoryEdit(name){
+  const wEl=document.getElementById('cat-edit-weight');
+  if(wEl){if(!catWeightValid(wEl.value)){toast('排序權重需為 0–9999 的整數','err');return;}
+    const g=catFind(name);if(g)g.weight=Number((wEl.value||'').trim());}
+  closeModal();renderShell();toast('分類「'+name+'」已更新');
 }
 /* 國家數據：按大洲分組 */
 const COUNTRY_GROUPS=[
@@ -1311,12 +1348,15 @@ function dpConfirm(){
   toast(e?'已設定日期範圍 '+s+' 至 '+e:'已選擇 '+s);
 }
 function openMoreMenu(name){
+  /* 二級分類不可再新增分類：隱藏「子分類管理」；該層級操作為「關聯標籤」 */
+  const subBtn=catIsChild(name)?'':
+    '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：子分類管理\',\'info\')">子分類管理</button>';
   openModal(modalShell({
     title:'更多操作'+(name?' · '+name:''),size:'narrow',
     body:'<div style="display:flex;flex-direction:column;gap:2px">'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：編輯分類\',\'info\')">編輯分類</button>'+
+      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();openCategoryEdit(\''+esc(name)+'\')">編輯分類</button>'+
       '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：關聯標籤設定\',\'info\')">關聯標籤</button>'+
-      '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px" onclick="closeModal();toast(\'原型示意：子分類管理\',\'info\')">子分類管理</button>'+
+      subBtn+
       '<button class="btn btn-ghost" style="justify-content:flex-start;height:38px;color:#f53f3f" onclick="closeModal();confirmDelete(\'分類\')">刪除分類</button></div>',
     foot:false
   }));
@@ -2516,7 +2556,11 @@ function showVersion(){
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
-      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 功能修復</div>'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">'+BUILD_DATE+' · 內容變更</div>'+
+      '事件分類列表新增排序權重字段，僅一級分類於新增/編輯彈窗錄入（0–9999，越小越靠前）；新增二級分類不帶該字段，二級分類不可再新增分類，該入口改為「關聯標籤」；二級「更多」隱藏子分類管理。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.3.1</span>'+
+      '<div style="flex:1;color:#4e5969;font-size:12.5px;line-height:1.85">'+
+      '<div style="color:#86909c;font-size:11.5px;margin-bottom:5px">2026-11-06 · 功能修復</div>'+
       '修復三處事件相關「詳情」的跳轉：事件列表、投注類係數調控、事件歸檔的摘要彈窗主按鈕由「前往事件列表」改為「進入詳情」，'+
       '跳轉事件詳情頁（/event/detail）；詳情頁沿用事件審核詳情四頁籤結構（基本資訊 / 市場 / 倉位情況 / 欄位映射），'+
       '去掉複核語境，補賽事比分與規則區；底部返回按來源回跳並還原係數調控頁籤。事件歸檔菜單加 NEW 標籤。</div></div>'+
