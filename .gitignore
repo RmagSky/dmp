@@ -14,3 +14,11 @@ _*.js
 _*.json
 *.log
 *.tmp
+
+# 本地調試腳本（用完即刪，不入庫）
+.dbg_*
+.nocache.py
+
+# 需求與分析資料（僅保留在本地，不入庫）
+# entity-lib 內含 PRD、數據字典、候選集 CSV 與對話原文，共約 46MB
+entity-lib/
