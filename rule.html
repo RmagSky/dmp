@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 產品基線規範
-  原型版本：V1.4.0 ｜ 入口：index.html
+  原型版本：V1.4.1 ｜ 入口：index.html
 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>產品基線 · 數據中台管理系統 V1.4.0</title>
+<title>產品基線 · 數據中台管理系統 V1.4.1</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.4.0">
-<link rel="stylesheet" href="assets/rule.css?v=1.4.0">
+<link rel="stylesheet" href="assets/app.css?v=1.4.1">
+<link rel="stylesheet" href="assets/rule.css?v=1.4.1">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -25,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 產品基線</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.4.0</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.4.1</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -41,7 +41,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-<script src="assets/core.js?v=1.4.0"></script>
+<script src="assets/core.js?v=1.4.1"></script>
 <script>
 
 /* ==================================================================
@@ -177,6 +177,7 @@ function specContent(){
 
 function specVersion(){
   const changes=[
+    ['V1.4.1','2026-11-09','內容變更','側欄 NEW 微標由 11px 恢復 9px（V1.4.0 字號收口時被誤推至 11px）；字號紀律補「裝飾性微標」條目：純裝飾標記不參與七檔收斂，固定 9px。事件歸檔列表「編號」改為「事件 ID」，並補分類、數據來源、截止時間三列（10 列）。分類對標事件分類樹，一級與二級同格顯示；歸檔頁補分類（按一級分組）與數據來源兩項篩選，並修復 arSetAf / arResetAf / arPage 三個函數缺失導致的篩選與翻頁失效。'],
     ['V1.4.0','2026-11-09','功能新增','合併「多源實體標識庫」MVP 原型：側欄新增實體標識庫分組與兩個頁面（標識庫總覽 / 實體列表）。總覽呈現 1,019 條實體構成與端到端六步鏈路；實體列表按 01_entity 13 字段呈現標誌、別名、上位名稱、主源側ID、其餘平台ID 與更新時間，支持實體類別、上位名稱、數據狀態篩選與詳情、編輯、錄入彈窗。演示數據取自 entity-lib/ 的初始化數據字典，均為源側原值；頁面清單、菜單分組與覆蓋頁數同步更新。組件與規範的常用組件補分頁器與圓角動效兩節，給出五個部位與八個令牌的對照。實體列表改為一實體一行，收斂後的多個賽事歸屬與多個源側編號在行內並列。全站樣式按基線收口：字號收進七檔、間距歸 4px 階、圓角四檔、動效兩檔並共用一條緩動曲線，清除漸變、彩色陰影與 700 字重；顏色、字號、圓角、動效、布局尺寸五類令牌統一由 assets/app.css 的 :root 提供，刪除 dmp.html 內的重复定義，並為三個獨立頁補齊缺失令牌。組件與規範補「間距與留白」「令牌單一源」兩節，字號補「字號紀律」一節，圖標尺寸表收為四檔；修正柱狀圖縱軸刻度壓在柱體上的定位缺陷，SVG 內聯字號一併收進七檔；修正別名添加按鈕在輸入框為空時無響應的問題，改為點擊即新增待輸入位、回車轉標籤、失焦收回。清理 api-alarm.html 與 api-detail.html 中未被調用的 renderLayout 及配套側欄樣式，兩頁各精簡約百行；將省略屬性名的 transition（裸寫時長與 var(--motion) 兩種）改為具名屬性，並抽出 --motion-ui 組合令牌，全站過渡屬性不再落到 all；面積圖去掉漸變填充，頂點數值標籤不再與縱軸刻度重複；字重補 b、strong 與標題統一 600，兩頁的緩動曲線一併收進 var(--ease)。合併上游 V1.3.2 事件分類排序權重與關聯標籤改動。事件分類與用戶管理的「更多」由窄彈窗改為錨定行內的下拉菜單，菜單在視窗底部空間不足時上翻；事件分類菜單移除關聯標籤與子分類管理兩項。事件列表按源平台列结构补齐：新增序號與開始時間、入庫時間、截止時間、更新時間四個時間列，表格由 10 列增至 15 列，橫向滾動、操作列固定右側。事件複核待複核頁籤補入庫時間、截止時間、數據來源三列（11 列），已複核頁籤去掉勾選列（13 列，勾選僅待複核）；商戶列表補狀態與創建時間（13 列）；操作日誌補操作時間（7 列）；事件複核、商戶、日誌三張寬表操作列固定右側。已複核操作列去掉複核記錄佔位，只保留詳情。'],
     ['V1.3.2','2026-11-09','內容變更','事件分類列表新增排序權重字段：僅一級分類表格顯示並可於新增/編輯一級分類彈窗錄入（0–9999 整數、數值越小越靠前）；新增二級分類不帶該字段，二級分類不可再新增分類，二級行入口改為「關聯標籤」、二級「更多」隱藏子分類管理；補齊編輯分類彈窗；合併上游 V1.3.1 事件詳情跳轉修復，需求編號順延為 R-43；需求清單、頁面清單與版本接線同步更新。'],
     ['V1.3.1','2026-11-06','功能修復','修復三處事件相關「詳情」的跳轉：事件列表、投注類係數調控、事件歸檔的摘要彈窗主按鈕由「前往事件列表」改為「進入詳情」，跳轉事件詳情頁（/event/detail）；詳情頁沿用事件審核詳情四頁籤結構（基本資訊/市場/倉位情況/欄位映射），去掉複核語境，補賽事比分與規則區；底部返回按來源回跳並還原係數調控頁籤。事件歸檔菜單加 NEW 標籤。'],
@@ -238,7 +239,7 @@ function specStructure(){
     ['事件分類','/event/category','分類表格（14 條）、排序權重欄位（僅一級分類）、樹形展開、狀態開關、新增一級分類/新增二級分類（無權重）/編輯分類/國家過濾/二級行關聯標籤/更多'],
     ['事件複核','/event/review','待複核與已複核雙頁籤、7 項篩選、審核彈窗（通過/棄用）；待複核 10 列（含入庫時間/截止時間/數據來源），已複核 13 列（增審核狀態/審核備註/操作人/審核時間），勾選僅待複核頁籤'],
     ['投注類係數調控','/event/betting-coefficient','三層頁籤：全域調控（公式/層級/係數/計算範例）、按商戶調控、按事件調控'],
-    ['事件歸檔','/event/archive','歸檔統計指標卡（總量/已歸檔/待歸檔/來源分佈）、7 個決策點說明、歸檔池列表（已結束事件）與來源標記、分頁'],
+    ['事件歸檔','/event/archive','已歸檔事件列表（10 列：事件 ID / 標題 / 分類 / 數據來源 / 截止時間 / 歸檔來源 / 操作人 / 歸檔時間 / 原最後更新 / 操作）、標題搜尋、分類（按一級分組）、數據來源、歸檔時間區間、歸檔來源四項篩選、詳情彈窗與跳轉、分頁'],
     ['商戶列表','/merchant/merchant/index','商戶表格（13 列，含狀態與創建時間）、權限設定跳轉、IP 白名單、更多操作'],
     ['商戶權限設定','/merchant/merchant/detail','商戶資訊頭 + 四頁籤：類型/分類/數據源/過濾事件'],
     ['用戶管理','/system/user','用戶表格（11 列）、狀態與 MFA 開關、解綁驗證、重置密碼、新增用戶'],
@@ -530,6 +531,7 @@ function specType(){
       '<tr><td>檔外字號（如 12.5、11.5、15）</td><td>就近向上收斂</td><td>12.5 與 11.5 分別歸入 12、11；15 歸入 16。不新增中間檔</td></tr>'+
       '<tr><td>特殊場景需要更大字號</td><td>改用檔內最大值</td><td>統計大數值固定 24px，不再向上擴；視覺重量靠字重 600 與留白解決</td></tr>'+
       '<tr><td>圖標附帶的數字字號</td><td>跟隨所在文本檔位</td><td>角標 11px、說明 12px，不因容器變大而放大</td></tr>'+
+      '<tr><td>裝飾性微標（側欄 NEW）</td><td>固定 9px，不參與收斂</td><td>純裝飾標記不承載信息，需與菜單行高保持比例；放大會壓過菜單文字</td></tr>'+
       '<tr><td>字距</td><td>一律 0</td><td>16px 及以下不設負字距；24px 標題也不設，靠字重與留白拉開層級</td></tr>'+
       '<tr><td>字重</td><td>只用 400 / 500 / 600</td><td>不使用 700 及以上。需要更強對比時改用主色或加大字號</td></tr>'+
       '</tbody></table>'+
@@ -789,7 +791,11 @@ function showVersion(){
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
-      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">'+BUILD_DATE+' · 功能新增</div>'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">'+BUILD_DATE+' · 內容變更</div>'+
+      '側欄 NEW 微標由 11px 恢復 9px（V1.4.0 字號收口時被誤推至 11px）；字號紀律補「裝飾性微標」條目：純裝飾標記不參與七檔收斂，固定 9px。事件歸檔列表「編號」改為「事件 ID」，並補分類、數據來源、截止時間三列（10 列）。分類對標事件分類樹，一級與二級同格顯示；歸檔頁補分類（按一級分組）與數據來源兩項篩選，並修復 arSetAf / arResetAf / arPage 三個函數缺失導致的篩選與翻頁失效。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.4.0</span>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-09 · 功能新增</div>'+
       '合併「多源實體標識庫」MVP 原型：側欄新增實體標識庫分組與兩個頁面（標識庫總覽、實體列表）。'+
       '總覽呈現 1,019 條實體構成與端到端六步鏈路；實體列表按 01_entity 13 字段呈現標誌、別名、上位名稱、主源側ID、其餘平台ID 與更新時間，支持實體類別、上位名稱、數據狀態篩選與詳情、編輯、錄入彈窗。'+
       '演示數據取自 entity-lib/ 的初始化數據字典，均為源側原值；別名多值樣本為界面示意。實體列表改為一實體一行，收斂後的多個賽事歸屬與多個源側編號在行內並列。頁面清單、菜單分組與覆蓋頁數同步更新。合併上游 V1.3.2 事件分類排序權重與關聯標籤改動。事件分類與用戶管理的「更多」由窄彈窗改為錨定行內的下拉菜單，菜單在視窗底部空間不足時上翻；事件分類菜單移除關聯標籤與子分類管理兩項。事件列表按源平台列结构补齐：新增序號與開始時間、入庫時間、截止時間、更新時間四個時間列，表格由 10 列增至 15 列，橫向滾動、操作列固定右側。事件複核待複核頁籤補入庫時間、截止時間、數據來源三列（11 列），已複核頁籤去掉勾選列（13 列，勾選僅待複核）；商戶列表補狀態與創建時間（13 列）；操作日誌補操作時間（7 列）；事件複核、商戶、日誌三張寬表操作列固定右側。已複核操作列去掉複核記錄佔位，只保留詳情。</div></div>'+

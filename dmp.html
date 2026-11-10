@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 管理面
-  原型版本：V1.4.0 ｜ 入口：index.html
+  原型版本：V1.4.1 ｜ 入口：index.html
   配色沿用原站 192.168.10.51:7080；字體按產品基線規範
 -->
 <html lang="zh-CN">
@@ -9,10 +9,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>管理面 · 數據中台管理系統 V1.4.0</title>
+<title>管理面 · 數據中台管理系統 V1.4.1</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.4.0">
+<link rel="stylesheet" href="assets/app.css?v=1.4.1">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -25,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 管理面</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.4.0</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.4.1</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -101,8 +101,8 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 .tbl-fixed-op thead th:last-child{background:var(--bg-soft)}
 .tbl-fixed-op tbody tr:hover td.actions{background:var(--bg-soft)}
 </style>
-<script src="assets/core.js?v=1.4.0"></script>
-<script src="assets/entity.js?v=1.4.0"></script>
+<script src="assets/core.js?v=1.4.1"></script>
+<script src="assets/entity.js?v=1.4.1"></script>
 <script>
 /* ==================================================================
    數據中台管理系統 · 交互原型
@@ -2573,7 +2573,11 @@ function showVersion(){
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
-      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">'+BUILD_DATE+' · 功能新增</div>'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">'+BUILD_DATE+' · 內容變更</div>'+
+      '側欄 NEW 微標由 11px 恢復 9px（V1.4.0 字號收口時被誤推至 11px）；字號紀律補「裝飾性微標」條目：純裝飾標記不參與七檔收斂，固定 9px。事件歸檔列表「編號」改為「事件 ID」，並補分類、數據來源、截止時間三列（10 列）。分類對標事件分類樹，一級與二級同格顯示；歸檔頁補分類（按一級分組）與數據來源兩項篩選，並修復 arSetAf / arResetAf / arPage 三個函數缺失導致的篩選與翻頁失效。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.4.0</span>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-09 · 功能新增</div>'+
       '合併「多源實體標識庫」MVP 原型：側欄新增實體標識庫分組與兩個頁面（標識庫總覽、實體列表）。'+
       '總覽呈現 1,019 條實體構成與端到端六步鏈路；實體列表按 01_entity 13 字段呈現標誌、別名、上位名稱、主源側ID、其餘平台ID 與更新時間，支持實體類別、上位名稱、數據狀態篩選與詳情、編輯、錄入彈窗。'+
       '演示數據取自 entity-lib/ 的初始化數據字典，均為源側原值；別名多值樣本為界面示意。實體列表改為一實體一行，收斂後的多個賽事歸屬與多個源側編號在行內並列。頁面清單、菜單分組與覆蓋頁數同步更新。'+
@@ -2784,32 +2788,32 @@ function arFmt(ts){
 function arDays(ts){return Math.floor((arNow()-ts)/AR_DAY);}
 
 const AR_SEED=[
- ['EV-1042','客訴：訂單延遲未送達','ended','李娜',32,32,'李娜','人工',null,'',''],
- ['EV-1038','支付網關 5xx 告警','ended','王強',28,28,'王強','人工',null,'',''],
- ['EV-1035','月度數據報表失敗','ended','系統',20,3,'巡檢機器人','心跳',null,'',''],
- ['EV-1031','會員體系需求評審','ended','小白',8,8,'小白','人工',null,'',''],
- ['EV-1029','API 限流策略調整','processing','王強',null,1,'王強','人工',null,'',''],
- ['EV-1026','數據庫慢查詢優化','processing','李娜',null,2,'李娜','人工',null,'',''],
- ['EV-1020','GPU rental prices (RTX 6000) end of November 2026?','archived','系統',40,40,'系統','心跳',5,'auto','系統'],
- ['EV-1015','GPU rental prices (B200) end of 2027 (Higher Strikes)','archived','李娜',60,60,'李娜','人工',12,'manual','李娜'],
- ['EV-1014','GPU rental prices (RTX 6000) end of December 2026?','archived','李娜',50,50,'李娜','人工',18,'auto','系統'],
- ['EV-1010','GPU rental prices (H200) end of December 2026?','archived','王強',55,55,'王強','人工',22,'auto','系統'],
- ['EV-1006','GPU rental prices (H100) end of December 2026?','archived','小白',70,70,'小白','人工',27,'manual','小白'],
- ['EV-1002','GPU rental prices (A100) end of December 2026?','archived','李娜',63,63,'李娜','人工',33,'auto','系統'],
- ['EV-0997','Next Muse Spark Model (1.4+) released on…?','archived','王強',80,80,'王強','人工',40,'manual','王強'],
- ['EV-0991','Will La-Z-Boy (LZB) beat quarterly earnings?','archived','系統',75,75,'巡檢機器人','心跳',45,'auto','系統'],
- ['EV-0986','Will Viking (VIK) beat quarterly earnings?','archived','李娜',90,90,'李娜','人工',52,'manual','李娜'],
- ['EV-0980','Will Woodward (WWD) beat quarterly earnings?','archived','系統',88,88,'巡檢機器人','心跳',58,'auto','系統'],
- ['EV-0974','Will Williams-Sonoma (WSM) beat quarterly earnings?','archived','小白',95,95,'小白','人工',62,'auto','系統'],
- ['EV-0968','Will Grab (GRAB) beat quarterly earnings?','archived','王強',100,100,'王強','人工',66,'manual','王強'],
- ['EV-0961','Will Nvidia (NVDA) beat quarterly earnings?','archived','系統',105,105,'巡檢機器人','心跳',71,'auto','系統'],
- ['EV-0955','Will Home Depot (HD) beat quarterly earnings?','archived','李娜',110,110,'李娜','人工',77,'manual','李娜'],
- ['EV-0948','Will Dolby (DLB) beat quarterly earnings?','archived','小白',115,115,'小白','人工',83,'auto','系統'],
- ['EV-0941','Will Disney (DIS) beat quarterly earnings?','archived','王強',120,120,'王強','人工',89,'manual','王強'],
- ['EV-0934','Will Amer Sports (AS) beat quarterly earnings?','archived','系統',125,125,'巡檢機器人','心跳',95,'auto','系統'],
- ['EV-0927','Will Tyson Foods (TSN) beat quarterly earnings?','archived','李娜',130,130,'李娜','人工',102,'manual','李娜'],
- ['EV-0921','Will Powell Industries (POWL) beat quarterly earnings?','archived','小白',135,135,'小白','人工',110,'auto','系統'],
- ['EV-0914','Will Getty Images (GETY) beat quarterly earnings?','archived','王強',140,140,'王強','人工',118,'manual','王強']
+ ['EV-1042','客訴：訂單延遲未送達','ended','李娜',32,32,'李娜','人工',null,'','','',''],
+ ['EV-1038','支付網關 5xx 告警','ended','王強',28,28,'王強','人工',null,'','','',''],
+ ['EV-1035','月度數據報表失敗','ended','系統',20,3,'巡檢機器人','心跳',null,'','','',''],
+ ['EV-1031','會員體系需求評審','ended','小白',8,8,'小白','人工',null,'','','',''],
+ ['EV-1029','API 限流策略調整','processing','王強',null,1,'王強','人工',null,'','','',''],
+ ['EV-1026','數據庫慢查詢優化','processing','李娜',null,2,'李娜','人工',null,'','','',''],
+ ['EV-1020','GPU rental prices (RTX 6000) end of November 2026?','archived','系統',40,41,'系統','心跳',5,'auto','系統','AI','polymarket'],
+ ['EV-1015','GPU rental prices (B200) end of 2027 (Higher Strikes)','archived','李娜',60,62,'李娜','人工',12,'manual','李娜','AI','predict.fun'],
+ ['EV-1014','GPU rental prices (RTX 6000) end of December 2026?','archived','李娜',50,53,'李娜','人工',18,'auto','系統','AI','predict.fun'],
+ ['EV-1010','GPU rental prices (H200) end of December 2026?','archived','王強',55,59,'王強','人工',22,'auto','系統','AI','polymarket'],
+ ['EV-1006','GPU rental prices (H100) end of December 2026?','archived','小白',70,75,'小白','人工',27,'manual','小白','AI','predict.fun'],
+ ['EV-1002','GPU rental prices (A100) end of December 2026?','archived','李娜',63,64,'李娜','人工',33,'auto','系統','AI','polymarket'],
+ ['EV-0997','Next Muse Spark Model (1.4+) released on…?','archived','王強',80,82,'王強','人工',40,'manual','王強','AI','predict.fun'],
+ ['EV-0991','Will La-Z-Boy (LZB) beat quarterly earnings?','archived','系統',75,78,'巡檢機器人','心跳',45,'auto','系統','Earnings','polymarket'],
+ ['EV-0986','Will Viking (VIK) beat quarterly earnings?','archived','李娜',90,94,'李娜','人工',52,'manual','李娜','Earnings','predict.fun'],
+ ['EV-0980','Will Woodward (WWD) beat quarterly earnings?','archived','系統',88,93,'巡檢機器人','心跳',58,'auto','系統','Earnings','polymarket'],
+ ['EV-0974','Will Williams-Sonoma (WSM) beat quarterly earnings?','archived','小白',95,96,'小白','人工',62,'auto','系統','Earnings','predict.fun'],
+ ['EV-0968','Will Grab (GRAB) beat quarterly earnings?','archived','王強',100,102,'王強','人工',66,'manual','王強','Earnings','polymarket'],
+ ['EV-0961','Will Nvidia (NVDA) beat quarterly earnings?','archived','系統',105,108,'巡檢機器人','心跳',71,'auto','系統','Earnings','predict.fun'],
+ ['EV-0955','Will Home Depot (HD) beat quarterly earnings?','archived','李娜',110,114,'李娜','人工',77,'manual','李娜','Earnings','polymarket'],
+ ['EV-0948','Will Dolby (DLB) beat quarterly earnings?','archived','小白',115,120,'小白','人工',83,'auto','系統','Earnings','predict.fun'],
+ ['EV-0941','Will Disney (DIS) beat quarterly earnings?','archived','王強',120,121,'王強','人工',89,'manual','王強','Earnings','polymarket'],
+ ['EV-0934','Will Amer Sports (AS) beat quarterly earnings?','archived','系統',125,127,'巡檢機器人','心跳',95,'auto','系統','Earnings','predict.fun'],
+ ['EV-0927','Will Tyson Foods (TSN) beat quarterly earnings?','archived','李娜',130,133,'李娜','人工',102,'manual','李娜','Earnings','polymarket'],
+ ['EV-0921','Will Powell Industries (POWL) beat quarterly earnings?','archived','小白',135,139,'小白','人工',110,'auto','系統','Earnings','predict.fun'],
+ ['EV-0914','Will Getty Images (GETY) beat quarterly earnings?','archived','王強',140,145,'王強','人工',118,'manual','王強','Earnings','polymarket']
 ];
 
 const ARCH={
@@ -2819,9 +2823,10 @@ const ARCH={
     return {id:r[0],title:r[1],status:r[2],owner:r[3],
       endedAt:r[4]===null?null:arAgo(r[4]),lastUpdateAt:arAgo(r[5]),
       lastUpdateBy:r[6],lastUpdateKind:r[7],
-      archivedAt:r[8]===null?null:arAgo(r[8]),archiveSource:r[9]||null,archiveBy:r[10]||null};
+      archivedAt:r[8]===null?null:arAgo(r[8]),archiveSource:r[9]||null,archiveBy:r[10]||null,
+      category:r[11]||'',dataSource:r[12]||''};
   }),
-  filter:'all',kw:'',sel:{},af:{kw:'',from:'',to:'',source:''},
+  filter:'all',kw:'',sel:{},af:{kw:'',from:'',to:'',source:'',cat:'',src:''},
   page:{wb:1,arc:1},pageSize:10,pending:[]
 }
 
@@ -2858,6 +2863,8 @@ function arArchivedPool(){
     if(e.status!=='archived')return false;
     if(k&&e.title.toLowerCase().indexOf(k)<0&&e.id.toLowerCase().indexOf(k)<0)return false;
     if(a.source&&e.archiveSource!==a.source)return false;
+    if(a.cat&&e.category!==a.cat)return false;
+    if(a.src&&e.dataSource!==a.src)return false;
     if(a.from&&e.archivedAt<new Date(a.from+'T00:00:00').getTime())return false;
     if(a.to&&e.archivedAt>new Date(a.to+'T23:59:59').getTime())return false;
     return true;
@@ -2882,21 +2889,63 @@ function arSlice(pool,key){
   return pool.slice((cur-1)*ARCH.pageSize,cur*ARCH.pageSize);
 }
 
+/* 分類取自事件分類的樹：二級名稱反查一級，保證兩頁同一套口徑 */
+function arCatParent(child){
+  for(let i=0;i<CAT_TREE.length;i++){
+    const g=CAT_TREE[i];
+    if(g.children&&g.children.some(function(c){return c.name===child;}))return g.name;
+  }
+  return '';
+}
+
+function arSetAf(k,v){
+  ARCH.af[k]=v;
+  ARCH.page.arc=1;
+  renderShell();
+}
+function arResetAf(){
+  ARCH.af={kw:'',from:'',to:'',source:'',cat:'',src:''};
+  ARCH.page.arc=1;
+  renderShell();
+}
+function arPage(key,n){
+  ARCH.page[key]=n;
+  renderShell();
+}
+
 function pageArchive(){
   const pool=arArchivedPool(),list=arSlice(pool,'arc'),a=ARCH.af;
   const rows=list.map(function(e){
-    return '<tr><td class="num">'+esc(e.id)+'</td>'+
-      '<td><div class="cell-clip" style="max-width:320px">'+esc(e.title)+'</div></td>'+
+    return '<tr><td class="num" style="white-space:nowrap">'+esc(e.id)+'</td>'+
+      '<td><div class="cell-clip" style="max-width:182px" title="'+esc(e.title)+'">'+esc(e.title)+'</div></td>'+
+      '<td style="white-space:nowrap">'+(e.category?'<span class="muted" style="margin-right:6px">'+esc(arCatParent(e.category))+'</span><span class="chip chip-line">'+esc(e.category)+'</span>':'<span class="muted">–</span>')+'</td>'+
+      '<td>'+(e.dataSource?'<span class="chip chip-line">'+esc(e.dataSource)+'</span>':'<span class="muted">–</span>')+'</td>'+
+      '<td class="num" style="white-space:nowrap">'+arFmt(e.endedAt)+'</td>'+
       '<td>'+arSource(e.archiveSource)+'</td>'+
       '<td>'+esc(e.archiveSource==='auto'?'系統':(e.archiveBy||'系統'))+'</td>'+
-      '<td class="num">'+arFmt(e.archivedAt)+'</td>'+
-      '<td class="num">'+arFmt(e.lastUpdateAt)+'</td>'+
+      '<td class="num" style="white-space:nowrap">'+arFmt(e.archivedAt)+'</td>'+
+      '<td class="num" style="white-space:nowrap">'+arFmt(e.lastUpdateAt)+'</td>'+
       '<td class="actions"><span class="btn-text" onclick="arView(\''+e.id+'\')">詳情</span></td></tr>';
+  }).join('');
+  /* 分類選項直接由事件分類樹生成，一級作分組標題 */
+  const catOpts=CAT_TREE.map(function(g){
+    return '<optgroup label="'+g.name+'">'+(g.children||[]).map(function(c){
+      return '<option value="'+c.name+'"'+(a.cat===c.name?' selected':'')+'>'+c.name+'</option>';
+    }).join('')+'</optgroup>';
+  }).join('');
+  const srcOpts=['polymarket','predict.fun'].map(function(s){
+    return '<option value="'+s+'"'+(a.src===s?' selected':'')+'>'+s+'</option>';
   }).join('');
   return '<div class="card"><div class="card-head"><div class="card-title">已歸檔事件</div></div>'+
     '<div class="filters">'+
       '<div class="f-item"><span class="f-label">搜尋</span>'+
-        '<input class="f-input" placeholder="輸入標題 / 編號" value="'+esc(a.kw)+'" onchange="arSetAf(\'kw\',this.value)" /></div>'+
+        '<input class="f-input" placeholder="輸入標題 / 事件 ID" value="'+esc(a.kw)+'" onchange="arSetAf(\'kw\',this.value)" /></div>'+
+      '<div class="f-item"><span class="f-label">分類</span>'+
+        '<select class="f-select" onchange="arSetAf(\'cat\',this.value)">'+
+          '<option value="">全部分類</option>'+catOpts+'</select></div>'+
+      '<div class="f-item"><span class="f-label">數據來源</span>'+
+        '<select class="f-select" onchange="arSetAf(\'src\',this.value)">'+
+          '<option value="">全部來源</option>'+srcOpts+'</select></div>'+
       '<div class="f-item"><span class="f-label">歸檔時間</span>'+
         '<input class="f-date" type="date" value="'+a.from+'" onchange="arSetAf(\'from\',this.value)" />'+
         '<span class="muted"> – </span>'+
@@ -2906,12 +2955,14 @@ function pageArchive(){
         '<option value="auto"'+(a.source==='auto'?' selected':'')+'>自動歸檔</option>'+
         '<option value="manual"'+(a.source==='manual'?' selected':'')+'>手動歸檔</option></select></div>'+
       '<button class="btn btn-ghost" onclick="arResetAf()">重置</button></div>'+
-    '<div class="table-wrap"><table style="min-width:880px"><thead><tr>'+
-      '<th style="width:100px">編號</th><th>事件標題</th><th style="width:110px">歸檔來源</th>'+
-      '<th style="width:100px">操作人</th><th style="width:150px">歸檔時間</th>'+
-      '<th style="width:150px">原最後更新</th><th style="width:80px">操作</th>'+
+    '<div class="table-wrap"><table class="tbl-fixed-op" style="min-width:1120px"><thead><tr>'+
+      '<th style="width:86px">事件 ID</th><th>事件標題</th><th style="width:92px">分類</th>'+
+      '<th style="width:96px">數據來源</th><th style="width:140px">截止時間</th>'+
+      '<th style="width:96px">歸檔來源</th>'+
+      '<th style="width:84px">操作人</th><th style="width:140px">歸檔時間</th>'+
+      '<th style="width:140px">原最後更新</th><th style="width:64px">操作</th>'+
     '</tr></thead><tbody>'+
-      (rows||'<tr><td colspan="7"><div class="ar-empty">未找到相關搜尋結果<br/>請調整篩選條件後重試</div></td></tr>')+
+      (rows||'<tr><td colspan="10"><div class="ar-empty">未找到相關搜尋結果<br/>請調整篩選條件後重試</div></td></tr>')+
     '</tbody></table></div>'+arPager(pool.length,'arc')+'</div>';
 }
 
@@ -2925,7 +2976,7 @@ function arView(id){
   if(!e)return;
   const g=function(k,v){return '<div class="info-item"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>';};
   const body='<div class="info-grid" style="grid-template-columns:1fr 1fr">'+
-    g('編號',e.id)+g('狀態',arStatus(e.status))+
+    g('事件 ID',e.id)+g('狀態',arStatus(e.status))+
     g('負責人',esc(e.owner))+g('結束時間',arFmt(e.endedAt))+
     g('最後更新',arFmt(e.lastUpdateAt))+
     g('更新類型',e.lastUpdateKind==='心跳'?'系統心跳':'人工更新')+
