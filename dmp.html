@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   數據中台管理系統 · 管理面
-  原型版本：V1.4.1 ｜ 入口：index.html
+  原型版本：V1.5.0 ｜ 入口：index.html
   配色沿用原站 192.168.10.51:7080；字體按產品基線規範
 -->
 <html lang="zh-CN">
@@ -9,10 +9,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
-<title>管理面 · 數據中台管理系統 V1.4.1</title>
+<title>管理面 · 數據中台管理系統 V1.5.0</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="_fonts/outfit.css">
-<link rel="stylesheet" href="assets/app.css?v=1.4.1">
+<link rel="stylesheet" href="assets/app.css?v=1.5.0">
 <script>
 /* 被 index.html 以 iframe 載入時收起自身工具條，避免與框架頁形成雙層頂欄 */
 if(window.self!==window.top)document.documentElement.classList.add('is-embedded');
@@ -25,7 +25,7 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
       <span class="dot"></span>
       <span class="name">數據中台管理系統</span>
       <small>· 管理面</small>
-      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.4.1</span>
+      <span class="vnum" onclick="showVersion()" title="點擊查看版本記錄">V1.5.0</span>
     </div>
     <nav class="proto-nav" style="flex:1"></nav>
     <div class="proto-actions">
@@ -101,8 +101,8 @@ if(window.self!==window.top)document.documentElement.classList.add('is-embedded'
 .tbl-fixed-op thead th:last-child{background:var(--bg-soft)}
 .tbl-fixed-op tbody tr:hover td.actions{background:var(--bg-soft)}
 </style>
-<script src="assets/core.js?v=1.4.1"></script>
-<script src="assets/entity.js?v=1.4.1"></script>
+<script src="assets/core.js?v=1.5.0"></script>
+<script src="assets/entity.js?v=1.5.0"></script>
 <script>
 /* ==================================================================
    數據中台管理系統 · 交互原型
@@ -150,8 +150,12 @@ const ROUTE_TITLE={
 
 /* ---------- 資料 ---------- */
 const DASH={
+  /* 全量事件數：含已歸檔，恆定不隨歸檔遞減；活躍事件＝全量－已歸檔 */
+  total:138988,
+  archived:20,
   stats:[
-    {label:'事件總量',value:'138,988',unit:'件',icon:'layers',color:'var(--primary)',bg:'var(--primary-light)',foot:'較上月 <span class="up">14.98% ↑</span>'},
+    {label:'事件總量',dyn:'total',value:'138,988',unit:'件',icon:'layers',color:'var(--primary)',bg:'var(--primary-light)',foot:'較上月 <span class="up">14.98% ↑</span>'},
+    {label:'活躍事件',dyn:'active',value:'138,968',unit:'件',icon:'wifi',color:'var(--success)',bg:'#e8f8ec'},
     {label:'今日新入庫',value:'4,142',unit:'件',icon:'file',color:'var(--success)',bg:'#e8f8ec'},
     {label:'待處理',value:'60',unit:'件',icon:'pause',color:'var(--text-help)',bg:'#f2f4f7'},
     {label:'即將結束',value:'6,338',unit:'件',icon:'clock',color:'var(--warning)',bg:'#fff3e8'},
@@ -162,7 +166,11 @@ const DASH={
   /* 30 天口徑：近 30 天分段切換使用 */
   trend30:{labels:['10-06','10-10','10-14','10-18','10-22','10-26','10-30','11-04'],values:[3100,2650,4200,3800,5100,4600,6200,4100]},
   cats:{labels:['Crypto','Sports','Finance','Politics','Weather','Culture','Science'],values:[70086,57294,4794,3390,2755,658,657]},
+  /* 活躍口徑＝全部事件按分類扣除已歸檔 20 件（8/5/3/2/1/1/0），差額與指標卡的已歸檔件數一致 */
+  catsActive:{labels:['Crypto','Sports','Finance','Politics','Weather','Culture','Science'],values:[70078,57289,4791,3388,2754,657,657]},
   sources:[{name:'polymarket',v:142800},{name:'predict.fun',v:4800}],
+  /* 活躍口徑＝全部事件扣除已歸檔 20 件（15 / 5），差額同上 */
+  sourcesActive:[{name:'polymarket',v:142785},{name:'predict.fun',v:4795}],
   top:[
     {n:'Fed Decision in October?',v:'20,528,763,904'},
     {n:'Which party will win the House in 2026?',v:'20,012,201,995'},
@@ -395,6 +403,8 @@ const state={
   navOpen:{event:true,merchant:false,entity:true,system:false,auth:false},
   drawer:false, coefTab:'global', reviewTab:'basic', merchantTab:'type', specSection:'version',
   topRange:'24h', mfaBound:false, eventCat:null, trendRange:'7',
+  /* 圖表統計範圍：all＝全部事件（含已歸檔）；active＝僅活躍事件（已剔除已歸檔） */
+  catScope:'all', srcScope:'all',
   apiDetailId:80001, apiDetailName:'', moreName:'',
   /* 事件詳情頁：detailId 為當前查看的事件；detailFrom 記錄來源路由，供「返回」使用 */
   detailId:null, detailFrom:'/event/list', detailFromTab:null, detailTab:'basic',
@@ -569,16 +579,33 @@ function tickClock(){
 /* ==================================================================
    頁面：事件總覽
    ================================================================== */
+/* 統計口徑（與事件歸檔頁同源）：
+   全量事件＝含已歸檔，恆定不減；活躍事件＝全量－已歸檔。
+   歸檔一筆 → 活躍 −1、已歸檔 +1、全量不變。 */
+function dashCounts(){
+  let archived=DASH.archived;
+  try{
+    if(typeof ARCH!=='undefined'&&ARCH&&ARCH.events){
+      archived=ARCH.events.filter(function(e){return e.status==='archived';}).length;
+    }
+  }catch(e){}
+  return {total:DASH.total,archived:archived,active:DASH.total-archived};
+}
+
 function pageDashboard(){
   const d=DASH;
   /* 圖表時間口徑：7 天 / 30 天 */
   const range=state.trendRange||'7';
   const tr=range==='30'?d.trend30:d.trend;
+  const c=dashCounts();
   const statsHtml=d.stats.map(function(s){
-    return '<div class="stat"><div class="stat-ico" style="background:'+s.bg+';color:'+s.color+'">'+icon(s.icon,16)+'</div>'+
+    /* 統計口徑：全量含已歸檔且恆定不減；活躍＝全量－已歸檔，歸檔一筆即減一 */
+    const val=s.dyn==='total'?c.total:(s.dyn==='active'?c.active:s.value);
+    const foot=s.dyn==='active'?'不含已歸檔 '+c.archived.toLocaleString()+' 件':s.foot;
+    return '<div class="stat"'+(s.dyn?' data-stat="'+s.dyn+'"':'')+'><div class="stat-ico" style="background:'+s.bg+';color:'+s.color+'">'+icon(s.icon,16)+'</div>'+
       '<div class="stat-main"><div class="stat-label">'+s.label+'</div>'+
-      '<div class="stat-value">'+s.value+'<small>'+s.unit+'</small></div>'+
-      (s.foot?'<div class="stat-foot">'+s.foot+'</div>':'')+'</div></div>';
+      '<div class="stat-value">'+val.toLocaleString()+'<small>'+s.unit+'</small></div>'+
+      (foot?'<div class="stat-foot">'+foot+'</div>':'')+'</div></div>';
   }).join('');
   const maxV=Math.max.apply(null,tr.values);
   const ticks=[0,Math.round(maxV/5),Math.round(maxV*2/5),Math.round(maxV*3/5),Math.round(maxV*4/5),maxV];
@@ -589,8 +616,9 @@ function pageDashboard(){
     return '<div class="bar-col"><div class="bar" style="height:'+Math.max(6,(v/maxV)*190)+'px" title="'+tr.labels[i]+'：'+v.toLocaleString()+'"></div></div>';
   }).join('');
   const xHtml=tr.labels.map(function(l){return '<span>'+l+'</span>';}).join('');
-  const srcMax=Math.max.apply(null,d.sources.map(function(s){return s.v;}));
-  const srcHtml=d.sources.map(function(s,i){
+  const srcData=state.srcScope==='active'?d.sourcesActive:d.sources;
+  const srcMax=Math.max.apply(null,srcData.map(function(s){return s.v;}));
+  const srcHtml=srcData.map(function(s,i){
     const color='var(--primary)';
     return '<div class="src-bar-row">'+
       '<span style="width:78px;color:var(--text-sub);font-size:12px">'+s.name+'</span>'+
@@ -612,17 +640,23 @@ function pageDashboard(){
       '<div class="legend" style="justify-content:flex-end;margin-bottom:4px"><i style="background:#5b8cff"></i>新增事件</div>'+
       '<div class="chart-trend"><div class="bars">'+gridHtml+barsHtml+'</div><div class="bar-x">'+xHtml+'</div></div></section>'+
     '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>類型分布</div>'+
-      '<div class="right"><select class="f-select" style="border:1px solid var(--border);border-radius:6px;height:28px"><option>全部事件</option><option>Crypto</option><option>Sports</option></select></div></div>'+
+      '<div class="right"><select class="f-select" style="border:1px solid var(--border);border-radius:6px;height:28px" onchange="setCatScope(this.value)">'+
+        '<option value="all"'+(state.catScope==='all'?' selected':'')+'>全部事件</option>'+
+        '<option value="active"'+(state.catScope==='active'?' selected':'')+'>活躍事件</option></select></div></div>'+
       '<div class="legend" style="justify-content:flex-end"><i style="background:#5b8cff"></i>事件數</div>'+
       '<div class="chart-area" id="area-chart"></div></section></div>'+
   '<div class="grid-2">'+
     '<section class="panel panel-col"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>來源分布</div>'+
-      '<div class="right"><select class="f-select" style="border:1px solid var(--border);border-radius:6px;height:28px"><option>全部事件</option><option>polymarket</option><option>predict.fun</option></select></div></div>'+
+      '<div class="right"><select class="f-select" style="border:1px solid var(--border);border-radius:6px;height:28px" onchange="setSrcScope(this.value)">'+
+        '<option value="all"'+(state.srcScope==='all'?' selected':'')+'>全部事件</option>'+
+        '<option value="active"'+(state.srcScope==='active'?' selected':'')+'>活躍事件</option></select></div></div>'+
       '<div class="legend" style="justify-content:flex-end;margin-bottom:10px"><i style="background:#5b8cff"></i>polymarket&nbsp;&nbsp;<i style="background:#a78bfa"></i>predict.fun</div>'+
       '<div class="src-bars">'+srcHtml+'</div>'+
       '<div class="num" style="display:flex;justify-content:space-between;color:var(--text-disabled);font-size:11px;padding-left:88px;margin-top:2px;flex:none">'+
       '<span>0</span><span>20,000</span><span>40,000</span><span>60,000</span><span>80,000</span><span>100,000</span><span>120,000</span><span>140,000</span></div></section>'+
-    '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>上游交易量 TOP10</div>'+
+    '<section class="panel"><div class="panel-head"><div class="panel-title"><span class="arrow"></span>上游交易量 TOP10'+
+      '<span class="panel-tip" tabindex="0" aria-label="統計口徑說明">'+icon('warn',14)+
+      '<span class="tip-bubble">僅統計活躍事件：已歸檔事件不計入交易量排行。</span></span></div>'+
       '<div class="right">'+
       '<div class="seg">'+
         '<button class="'+(isTotal?'':'active')+'" onclick="setTopRange(\'24h\')">24h 交易量</button>'+
@@ -634,12 +668,16 @@ function pageDashboard(){
 }
 function setTopRange(r){ state.topRange=r; renderShell(); }
 function setTrendRange(r){ state.trendRange=r; renderShell(); }
+/* 圖表統計範圍切換：all＝全部事件（含已歸檔）；active＝僅活躍事件（已歸檔剔除） */
+function setCatScope(v){ state.catScope=v; renderShell(); }
+function setSrcScope(v){ state.srcScope=v; renderShell(); }
 
 /* 類型分布面積圖：按容器實際寬度繪製，避免固定 viewBox 等比縮放後兩側留白 */
 function drawAreaChart(){
   const host=document.getElementById('area-chart');
   if(!host)return;
-  const d=DASH.cats;
+  /* 統計範圍：活躍事件口徑已剔除已歸檔，與指標卡同源 */
+  const d=state.catScope==='active'?DASH.catsActive:DASH.cats;
   const W=Math.max(320,host.clientWidth||620), H=host.clientHeight||236;
   const padL=46, padR=14, padT=26, padB=30;
   const iw=W-padL-padR, ih=H-padT-padB;
@@ -2573,7 +2611,11 @@ function showVersion(){
       '<div style="font-weight:600;margin-bottom:10px">變更記錄</div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">'+VERSION+'</span>'+
       '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
-      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">'+BUILD_DATE+' · 內容變更</div>'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">'+BUILD_DATE+' · 功能新增</div>'+
+      '事件總覽新增「活躍事件」指標卡，指標卡由 6 項增至 7 項。統計口徑拆為三檔：事件總量＝全量（含已歸檔），恆定不隨歸檔遞減；活躍事件＝全量－已歸檔，歸檔一筆即減一，卡腳註明已剔除的歸檔件數；已歸檔件數與事件歸檔頁同源取數，避免兩處對不上。歸檔操作後事件總覽即時聯動，不需刷新。指標卡改為單行 7 列排布，卡片內距收至 12px、圖標收至 26px 以容納 7 卡；980 以下 2 列、640 以下單列。類型分布與來源分布兩處下拉改為「全部事件 / 活躍事件」範圍切換，選活躍事件時面積圖與來源條形圖同步剔除已歸檔件數，切回全部事件即復原。；上游交易量 TOP10 標題右側加口徑說明圖標，滑鼠懸浮顯示「僅統計活躍事件」，鍵盤聚焦同樣可觸發，窄屏氣泡改左對齊避免溢出視口。</div></div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.4.1</span>'+
+      '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+
+      '<div style="color:var(--text-help);font-size:11px;margin-bottom:6px">2026-11-09 · 內容變更</div>'+
       '側欄 NEW 微標由 11px 恢復 9px（V1.4.0 字號收口時被誤推至 11px）；字號紀律補「裝飾性微標」條目：純裝飾標記不參與七檔收斂，固定 9px。事件歸檔列表「編號」改為「事件 ID」，並補分類、數據來源、截止時間三列（10 列）。分類對標事件分類樹，一級與二級同格顯示；歸檔頁補分類（按一級分組）與數據來源兩項篩選，並修復 arSetAf / arResetAf / arPage 三個函數缺失導致的篩選與翻頁失效。</div></div>'+
       '<div style="display:flex;gap:12px;margin-bottom:14px"><span class="vnum" style="align-self:flex-start">V1.4.0</span>'+
       '<div style="flex:1;color:var(--text-sub);font-size:12px;line-height:1.85">'+

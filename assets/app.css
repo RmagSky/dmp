@@ -214,10 +214,11 @@ td.name{color:var(--text);font-weight:500}
 .pager select{height:28px;border:1px solid var(--border);border-radius:var(--r-md);padding:0 4px;background:#fff;font-size:var(--fs-tag)}
 .pager .jump{display:flex;align-items:center;gap:6px}
 .pager .jump input{width:44px;height:28px;border:1px solid var(--border);border-radius:var(--r-md);text-align:center;font-size:var(--fs-tag)}
-.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);background:#fff;border-radius:var(--r-xl);box-shadow:var(--shadow);overflow:hidden}
-.stat{padding:18px 20px;display:flex;align-items:center;gap:12px;position:relative}
+.stat-grid{display:grid;grid-template-columns:repeat(7,1fr);background:#fff;border-radius:var(--r-xl);box-shadow:var(--shadow);overflow:hidden}
+/* 7 項指標卡單行排布：卡片橫向收緊（內距 12px、圖標 26px），24px 數值仍守住字號檔位 */
+.stat{padding:18px 12px;display:flex;align-items:center;gap:8px;position:relative}
 .stat + .stat::before{content:'';position:absolute;left:0;top:18%;height:64%;width:2px;background:var(--line-soft)}
-.stat-ico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.stat-ico{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
 .stat-main{min-width:0}
 .stat-label{color:var(--text-help);font-size:var(--fs-help);margin-bottom:6px;white-space:nowrap}
 .stat-value{font-size:var(--fs-stat);font-weight:600;letter-spacing:0;line-height:1.15;white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -240,6 +241,12 @@ td.name{color:var(--text);font-weight:500}
 .panel-title{font-size:var(--fs-block);font-weight:600;display:flex;align-items:center;gap:8px}
 .panel-title .arrow{width:0;height:0;border-left:6px solid var(--primary);border-top:4px solid transparent;border-bottom:4px solid transparent}
 .panel-head .right{margin-left:auto;display:flex;align-items:center;gap:8px}
+/* 面板標題說明圖標：hover / 鍵盤聚焦時浮出氣泡，純 CSS 不依賴腳本 */
+.panel-tip{position:relative;display:inline-flex;align-items:center;color:var(--text-disabled);cursor:help;flex:0 0 auto;transition:color var(--motion)}
+.panel-tip:hover,.panel-tip:focus{color:var(--primary);outline:none}
+.panel-tip .tip-bubble{position:absolute;right:-4px;top:calc(100% + 9px);z-index:6;width:210px;padding:8px 10px;border-radius:var(--r-md);background:#1d2129;color:#fff;font-size:var(--fs-tag);font-weight:400;line-height:1.7;text-align:left;white-space:normal;box-shadow:0 6px 18px rgba(16,24,40,.16);opacity:0;visibility:hidden;transform:translateY(-4px);transition:opacity var(--motion),transform var(--motion),visibility var(--motion);pointer-events:none}
+.panel-tip .tip-bubble::before{content:'';position:absolute;right:12px;top:-4px;width:8px;height:8px;background:#1d2129;transform:rotate(45deg)}
+.panel-tip:hover .tip-bubble,.panel-tip:focus .tip-bubble{opacity:1;visibility:visible;transform:none}
 .seg{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;height:28px}
 .seg button{padding:0 12px;font-size:var(--fs-tag);color:var(--text-sub);background:#fff;transition:var(--motion-ui)}
 .seg button + button{border-left:1px solid var(--border)}
@@ -500,8 +507,6 @@ tr.cat-parent:hover > td{background:var(--bg-soft)}
 
 /* ============ 響應式 ============ */
 @media (max-width:1440px){
-  .stat-grid{grid-template-columns:repeat(3,1fr)}
-  .stat:nth-child(4)::before{display:none}
   .ver-cards{grid-template-columns:repeat(3,1fr)}
 }
 @media (max-width:1240px){
@@ -520,7 +525,9 @@ tr.cat-parent:hover > td{background:var(--bg-soft)}
 }
 @media (max-width:980px){
   .stat-grid{grid-template-columns:repeat(2,1fr)}
-  .stat:nth-child(3)::before{display:none}
+  /* 7 項折成 2 列時末卡跨兩欄，避免最後一行只剩一張 */
+  .stat:last-child{grid-column:span 2}
+  .stat:nth-child(3)::before,.stat:nth-child(5)::before,.stat:nth-child(7)::before{display:none}
   .calc-grid{grid-template-columns:1fr}
   .state-grid{grid-template-columns:1fr}
   .login{grid-template-columns:1fr}
@@ -554,7 +561,11 @@ tr.cat-parent:hover > td{background:var(--bg-soft)}
   .ver-cards{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:640px){
+  /* 窄屏氣泡改左對齊，避免右對齊時左端溢出視口 */
+  .panel-tip .tip-bubble{right:auto;left:-4px}
+  .panel-tip .tip-bubble::before{right:auto;left:12px}
   .stat-grid{grid-template-columns:1fr}
+  .stat:last-child{grid-column:auto}
   .stat::before{display:none !important}
   .f-item{flex:1 1 100%}
   .f-input,.f-select{min-width:0;flex:1}
